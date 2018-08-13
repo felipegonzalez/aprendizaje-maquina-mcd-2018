@@ -289,7 +289,7 @@ decir predicción de variables numéricas.
 
 ¿Cómo entendemos el problema de predicción?
 
-### Proceso generador de datos (modelo teórico)
+### Proceso generador de datos (modelo teórico) {-}
 
 Para entender lo que estamos intentando hacer, pensaremos en términos
 de **modelos probabilísticos que generan los datos**. La idea es que
@@ -440,7 +440,7 @@ En aprendizaje buscamos que estos errores sean lo más cercano a cero que
 sea posible.
 ```
 
-## Cuantificación de error o precisión
+## Tarea de aprendizaje supervisado {#aprendizaje}
 
 El elemento faltante para definir la tarea de aprendizaje supervisado es 
 cuantificar qué significa aproximar *bien* a $f$, o tener predicciones precisas. Para
@@ -470,7 +470,6 @@ el modelo aditivo $Y=f(X)+\epsilon$, el mejor predictor
 de $Y$ es $f(x)= E[Y|X=x]$. Es decir: lo que nos interesa es aproximar
 lo mejor que se pueda la esperanza condicional
 
-## Tarea de aprendizaje supervisado {#aprendizaje}
 
 Ahora tenemos los elementos para definir con precisión el problema
 de aprendizaje supervisado. 
@@ -506,4 +505,277 @@ $$\hat{Err} =   \frac{1}{m}\sum_{j=1}^m (y_0^{(j)} - \hat{f}(x_0^{(j)}))^2$$
 
 que es una estimación del error de predicción 
 $$Err = E (Y - \hat{f}(X))^2 $$
+
+Adicionalmente, definimos otra cantidad de menor interés,
+el **error de entrenamiento**, como 
+
+$$\overline{err} = \frac{1}{N}\sum_{i=1}^N (y^{(i)} - \hat{f}(x^{(i)}))^2.$$
+
+El punto más importante que discutiremos ahora es el siguiente:
+
+- Nótese que el error de entrenamiento se calcula sobre la muestra ${\mathcal L}$
+que se usó
+para construir $\hat{f}$, mientras que el error de prueba se calcula usando
+una muestra independiente ${\mathcal T}$.
+- $\hat{Err}$ es una estimación razonable de el error de predicción $Err$ 
+(por ejemplo, $\hat{Err} \to Err$ cuando el tamaño de la muestra de prueba
+crece), pero $\overline{err}$ típicamente es una estimación mala del error de
+predicción.
+
+#### Ejemplo {-}
+
+En el ejemplo que hemos estado usando, ¿que curva preferirías para
+predecir, la gris, la roja o la azul? ¿Cuál tiene menor error de entrenamiento?
+
+```{r, fig.width=5, fig.asp=0.7}
+set.seed(280572)
+error <- rnorm(length(x), 0, 500)
+y <- f(x) + error
+datos_entrena <- data.frame(x=x, y=y)
+head(datos_entrena)
+curva_1 <- geom_smooth(data=datos_entrena,
+  method = "loess", se=FALSE, color="gray", span=1, size=1.1)
+curva_2 <- geom_smooth(data=datos_entrena,
+  method = "loess", se=FALSE, color="red", span=0.3, size=1.1)
+curva_3 <- geom_smooth(data=datos_entrena,
+  method = "lm", se=FALSE, color="blue", size=1.1)
+```
+
+```{r, fig.width=5, fig.asp=0.7, warning = FALSE}
+ggplot(datos_entrena, aes(x=x, y=y)) + geom_point() + 
+    curva_1 + curva_2 + curva_3
+```
+
+
+Calculamos los errores de entrenamiento de cada curva:
+
+```{r, warning = FALSE}
+mod_rojo <- loess(y ~ x, data = datos_entrena, span=0.3)
+mod_gris <- loess(y ~ x, data = datos_entrena, span=1)
+mod_recta <- lm(y ~ x, data = datos_entrena)
+df_mods <- data_frame(nombre = c('recta', 'rojo','gris'))
+df_mods$modelo <- list(mod_recta, mod_rojo, mod_gris)
+```
+
+```{r}
+error_f <- function(df){
+  function(mod){
+    preds <- predict(mod, newdata = df)
+    round(sqrt(mean((preds - df$y) ^ 2)))
+  }
+}
+error_ent <- error_f(datos_entrena)
+
+df_mods <- df_mods %>% 
+  mutate(error_entrena = map_dbl(modelo, error_ent))
+df_mods
+```
+
+El error de entrenamiento es considerablemente menor para la curva
+roja, y es más grande para la recta.
+
+Sin embargo, consideremos que tenemos una nueva muestra (de prueba).
+
+```{r, fig.width=5, fig.asp=0.7}
+set.seed(218052272)
+x_0 <- sample(0:13, 100, replace = T)
+error <- rnorm(length(x_0), 0, 500)
+y_0 <- f(x_0) + error
+datos_prueba <- data_frame(x = x_0, y = y_0)
+datos_prueba
+```
+
+```{r}
+error_p <- error_f(datos_prueba)
+df_mods <- df_mods %>% 
+  mutate(error_prueba = map_dbl(modelo, error_p))
+df_mods
+```
+
+
+**Observaciones**
+
+- El "mejor"" modelo en entrenamiento es uno que *sobreajusta* a los datos, pero es
+el peor con una muestra de prueba. La curva roja aprende de la componente
+de ruido del modelo - lo cual realmente no es aprendizaje.
+
+- El modelo de la recta no es bueno en entrenamiento ni en prueba. Este modelo
+no tiene la capacidad para aprender de la señal en los datos.
+
+- El mejor modelo en la muestra de prueba es uno que está entre la recta y
+la curva roja en términos de flexibilidad. 
+
+- Nuestra intuición para escoger el modelo gris desde el principio se refleja
+en que *generaliza* mejor que los otros, y eso a su vez se refleja en
+un error de prueba más bajo.
+
+
+## Balance de complejidad y rigidez {#error}
+
+Como vimos en el ejemplo de arriba, el error de entrenamiento no es
+un buen indicador del desempeño futuro de nuestras predicciones. Para evaluar
+este desempeño, necesitamos una muestra de prueba independiente de la
+muestra que usamos para aprender o para entrenar el modelo.
+
+Intuitivamente esto tiene sentido: en el proceso de aprendizaje tenemos
+disponibles las etiquetas (sabemos las respuestas), de modo que puede suceder
+que el algoritmo **memorice** la asociación de qué etiquetas $y^{(i)}$ van con cada
+conjunto de entradas $x^{(i)}$. Esto se dice de varias maneras, por ejemplo:
+
+- El modelo *sobreajusta* a los datos: esto quiere decir que por ajustar aspectos
+de los datos de entrenamiento demasiado fuertemente, el algoritmo parece replicar
+de cerca los datos de entrenamiento pero se desempeña mal en la predicción.
+
+- El modelo *aprende del ruido*: nuestro proceso de aprendizaje captura aspectos
+irrelevantes de los datos, que nuevos datos no van a compartir.
+
+- El modelo *no tiene capacidad de generalización*, porque captura aspectos
+que solo están presentes en nuestra muestra de entrenamiento.
+
+- El modelo *tiene varianza alta*, porque cambia mucho dependiendo de la muestra 
+de entrenamiento.
+
+- El modelo es *demasiado complejo o flexible* y fácilmente se adapta a cualquier
+conjunto de datos, tanto señal como ruido
+
+En el ejemplo de arriba, también vimos que algunos modelos pueden tener desempeño
+malo porque no tienen la capacidad de aprender de patrones reales y generales
+en los datos (la recta en el ejemplo anterior). Podemos decir esto de varias maneras:
+
+- El modelo *subajusta* a los datos: no tienen la capacidad de ajustar
+aspectos de los datos de entrenamiento que son relaciones reales entre las
+variables. 
+
+- El modelo *ignora señal en los datos*: el algoritmo no captura aspectos relevantes de los
+datos, que comparten con nuevos datos y pueden utilizarse para hacer predicciones.
+
+- El modelo *no tiene capacidad de aprendizaje*, pues no puede capturar
+aspectos que son generales para el fenómeno de interés.
+
+- El modelo tiene *sesgo alto*, porque no puede ajustar patrones generalizables
+en los datos.
+
+- El modelo es *demasiado rígido*, y no puede adaptarse ni siquiera a patrones
+fuertes y claros en los datos.
+
+Logramos buenas predicciones cuando refinamos nuestros modelos o algoritmos
+para lograr *aprender de la señal* e 
+*ignorar el ruido, que no ayuda en la predicción*, y lograr reducir el
+error de predicción lo más posible con los datos disponibles. Esto requiere
+buscar el nivel adecuado de complejidad en los modelos o algoritmos para los
+datos que tenemos.
+
+```{block, type='comentario'}
+Para construir buenos predictores, requerimos que:
+
+- El algoritmo tenga la **flexibilidad** necesaria para capturar patrones generales y
+fuertes en los datos
+- El algoritmo tenga la **rigidez** necesaria para tener robustez a patrones de ruido
+o particularidades no repetibles de nuestra muestra de entrenamiento.
+- Saber intuitivamente cuál es el grado adecuado de complejidad para un problema
+dado es difícil. Para decidirlo, evaluamos el desempeño de nuestros métodos
+usando una **muestra de prueba**. El nivel adecuado de complejidad se traduce
+en menos errores de predicción.
+```
+
+#### Discusión (error de entrenamiento y prueba)
+
+En términos teóricos, podemos ver cuál es el problema de intentar evaluar el
+error de predicción utilizando la muestra de entrenamiento. 
+
+En primer lugar consideremos evaluar el error de predicción para
+un ejemplo $$(y_0- \hat{f}(x_0))^2$$
+
+donde $(x_0, y_0)$ es independiente de la muestra de entrenamiento. En este
+caso, la $\hat{f}$ está fija, y el valor esperado (error de predicción) nos
+da el error de predicción.
+
+Sin embargo, si $(x,y)$ es un caso de entrenamiento, el valor esperado
+de 
+$$(y- \hat{f}(x))^2$$
+requiere un cálculo más complicado, pues ¡ $\hat{f}$ también depende de $(x,y)$,
+pues se construye con la muestra de entrenamiento !
+Esta cantidad podría ser igual a cero para cualquier $(x,y)$ 
+(si nuestro algoritmo "interpola" como el en la curva roja del ejemplo anterior),
+y no necesariamente tiene qué ver con el error de predicción.
+
+- En general, el error de entrenamiento es una cantidad secundaria, que 
+utilizaremos más como medida de diagnóstico de nuestro proceso de ajuste. La
+cantidad que realmente queremos hacer chica es el error de predicción, que evaluamos
+con una muestra de prueba independiente de la muestra de entrenamiento.
+- Para modelos muy simples, el error de entrenamiento puedes ser similar al de prueba. Sin
+embargo, conforme aumentamos complejidad (necesario para capturar patrones reales
+en los datos), estos dos errores típicamente divergen.
+
+## ¿Cómo estimar f? 
+
+Ahora mostramos otro aspecto característico del aprendizaje supervisado. En primer
+lugar, el método general más usual para encontrar $\hat{f}$ es hacer lo siguiente:
+
+- Consideramos una familia de funciones $h$ candidatas para aproximar $f$
+- Calculamos el error de entrenamiento de cada posible $h$, y encontramos
+la $h$ que minimiza el error de entrenamiento (la que más se ajusta a los datos
+de entrenamiento). Tomamos $\hat{f} = h$.
+$$\hat{f} = \min_h \frac{1}{N}\sum_{i=1}^N (y^{(i)} - h(x^{(i)}))^2.$$
+- Evaluar el error de predicción del modelo que seleccionamos (queremos que sea bajo):
+
+$$\hat{Err} =   \frac{1}{m}\sum_{j=1}^m (y_0^{(j)} - \hat{f}(x_0^{(j)}))^2$$
+
+De modo que el proceso es un problema de minimización. Lo que hace
+interesante nuestro caso es que realmente **no queremos minimizar el error de entrenamiento**. Queremos **minimizar el error de prueba**. O sea que minimizamos una cantidad
+que realmente no nos interesa (error de entrenamiento) con la esperanza de minimizar 
+la cantidad
+que nos interesa (error de predicción).
+
+Como es de esperarse, este esquema simple no funciona muy bien en general.
+Para que la solución anterior sea razonable o buena, entonces:
+
+- Tenemos que ser cuidadosos y poder regular la elección de la familia inicial de funciones
+(rectas? curvas muy flexibles? etc.), y/o
+- A veces tenemos que modificar el objetivo del problema de minimización para 
+que nos obligue encontrar un balance adecuado de complejidad y error de 
+predicción bajo. Por ejemplo, penalizar el objetivo 
+de modelos que son poco creíbles o demasiado complicados.
+- Perturbar la muestra de entrenamiento de distintas maneras para evitar que
+un algoritmo aprenda información irrelevante
+
+La mayor parte del curso se concentra en considerar qué familias podemos
+utilizar, qué modificaciones de la función objetivo pueden hacerse,
+y qué perturbaciones pueden considerarse mejorar el desempeño predictivo de
+nuestros modelos.
+
+
+## Resumen
+
+- Aprendizaje de máquina: algoritmos que aprenden de los datos para predecir cantidades
+numéricas, o clasificar (aprendizaje supervisado), o para encontrar estructura en los
+datos (aprendizaje no supervisado).
+
+- En aprendizaje supervisado, el esquema general es: 
+  - Un algoritmo aprende de una
+muestra de entrenamiento ${\mathcal L}$, que es generada por el proceso generador de datos que nos interesa. Eso quiere decir que produce una función $\hat{f}$ (a partir de ${\mathcal L}$) que nos sirve para hacer predicciones $x \to \hat{f}(x)$ de $y$
+  - El error de predicción del algoritmo es $Err$, que mide en promedio qué tan lejos están las predicciones de valores reales.
+  - Para estimar esta cantidad usamos una muestra de prueba ${\mathcal T}$, que
+  es independiente de ${\mathcal L}$.
+  - Esta es porque nos interesa el desempeño futuro de $\hat{f}$ para nuevos casos
+  que el algoritmo no ha visto (esto es aprender).
+  
+- El error en la muestra de entrenamiento no necesariamente es buen indicador
+del desempeño futuro de nuestro algoritmo.
+
+- Para obtener las mejores predicciones posibles, es necesario que el algoritmo
+sea capaz de capturar patrones en los datos, pero no tanto que tienda a absorber ruido
+en la estimación - es un balance de complejidad y rigidez. En términos estadísticos,
+se trata de un balance de varianza y sesgo.
+
+
+## Tarea
+
+En el ejemplo simple que vimos en la sección \@ref(aprendizaje), utilizamos
+una sola muestra de entrenamiento para evaluar el algoritmo. ¿Será posible
+que escogimos una muestra atípica?
+- Corre el ejemplo con otra muestra y reporta tus resultados de error de entrenamiento y error de prueba para los tres métodos.
+- Opcional (difícil): evalúa los tres métodos comparando estos valores para
+un número grande de distintas simulaciones de los datos de entrenamiento.
+
 

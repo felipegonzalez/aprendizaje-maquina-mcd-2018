@@ -879,6 +879,24 @@ la curva roja en términos de flexibilidad.
 en que *generaliza* mejor que los otros, y eso a su vez se refleja en
 un error de prueba más bajo.
 
+- ¿De dónde
+provienen los errores en la predicción? ¿Podemos hacer el error igual a cero?
+Si establemos que el error es una función
+creciente de $Y-\hat{Y}$, vemos que
+$$ Y-\hat{Y} = f(X) + \epsilon - \hat{f}(X)= (f(X) - \hat{f}(X)) + \epsilon,$$
+donde vemos que hay dos componentes que pueden hacer grande a $Y-\hat{Y}$:
+    - La diferencia $f(X) - \hat{f}(X)$ está asociada a **error reducible**, pues
+depende de qué tan bien estimemos $f(X)$ con $\hat{f}(X)$
+    - El error aleatorio $\epsilon$, asociado a  **error irreducible**.
+
+- Cualquiera de estas dos cantidades pueden hacer que nuestras predicciones no sean
+precisas. No podemos hacer mucho acerca del error irreducible (sin cambiar las variables
+que usamos, la definición del problema, etc.) En nuestro ejemplo anterior, el error reducible:
+    - Es grande para el modelo rojo, pues responde demasiado fuerte a ruido en los datos (tiene varianza alta).
+    - Es grande para el modelo de la recta, pues no tiene capacidad para acercarse a
+la verdadera curva (está sesgado).
+
+
 
 ## Balance de complejidad y rigidez {#error}
 
@@ -1010,7 +1028,6 @@ utilizar, qué modificaciones de la función objetivo pueden hacerse,
 y qué perturbaciones pueden considerarse mejorar el desempeño predictivo de
 nuestros modelos.
 
-
 ## Resumen
 
 - Aprendizaje de máquina: algoritmos que aprenden de los datos para predecir cantidades
@@ -1040,6 +1057,7 @@ se trata de un balance de varianza y sesgo.
 En el ejemplo simple que vimos en la sección \@ref(aprendizaje), utilizamos
 una sola muestra de entrenamiento para evaluar el algoritmo. ¿Será posible
 que escogimos una muestra atípica?
+
 - Corre el ejemplo con otra muestra y reporta tus resultados de error de entrenamiento y error de prueba para los tres métodos.
 - Opcional (difícil): evalúa los tres métodos comparando estos valores para
 un número grande de distintas simulaciones de los datos de entrenamiento.

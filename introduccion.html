@@ -866,6 +866,25 @@ la curva roja en términos de flexibilidad.</p></li>
 <li><p>Nuestra intuición para escoger el modelo gris desde el principio se refleja
 en que <em>generaliza</em> mejor que los otros, y eso a su vez se refleja en
 un error de prueba más bajo.</p></li>
+<li>¿De dónde
+provienen los errores en la predicción? ¿Podemos hacer el error igual a cero?
+Si establemos que el error es una función
+creciente de <span class="math inline">\(Y-\hat{Y}\)</span>, vemos que
+<span class="math display">\[ Y-\hat{Y} = f(X) + \epsilon - \hat{f}(X)= (f(X) - \hat{f}(X)) + \epsilon,\]</span>
+donde vemos que hay dos componentes que pueden hacer grande a <span class="math inline">\(Y-\hat{Y}\)</span>:
+<ul>
+<li>La diferencia <span class="math inline">\(f(X) - \hat{f}(X)\)</span> está asociada a <strong>error reducible</strong>, pues
+depende de qué tan bien estimemos <span class="math inline">\(f(X)\)</span> con <span class="math inline">\(\hat{f}(X)\)</span></li>
+<li>El error aleatorio <span class="math inline">\(\epsilon\)</span>, asociado a <strong>error irreducible</strong>.</li>
+</ul></li>
+<li>Cualquiera de estas dos cantidades pueden hacer que nuestras predicciones no sean
+precisas. No podemos hacer mucho acerca del error irreducible (sin cambiar las variables
+que usamos, la definición del problema, etc.) En nuestro ejemplo anterior, el error reducible:
+<ul>
+<li>Es grande para el modelo rojo, pues responde demasiado fuerte a ruido en los datos (tiene varianza alta).</li>
+<li>Es grande para el modelo de la recta, pues no tiene capacidad para acercarse a
+la verdadera curva (está sesgado).</li>
+</ul></li>
 </ul>
 </div>
 </div>
@@ -1021,10 +1040,12 @@ se trata de un balance de varianza y sesgo.</p></li>
 <h2><span class="header-section-number">1.8</span> Tarea</h2>
 <p>En el ejemplo simple que vimos en la sección <a href="introduccion.html#aprendizaje">1.4</a>, utilizamos
 una sola muestra de entrenamiento para evaluar el algoritmo. ¿Será posible
-que escogimos una muestra atípica?
-- Corre el ejemplo con otra muestra y reporta tus resultados de error de entrenamiento y error de prueba para los tres métodos.
-- Opcional (difícil): evalúa los tres métodos comparando estos valores para
-un número grande de distintas simulaciones de los datos de entrenamiento.</p>
+que escogimos una muestra atípica?</p>
+<ul>
+<li>Corre el ejemplo con otra muestra y reporta tus resultados de error de entrenamiento y error de prueba para los tres métodos.</li>
+<li>Opcional (difícil): evalúa los tres métodos comparando estos valores para
+un número grande de distintas simulaciones de los datos de entrenamiento.</li>
+</ul>
 
 <div id="refs" class="references">
 <div>

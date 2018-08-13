@@ -31,9 +31,9 @@ description: "Notas y material para el curso de aprendizaje de máquina (ITAM)"
 
 ### Evaluación {-}
 
-- Tareas semanales (20%)
+- Tareas semanales (25%)
 - Examen parcial (30% práctico, 20% teórico)
-- Un examen final (30% práctico)
+- Un examen final (25% práctico)
 
 ### Software: R y Rstudio {-}
 

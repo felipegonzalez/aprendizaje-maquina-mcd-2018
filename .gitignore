@@ -40,3 +40,4 @@ _book/
 *.rds
 *_files/
 *.md
+.Rproj.user

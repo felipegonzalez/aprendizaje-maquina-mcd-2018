@@ -1,9 +1,10 @@
 # Introducción {#introduccion}
 
 
-
-
 ## ¿Qué es aprendizaje de máquina (machine learning)? 
+
+
+
 
 Métodos **computacionales** para **aprender de datos**  con el fin
 de producir reglas para 

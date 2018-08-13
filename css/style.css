@@ -16,7 +16,7 @@ pre code {
 .comentario {
   padding: 1em 1em 1em 4em;
   margin-bottom: 10px;
-  background: #f5f5f5;
+  background: #F0E7E7;
   position:relative;
 }
 
@@ -26,5 +26,5 @@ pre code {
     left:10px;
     position:absolute;
     top:0px;
-    font-size: 45px;
+    font-size: 30px;
  }

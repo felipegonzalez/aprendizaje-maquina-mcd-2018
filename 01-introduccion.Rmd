@@ -1,13 +1,14 @@
 # Introducción {#introduccion}
 
+
+## ¿Qué es aprendizaje de máquina (machine learning)? 
+
+
 ```{r, include = FALSE}
 library(ggplot2)
 theme_set(theme_minimal())
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 ```
-
-
-## ¿Qué es aprendizaje de máquina (machine learning)? 
 
 Métodos **computacionales** para **aprender de datos**  con el fin
 de producir reglas para 

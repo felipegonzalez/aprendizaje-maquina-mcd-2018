@@ -142,11 +142,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="1" data-path="introduccion.html"><a href="introduccion.html"><i class="fa fa-check"></i><b>1</b> Introducción</a><ul>
 <li class="chapter" data-level="1.1" data-path="introduccion.html"><a href="introduccion.html#que-es-aprendizaje-de-maquina-machine-learning"><i class="fa fa-check"></i><b>1.1</b> ¿Qué es aprendizaje de máquina (machine learning)?</a></li>
 <li class="chapter" data-level="1.2" data-path="introduccion.html"><a href="introduccion.html#aprendizaje-supervisado-1"><i class="fa fa-check"></i><b>1.2</b> Aprendizaje Supervisado</a><ul>
-<li class="chapter" data-level="1.2.1" data-path="introduccion.html"><a href="introduccion.html#proceso-generador-de-datos-modelo-teorico"><i class="fa fa-check"></i><b>1.2.1</b> Proceso generador de datos (modelo teórico)</a></li>
+<li class="chapter" data-level="" data-path="introduccion.html"><a href="introduccion.html#proceso-generador-de-datos-modelo-teorico"><i class="fa fa-check"></i>Proceso generador de datos (modelo teórico)</a></li>
 </ul></li>
 <li class="chapter" data-level="1.3" data-path="introduccion.html"><a href="introduccion.html#predicciones"><i class="fa fa-check"></i><b>1.3</b> Predicciones</a></li>
-<li class="chapter" data-level="1.4" data-path="introduccion.html"><a href="introduccion.html#cuantificacion-de-error-o-precision"><i class="fa fa-check"></i><b>1.4</b> Cuantificación de error o precisión</a></li>
-<li class="chapter" data-level="1.5" data-path="introduccion.html"><a href="introduccion.html#aprendizaje"><i class="fa fa-check"></i><b>1.5</b> Tarea de aprendizaje supervisado</a></li>
+<li class="chapter" data-level="1.4" data-path="introduccion.html"><a href="introduccion.html#aprendizaje"><i class="fa fa-check"></i><b>1.4</b> Tarea de aprendizaje supervisado</a></li>
+<li class="chapter" data-level="1.5" data-path="introduccion.html"><a href="introduccion.html#error"><i class="fa fa-check"></i><b>1.5</b> Balance de complejidad y rigidez</a></li>
+<li class="chapter" data-level="1.6" data-path="introduccion.html"><a href="introduccion.html#como-estimar-f"><i class="fa fa-check"></i><b>1.6</b> ¿Cómo estimar f?</a></li>
+<li class="chapter" data-level="1.7" data-path="introduccion.html"><a href="introduccion.html#resumen"><i class="fa fa-check"></i><b>1.7</b> Resumen</a></li>
+<li class="chapter" data-level="1.8" data-path="introduccion.html"><a href="introduccion.html#tarea"><i class="fa fa-check"></i><b>1.8</b> Tarea</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>
@@ -589,8 +592,8 @@ autos<span class="op">$</span>nombre &lt;-<span class="st"> </span>Auto<span cla
 <p>Por el momento nos concentramos en problemas supervisados de regresión, es
 decir predicción de variables numéricas.</p>
 <p>¿Cómo entendemos el problema de predicción?</p>
-<div id="proceso-generador-de-datos-modelo-teorico" class="section level3">
-<h3><span class="header-section-number">1.2.1</span> Proceso generador de datos (modelo teórico)</h3>
+<div id="proceso-generador-de-datos-modelo-teorico" class="section level3 unnumbered">
+<h3>Proceso generador de datos (modelo teórico)</h3>
 <p>Para entender lo que estamos intentando hacer, pensaremos en términos
 de <strong>modelos probabilísticos que generan los datos</strong>. La idea es que
 estos representan los procesos que generan los datos o las observaciones.</p>
@@ -708,8 +711,8 @@ En aprendizaje buscamos que estos errores sean lo más cercano a cero que sea po
 </p>
 </div>
 </div>
-<div id="cuantificacion-de-error-o-precision" class="section level2">
-<h2><span class="header-section-number">1.4</span> Cuantificación de error o precisión</h2>
+<div id="aprendizaje" class="section level2">
+<h2><span class="header-section-number">1.4</span> Tarea de aprendizaje supervisado</h2>
 <p>El elemento faltante para definir la tarea de aprendizaje supervisado es
 cuantificar qué significa aproximar <em>bien</em> a <span class="math inline">\(f\)</span>, o tener predicciones precisas. Para
 esto definimos una <strong>función de pérdida</strong>:</p>
@@ -733,9 +736,6 @@ el modelo aditivo <span class="math inline">\(Y=f(X)+\epsilon\)</span>, el mejor
 de <span class="math inline">\(Y\)</span> es <span class="math inline">\(f(x)= E[Y|X=x]\)</span>. Es decir: lo que nos interesa es aproximar
 lo mejor que se pueda la esperanza condicional</li>
 </ul>
-</div>
-<div id="aprendizaje" class="section level2">
-<h2><span class="header-section-number">1.5</span> Tarea de aprendizaje supervisado</h2>
 <p>Ahora tenemos los elementos para definir con precisión el problema
 de aprendizaje supervisado.</p>
 <p>Consideramos un proceso generador de datos <span class="math inline">\((X,Y)\)</span>.</p>
@@ -759,6 +759,272 @@ ejemplo <span class="math inline">\((x_0^{(j)},y_0^{(j)})\)</span> está dado po
 <p><span class="math display">\[\hat{Err} =   \frac{1}{m}\sum_{j=1}^m (y_0^{(j)} - \hat{f}(x_0^{(j)}))^2\]</span></p>
 <p>que es una estimación del error de predicción
 <span class="math display">\[Err = E (Y - \hat{f}(X))^2 \]</span></p>
+<p>Adicionalmente, definimos otra cantidad de menor interés,
+el <strong>error de entrenamiento</strong>, como</p>
+<p><span class="math display">\[\overline{err} = \frac{1}{N}\sum_{i=1}^N (y^{(i)} - \hat{f}(x^{(i)}))^2.\]</span></p>
+<p>El punto más importante que discutiremos ahora es el siguiente:</p>
+<ul>
+<li>Nótese que el error de entrenamiento se calcula sobre la muestra <span class="math inline">\({\mathcal L}\)</span>
+que se usó
+para construir <span class="math inline">\(\hat{f}\)</span>, mientras que el error de prueba se calcula usando
+una muestra independiente <span class="math inline">\({\mathcal T}\)</span>.</li>
+<li><span class="math inline">\(\hat{Err}\)</span> es una estimación razonable de el error de predicción <span class="math inline">\(Err\)</span>
+(por ejemplo, <span class="math inline">\(\hat{Err} \to Err\)</span> cuando el tamaño de la muestra de prueba
+crece), pero <span class="math inline">\(\overline{err}\)</span> típicamente es una estimación mala del error de
+predicción.</li>
+</ul>
+<div id="ejemplo-1" class="section level4 unnumbered">
+<h4>Ejemplo</h4>
+<p>En el ejemplo que hemos estado usando, ¿que curva preferirías para
+predecir, la gris, la roja o la azul? ¿Cuál tiene menor error de entrenamiento?</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">280572</span>)
+error &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="kw">length</span>(x), <span class="dv">0</span>, <span class="dv">500</span>)
+y &lt;-<span class="st"> </span><span class="kw">f</span>(x) <span class="op">+</span><span class="st"> </span>error
+datos_entrena &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)
+<span class="kw">head</span>(datos_entrena)</code></pre>
+<pre><code>##    x          y
+## 1  1   86.22033
+## 2  7 2353.75863
+## 3 10 3078.71029
+## 4  0 -397.80229
+## 5  0  424.73363
+## 6  5 3075.92998</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">curva_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">data=</span>datos_entrena,
+  <span class="dt">method =</span> <span class="st">&quot;loess&quot;</span>, <span class="dt">se=</span><span class="ot">FALSE</span>, <span class="dt">color=</span><span class="st">&quot;gray&quot;</span>, <span class="dt">span=</span><span class="dv">1</span>, <span class="dt">size=</span><span class="fl">1.1</span>)
+curva_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">data=</span>datos_entrena,
+  <span class="dt">method =</span> <span class="st">&quot;loess&quot;</span>, <span class="dt">se=</span><span class="ot">FALSE</span>, <span class="dt">color=</span><span class="st">&quot;red&quot;</span>, <span class="dt">span=</span><span class="fl">0.3</span>, <span class="dt">size=</span><span class="fl">1.1</span>)
+curva_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">data=</span>datos_entrena,
+  <span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se=</span><span class="ot">FALSE</span>, <span class="dt">color=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">size=</span><span class="fl">1.1</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(datos_entrena, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span>curva_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>curva_<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>curva_<span class="dv">3</span></code></pre>
+<p><img src="01-introduccion_files/figure-html/unnamed-chunk-25-1.png" width="480" /></p>
+<p>Calculamos los errores de entrenamiento de cada curva:</p>
+<pre class="sourceCode r"><code class="sourceCode r">mod_rojo &lt;-<span class="st"> </span><span class="kw">loess</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data =</span> datos_entrena, <span class="dt">span=</span><span class="fl">0.3</span>)
+mod_gris &lt;-<span class="st"> </span><span class="kw">loess</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data =</span> datos_entrena, <span class="dt">span=</span><span class="dv">1</span>)
+mod_recta &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data =</span> datos_entrena)
+df_mods &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">nombre =</span> <span class="kw">c</span>(<span class="st">&#39;recta&#39;</span>, <span class="st">&#39;rojo&#39;</span>,<span class="st">&#39;gris&#39;</span>))
+df_mods<span class="op">$</span>modelo &lt;-<span class="st"> </span><span class="kw">list</span>(mod_recta, mod_rojo, mod_gris)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">error_f &lt;-<span class="st"> </span><span class="cf">function</span>(df){
+  <span class="cf">function</span>(mod){
+    preds &lt;-<span class="st"> </span><span class="kw">predict</span>(mod, <span class="dt">newdata =</span> df)
+    <span class="kw">round</span>(<span class="kw">sqrt</span>(<span class="kw">mean</span>((preds <span class="op">-</span><span class="st"> </span>df<span class="op">$</span>y) <span class="op">^</span><span class="st"> </span><span class="dv">2</span>)))
+  }
+}
+error_ent &lt;-<span class="st"> </span><span class="kw">error_f</span>(datos_entrena)
+
+df_mods &lt;-<span class="st"> </span>df_mods <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">error_entrena =</span> <span class="kw">map_dbl</span>(modelo, error_ent))
+df_mods</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##   nombre modelo      error_entrena
+##   &lt;chr&gt;  &lt;list&gt;              &lt;dbl&gt;
+## 1 recta  &lt;S3: lm&gt;              782
+## 2 rojo   &lt;S3: loess&gt;           189
+## 3 gris   &lt;S3: loess&gt;           389</code></pre>
+<p>El error de entrenamiento es considerablemente menor para la curva
+roja, y es más grande para la recta.</p>
+<p>Sin embargo, consideremos que tenemos una nueva muestra (de prueba).</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">218052272</span>)
+x_<span class="dv">0</span> &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">0</span><span class="op">:</span><span class="dv">13</span>, <span class="dv">100</span>, <span class="dt">replace =</span> T)
+error &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="kw">length</span>(x_<span class="dv">0</span>), <span class="dv">0</span>, <span class="dv">500</span>)
+y_<span class="dv">0</span> &lt;-<span class="st"> </span><span class="kw">f</span>(x_<span class="dv">0</span>) <span class="op">+</span><span class="st"> </span>error
+datos_prueba &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">x =</span> x_<span class="dv">0</span>, <span class="dt">y =</span> y_<span class="dv">0</span>)
+datos_prueba</code></pre>
+<pre><code>## # A tibble: 100 x 2
+##        x      y
+##    &lt;int&gt;  &lt;dbl&gt;
+##  1     9  2156.
+##  2    11  3227.
+##  3     3  2382.
+##  4    10  3482.
+##  5     7  2733.
+##  6     7  2326.
+##  7    12  3464.
+##  8     0  -564.
+##  9    10  3296.
+## 10     0   366.
+## # ... with 90 more rows</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">error_p &lt;-<span class="st"> </span><span class="kw">error_f</span>(datos_prueba)
+df_mods &lt;-<span class="st"> </span>df_mods <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">error_prueba =</span> <span class="kw">map_dbl</span>(modelo, error_p))
+df_mods</code></pre>
+<pre><code>## # A tibble: 3 x 4
+##   nombre modelo      error_entrena error_prueba
+##   &lt;chr&gt;  &lt;list&gt;              &lt;dbl&gt;        &lt;dbl&gt;
+## 1 recta  &lt;S3: lm&gt;              782          801
+## 2 rojo   &lt;S3: loess&gt;           189          628
+## 3 gris   &lt;S3: loess&gt;           389          520</code></pre>
+<p><strong>Observaciones</strong></p>
+<ul>
+<li><p>El “mejor”&quot; modelo en entrenamiento es uno que <em>sobreajusta</em> a los datos, pero es
+el peor con una muestra de prueba. La curva roja aprende de la componente
+de ruido del modelo - lo cual realmente no es aprendizaje.</p></li>
+<li><p>El modelo de la recta no es bueno en entrenamiento ni en prueba. Este modelo
+no tiene la capacidad para aprender de la señal en los datos.</p></li>
+<li><p>El mejor modelo en la muestra de prueba es uno que está entre la recta y
+la curva roja en términos de flexibilidad.</p></li>
+<li><p>Nuestra intuición para escoger el modelo gris desde el principio se refleja
+en que <em>generaliza</em> mejor que los otros, y eso a su vez se refleja en
+un error de prueba más bajo.</p></li>
+</ul>
+</div>
+</div>
+<div id="error" class="section level2">
+<h2><span class="header-section-number">1.5</span> Balance de complejidad y rigidez</h2>
+<p>Como vimos en el ejemplo de arriba, el error de entrenamiento no es
+un buen indicador del desempeño futuro de nuestras predicciones. Para evaluar
+este desempeño, necesitamos una muestra de prueba independiente de la
+muestra que usamos para aprender o para entrenar el modelo.</p>
+<p>Intuitivamente esto tiene sentido: en el proceso de aprendizaje tenemos
+disponibles las etiquetas (sabemos las respuestas), de modo que puede suceder
+que el algoritmo <strong>memorice</strong> la asociación de qué etiquetas <span class="math inline">\(y^{(i)}\)</span> van con cada
+conjunto de entradas <span class="math inline">\(x^{(i)}\)</span>. Esto se dice de varias maneras, por ejemplo:</p>
+<ul>
+<li><p>El modelo <em>sobreajusta</em> a los datos: esto quiere decir que por ajustar aspectos
+de los datos de entrenamiento demasiado fuertemente, el algoritmo parece replicar
+de cerca los datos de entrenamiento pero se desempeña mal en la predicción.</p></li>
+<li><p>El modelo <em>aprende del ruido</em>: nuestro proceso de aprendizaje captura aspectos
+irrelevantes de los datos, que nuevos datos no van a compartir.</p></li>
+<li><p>El modelo <em>no tiene capacidad de generalización</em>, porque captura aspectos
+que solo están presentes en nuestra muestra de entrenamiento.</p></li>
+<li><p>El modelo <em>tiene varianza alta</em>, porque cambia mucho dependiendo de la muestra
+de entrenamiento.</p></li>
+<li><p>El modelo es <em>demasiado complejo o flexible</em> y fácilmente se adapta a cualquier
+conjunto de datos, tanto señal como ruido</p></li>
+</ul>
+<p>En el ejemplo de arriba, también vimos que algunos modelos pueden tener desempeño
+malo porque no tienen la capacidad de aprender de patrones reales y generales
+en los datos (la recta en el ejemplo anterior). Podemos decir esto de varias maneras:</p>
+<ul>
+<li><p>El modelo <em>subajusta</em> a los datos: no tienen la capacidad de ajustar
+aspectos de los datos de entrenamiento que son relaciones reales entre las
+variables.</p></li>
+<li><p>El modelo <em>ignora señal en los datos</em>: el algoritmo no captura aspectos relevantes de los
+datos, que comparten con nuevos datos y pueden utilizarse para hacer predicciones.</p></li>
+<li><p>El modelo <em>no tiene capacidad de aprendizaje</em>, pues no puede capturar
+aspectos que son generales para el fenómeno de interés.</p></li>
+<li><p>El modelo tiene <em>sesgo alto</em>, porque no puede ajustar patrones generalizables
+en los datos.</p></li>
+<li><p>El modelo es <em>demasiado rígido</em>, y no puede adaptarse ni siquiera a patrones
+fuertes y claros en los datos.</p></li>
+</ul>
+<p>Logramos buenas predicciones cuando refinamos nuestros modelos o algoritmos
+para lograr <em>aprender de la señal</em> e
+<em>ignorar el ruido, que no ayuda en la predicción</em>, y lograr reducir el
+error de predicción lo más posible con los datos disponibles. Esto requiere
+buscar el nivel adecuado de complejidad en los modelos o algoritmos para los
+datos que tenemos.</p>
+<div class="comentario">
+<p>
+Para construir buenos predictores, requerimos que:
+</p>
+<ul>
+<li>
+El algoritmo tenga la <strong>flexibilidad</strong> necesaria para capturar patrones generales y fuertes en los datos
+</li>
+<li>
+El algoritmo tenga la <strong>rigidez</strong> necesaria para tener robustez a patrones de ruido o particularidades no repetibles de nuestra muestra de entrenamiento.
+</li>
+<li>
+Saber intuitivamente cuál es el grado adecuado de complejidad para un problema dado es difícil. Para decidirlo, evaluamos el desempeño de nuestros métodos usando una <strong>muestra de prueba</strong>. El nivel adecuado de complejidad se traduce en menos errores de predicción.
+</li>
+</ul>
+</div>
+<div id="discusion-error-de-entrenamiento-y-prueba" class="section level4">
+<h4><span class="header-section-number">1.5.0.1</span> Discusión (error de entrenamiento y prueba)</h4>
+<p>En términos teóricos, podemos ver cuál es el problema de intentar evaluar el
+error de predicción utilizando la muestra de entrenamiento.</p>
+<p>En primer lugar consideremos evaluar el error de predicción para
+un ejemplo <span class="math display">\[(y_0- \hat{f}(x_0))^2\]</span></p>
+<p>donde <span class="math inline">\((x_0, y_0)\)</span> es independiente de la muestra de entrenamiento. En este
+caso, la <span class="math inline">\(\hat{f}\)</span> está fija, y el valor esperado (error de predicción) nos
+da el error de predicción.</p>
+<p>Sin embargo, si <span class="math inline">\((x,y)\)</span> es un caso de entrenamiento, el valor esperado
+de
+<span class="math display">\[(y- \hat{f}(x))^2\]</span>
+requiere un cálculo más complicado, pues ¡ <span class="math inline">\(\hat{f}\)</span> también depende de <span class="math inline">\((x,y)\)</span>,
+pues se construye con la muestra de entrenamiento !
+Esta cantidad podría ser igual a cero para cualquier <span class="math inline">\((x,y)\)</span>
+(si nuestro algoritmo “interpola” como el en la curva roja del ejemplo anterior),
+y no necesariamente tiene qué ver con el error de predicción.</p>
+<ul>
+<li>En general, el error de entrenamiento es una cantidad secundaria, que
+utilizaremos más como medida de diagnóstico de nuestro proceso de ajuste. La
+cantidad que realmente queremos hacer chica es el error de predicción, que evaluamos
+con una muestra de prueba independiente de la muestra de entrenamiento.</li>
+<li>Para modelos muy simples, el error de entrenamiento puedes ser similar al de prueba. Sin
+embargo, conforme aumentamos complejidad (necesario para capturar patrones reales
+en los datos), estos dos errores típicamente divergen.</li>
+</ul>
+</div>
+</div>
+<div id="como-estimar-f" class="section level2">
+<h2><span class="header-section-number">1.6</span> ¿Cómo estimar f?</h2>
+<p>Ahora mostramos otro aspecto característico del aprendizaje supervisado. En primer
+lugar, el método general más usual para encontrar <span class="math inline">\(\hat{f}\)</span> es hacer lo siguiente:</p>
+<ul>
+<li>Consideramos una familia de funciones <span class="math inline">\(h\)</span> candidatas para aproximar <span class="math inline">\(f\)</span></li>
+<li>Calculamos el error de entrenamiento de cada posible <span class="math inline">\(h\)</span>, y encontramos
+la <span class="math inline">\(h\)</span> que minimiza el error de entrenamiento (la que más se ajusta a los datos
+de entrenamiento). Tomamos <span class="math inline">\(\hat{f} = h\)</span>.
+<span class="math display">\[\hat{f} = \min_h \frac{1}{N}\sum_{i=1}^N (y^{(i)} - h(x^{(i)}))^2.\]</span></li>
+<li>Evaluar el error de predicción del modelo que seleccionamos (queremos que sea bajo):</li>
+</ul>
+<p><span class="math display">\[\hat{Err} =   \frac{1}{m}\sum_{j=1}^m (y_0^{(j)} - \hat{f}(x_0^{(j)}))^2\]</span></p>
+<p>De modo que el proceso es un problema de minimización. Lo que hace
+interesante nuestro caso es que realmente <strong>no queremos minimizar el error de entrenamiento</strong>. Queremos <strong>minimizar el error de prueba</strong>. O sea que minimizamos una cantidad
+que realmente no nos interesa (error de entrenamiento) con la esperanza de minimizar
+la cantidad
+que nos interesa (error de predicción).</p>
+<p>Como es de esperarse, este esquema simple no funciona muy bien en general.
+Para que la solución anterior sea razonable o buena, entonces:</p>
+<ul>
+<li>Tenemos que ser cuidadosos y poder regular la elección de la familia inicial de funciones
+(rectas? curvas muy flexibles? etc.), y/o</li>
+<li>A veces tenemos que modificar el objetivo del problema de minimización para
+que nos obligue encontrar un balance adecuado de complejidad y error de
+predicción bajo. Por ejemplo, penalizar el objetivo
+de modelos que son poco creíbles o demasiado complicados.</li>
+<li>Perturbar la muestra de entrenamiento de distintas maneras para evitar que
+un algoritmo aprenda información irrelevante</li>
+</ul>
+<p>La mayor parte del curso se concentra en considerar qué familias podemos
+utilizar, qué modificaciones de la función objetivo pueden hacerse,
+y qué perturbaciones pueden considerarse mejorar el desempeño predictivo de
+nuestros modelos.</p>
+</div>
+<div id="resumen" class="section level2">
+<h2><span class="header-section-number">1.7</span> Resumen</h2>
+<ul>
+<li><p>Aprendizaje de máquina: algoritmos que aprenden de los datos para predecir cantidades
+numéricas, o clasificar (aprendizaje supervisado), o para encontrar estructura en los
+datos (aprendizaje no supervisado).</p></li>
+<li>En aprendizaje supervisado, el esquema general es:
+<ul>
+<li>Un algoritmo aprende de una
+muestra de entrenamiento <span class="math inline">\({\mathcal L}\)</span>, que es generada por el proceso generador de datos que nos interesa. Eso quiere decir que produce una función <span class="math inline">\(\hat{f}\)</span> (a partir de <span class="math inline">\({\mathcal L}\)</span>) que nos sirve para hacer predicciones <span class="math inline">\(x \to \hat{f}(x)\)</span> de <span class="math inline">\(y\)</span></li>
+<li>El error de predicción del algoritmo es <span class="math inline">\(Err\)</span>, que mide en promedio qué tan lejos están las predicciones de valores reales.</li>
+<li>Para estimar esta cantidad usamos una muestra de prueba <span class="math inline">\({\mathcal T}\)</span>, que
+es independiente de <span class="math inline">\({\mathcal L}\)</span>.</li>
+<li>Esta es porque nos interesa el desempeño futuro de <span class="math inline">\(\hat{f}\)</span> para nuevos casos
+que el algoritmo no ha visto (esto es aprender).</li>
+</ul></li>
+<li><p>El error en la muestra de entrenamiento no necesariamente es buen indicador
+del desempeño futuro de nuestro algoritmo.</p></li>
+<li><p>Para obtener las mejores predicciones posibles, es necesario que el algoritmo
+sea capaz de capturar patrones en los datos, pero no tanto que tienda a absorber ruido
+en la estimación - es un balance de complejidad y rigidez. En términos estadísticos,
+se trata de un balance de varianza y sesgo.</p></li>
+</ul>
+</div>
+<div id="tarea" class="section level2">
+<h2><span class="header-section-number">1.8</span> Tarea</h2>
+<p>En el ejemplo simple que vimos en la sección <a href="introduccion.html#aprendizaje">1.4</a>, utilizamos
+una sola muestra de entrenamiento para evaluar el algoritmo. ¿Será posible
+que escogimos una muestra atípica?
+- Corre el ejemplo con otra muestra y reporta tus resultados de error de entrenamiento y error de prueba para los tres métodos.
+- Opcional (difícil): evalúa los tres métodos comparando estos valores para
+un número grande de distintas simulaciones de los datos de entrenamiento.</p>
 
 <div id="refs" class="references">
 <div>

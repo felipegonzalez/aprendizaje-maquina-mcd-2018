@@ -165,9 +165,10 @@ head(dat_ingreso) %>%
 
 
 ```r
-ggplot(dat_ingreso, aes(x=INGTOT)) +  
+ggplot(dat_ingreso, aes(x=INGTOT/1000)) +  
   geom_histogram(bins = 100) + 
-  scale_x_log10()
+  scale_x_log10(breaks = c(2.5, 5, 10, 20, 40, 80, 160, 320, 640, 1280)) +
+    xlab("Ingreso trimestral (miles de pesos)")
 ```
 
 <img src="01-introduccion_files/figure-html/unnamed-chunk-5-1.png" width="480" />
@@ -178,9 +179,10 @@ de focos en la vivienda:
 
 
 ```r
-ggplot(dat_ingreso, aes(x = FOCOS, y = INGTOT)) + 
+ggplot(dat_ingreso, aes(x = FOCOS, y = INGTOT/1000)) + 
   geom_point() +
-  scale_y_log10() + xlim(c(0,50))
+  scale_y_log10(breaks = c(2.5, 5, 10, 20, 40, 80, 160, 320, 640, 1280)) +
+    ylab("Ingreso trimestral (miles de pesos)") + xlim(c(0,50))
 ```
 
 <img src="01-introduccion_files/figure-html/unnamed-chunk-6-1.png" width="480" />
@@ -188,9 +190,10 @@ ggplot(dat_ingreso, aes(x = FOCOS, y = INGTOT)) +
 O el tamaño de la localidad:
 
 ```r
-ggplot(dat_ingreso, aes(x = tamaño_localidad, y = INGTOT)) + 
+ggplot(dat_ingreso, aes(x = tamaño_localidad, y = INGTOT/1000)) + 
   geom_boxplot() +
-  scale_y_log10() 
+  scale_y_log10(breaks = c(2.5, 5, 10, 20, 40, 80, 160, 320, 640, 1280)) +
+    ylab("Ingreso trimestral (miles de pesos)")
 ```
 
 <img src="01-introduccion_files/figure-html/unnamed-chunk-7-1.png" width="480" />
@@ -765,7 +768,7 @@ head(datos_entrena)
 curva_1 <- geom_smooth(data=datos_entrena,
   method = "loess", se=FALSE, color="gray", span=1, size=1.1)
 curva_2 <- geom_smooth(data=datos_entrena,
-  method = "loess", se=FALSE, color="red", span=0.3, size=1.1)
+  method = "loess", se=FALSE, color="red", span=0.5, size=1.1)
 curva_3 <- geom_smooth(data=datos_entrena,
   method = "lm", se=FALSE, color="blue", size=1.1)
 ```
@@ -792,7 +795,7 @@ df_mods$modelo <- list(mod_recta, mod_rojo, mod_gris)
 
 
 ```r
-error_f <- function(df){
+error_f <- function(df, mod){
   function(mod){
     preds <- predict(mod, newdata = df)
     round(sqrt(mean((preds - df$y) ^ 2)))

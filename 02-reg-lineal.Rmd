@@ -741,7 +741,7 @@ antes de poder tener interpretaciones causales sólidas.
 
 En el siguiente ejercicio intentamos predecir el porcentaje de grasa corporal 
 (una medición relativamente cara) usando mediciones de varias partes del cuerpo,
-edad, peso y estatura. Ver script *bodyfat_ejercicio.R*
+edad, peso y estatura. Ver script *ejercicios/bodyfat_ejercicio.R*
 
 ```{r, warning = FALSE, message = FALSE}
 library(tidyr)
@@ -782,7 +782,7 @@ y parecería que debería haber métodos más avanzados que lo superen fácilmen
 
 Para empezar, es poco creíble que el modelo
 $$f(X) = b_0 + b_1X_1 + \cdots b_p X_p$$
-se cumple exactamente para el fenómeno que estamos tratando. Pero regresión lineal muchas veces supera a métodos s que intentan
+se cumple exactamente para el fenómeno que estamos tratando. Pero regresión lineal muchas veces supera a métodos que intentan
 construir predictores más complejos. 
 Una de las primeras razones es que podemos ver la aproximación lineal como una aproximación de primer orden a la verdadera $f(X)$, y muchas veces eso es suficiente para producir predicciones razonables.
 

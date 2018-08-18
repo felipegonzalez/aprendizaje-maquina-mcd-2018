@@ -459,7 +459,7 @@ delta <- 0.001
 Y ahora iteramos para obtener
 
 ```{r}
-iteraciones <- descenso(30, c(0,0), 0.005, grad)
+iteraciones <- descenso(30, c(0,0), 0.005, grad_prostata)
 iteraciones
 ```
 

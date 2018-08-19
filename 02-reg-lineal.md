@@ -836,18 +836,18 @@ ggplot(dat_x) +
 <p>En cuanto a la forma funcional del predictor <span class="math inline">\(f\)</span>, el problema con entradas normalizadas es equivalente al de las entradas no normalizadas. Asegúrate de esto escribiendo cómo correponden los coeficientes de cada modelo normalizado con los coeficientes del modelo no normalizado.</p>
 </div>
 
-Supongamos que el modelo en las variables originales (ajustado) es
+Supongamos que el modelo en las variables originales  es
 $${f}_\beta (X) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p,$$
 Consideramos el modelo con variables estandarizadas
 $${g}_\beta (X) = \beta_0^s + \beta_1^s Z_1 + \beta_2^s Z_2 + \cdots + \beta_p^s Z_p,$$
 
 Sustituyendo $Z_j = (X_j - \mu_j)/s_j,$ 
 
-$${g}_\beta (X) = (\beta_0^s - \sum_{j=1}^p \mu_j/s_j) + \frac{\beta_1^s}{s_j} X_1 + \frac{\beta_2^s}{s_2} X_2 + \cdots + \frac{\beta_p^s}{s_p} X_p,$$
+$${g}_{\beta^s} (X) = (\beta_0^s - \sum_{j=1}^p \mu_j/s_j) + \frac{\beta_1^s}{s_j} X_1 + \frac{\beta_2^s}{s_2} X_2 + \cdots + \frac{\beta_p^s}{s_p} X_p,$$
 Y vemos que tiene la misma forma funcional de $f_\beta(X)$. Si la solución de mínimos cuadrados es única,
-entonces una vez que ajustemos tenemos que tener $\hat{f}_\beta(X) = \hat{g}_\beta (X)$,
+entonces una vez que ajustemos tenemos que tener $\hat{f}_\beta(X) = \hat{g}_{\beta^s} (X)$,
 lo que implica que
-$$\hat{beta}_0 = \hat{\beta}_0 -  \sum_{j=1}^p \mu_j/s_j)$$ y
+$$\hat{\beta}_0 = \hat{\beta}_0^s -  \sum_{j=1}^p \mu_j/s_j)$$ y
 $$\hat{\beta}_j = \hat{\beta}_j^s/s_j.$$
 
 Nótese que para pasar del problema estandarizado al no estandarizado simplemente
@@ -1300,6 +1300,23 @@ con una función lineal:
 
 ```r
 fun_cubica <- function(x) 0.5 * (1 + x[1])^3
+```
+
+Y queremos predecir para $x=(0,0,\ldots,0)$, cuyo valor exacto es
+
+
+```r
+fun_cubica(0)
+```
+
+```
+## [1] 0.5
+```
+
+Repetimos el proceso: simulamos las entradas, y aplicamos un vecino más cercano:
+
+
+```r
 set.seed(821)
 sims_1 <- lapply(1:40, function(i) runif(1000, -0.5, 0.5) )
 dat <- data.frame(Reduce(cbind, sims_1))
@@ -1313,7 +1330,8 @@ dat$y[mas_cercano_indice]
 ## [1] 0.09842398
 ```
 
-Este no es un resultado muy bueno. Sin embargo,
+Este no es un resultado muy bueno. Sin embargo, regresión se
+desempeña considerablemente mejor:
 
 
 ```r
@@ -1329,7 +1347,7 @@ predict(mod_lineal, newdata = origen)
 ```
 
 Donde podemos ver que típicamente la predicción de regresión
-es mucho mejor que la de 1 vecino más cercano. Esto es porque el modelo **explota la estructura aproximadamente lineal del problema.** Nota: corre este ejemplo varias veces con semilla diferente.
+es mucho mejor que la de 1 vecino más cercano. Esto es porque el modelo **explota la estructura aproximadamente lineal del problema** (¿cuál estructura lineal? haz algunas gráficas). Nota: corre este ejemplo varias veces con semilla diferente.
 
 Lo que sucede más específicamente es que en regresión lineal
 utilizamos **todos** los datos para hacer nuestra estimación en cada

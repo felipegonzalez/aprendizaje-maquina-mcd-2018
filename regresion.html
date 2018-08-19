@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-08-18">
+<meta name="date" content="2018-08-19">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -478,19 +478,18 @@ z</code></pre>
 ## [14,] 1.247364
 ## [15,] 1.246025</code></pre>
 <p>Y vemos que estamos cerca de la convergencia.</p>
-<pre class="sourceCode r"><code class="sourceCode r">dat_iteraciones &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">iteracion =</span> <span class="kw">as.integer</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(z)), 
+<pre class="sourceCode r"><code class="sourceCode r">dat_iteraciones &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">iteracion =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(z), 
                               <span class="dt">x =</span> z[, <span class="dv">1</span>], <span class="dt">y =</span> <span class="kw">h</span>(z[, <span class="dv">1</span>]))
 graf_descenso &lt;-<span class="st"> </span><span class="kw">ggplot</span>(dat_iteraciones, <span class="kw">aes</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)) <span class="op">+</span>
 <span class="st">    </span><span class="kw">stat_function</span>(<span class="dt">fun =</span> h) <span class="op">+</span>
 <span class="st">    </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="dv">4</span>, <span class="dt">color =</span> <span class="st">&quot;red&quot;</span>) <span class="op">+</span>
 <span class="st">    </span><span class="kw">xlim</span>(<span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>, <span class="dv">5</span>)) </code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="cf">if</span>(<span class="ot">FALSE</span>){
-    <span class="kw">library</span>(gganimate)
-    graf_descenso <span class="op">+</span><span class="st"> </span>
+   <span class="kw">library</span>(gganimate)
+   graf_descenso <span class="op">+</span><span class="st"> </span>
 <span class="st">        </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;Iteración: {frame_time}&#39;</span>) <span class="op">+</span>
 <span class="st">        </span><span class="kw">transition_time</span>(iteracion)
-    magick<span class="op">::</span><span class="kw">image_write</span>(<span class="kw">animate</span>(graf_descenso), <span class="dt">path=</span><span class="st">&quot;figuras/descenso_1.gif&quot;</span>, )
-    <span class="co">#anim_save()</span>
+    <span class="kw">anim_save</span>(<span class="dt">filename =</span> <span class="st">&quot;figuras/descenso_1.gif&quot;</span>)
 }
 knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&quot;figuras/descenso_1.gif&quot;</span>)</code></pre>
 <p><img src="figuras/descenso_1.gif" /><!-- --></p>
@@ -577,32 +576,21 @@ gr_contour <span class="op">+</span>
 <p>Y aplicamos descenso en gradiente:</p>
 <pre class="sourceCode r"><code class="sourceCode r">inicial &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">1</span>)
 iteraciones &lt;-<span class="st"> </span><span class="kw">descenso</span>(<span class="dv">20</span>, inicial , <span class="fl">0.1</span>, h_grad)
-iteraciones</code></pre>
-<pre><code>##            [,1]      [,2]
-##  [1,] 3.0000000 1.0000000
-##  [2,] 2.5000000 1.1000000
-##  [3,] 2.1100000 1.1300000
-##  [4,] 1.8010000 1.1150000
-##  [5,] 1.5523000 1.0721000
-##  [6,] 1.3490500 1.0129100
-##  [7,] 1.1805310 0.9452330
-##  [8,] 1.0389481 0.8742395
-##  [9,] 0.9185824 0.8032864
-## [10,] 0.8151946 0.7344874
-## [11,] 0.7256044 0.6691094
-## [12,] 0.6473945 0.6078479
-## [13,] 0.5787004 0.5510178
-## [14,] 0.5180621 0.4986843
-## [15,] 0.4643181 0.4507536
-## [16,] 0.4165298 0.4070347
-## [17,] 0.3739273 0.3672807
-## [18,] 0.3358699 0.3312173
-## [19,] 0.3018177 0.2985609
-## [20,] 0.2713102 0.2690305</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"> <span class="kw">ggplot</span>(<span class="dt">data=</span> grid_graf) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_contour</span>(<span class="dt">binwidth =</span> <span class="fl">1.5</span>, <span class="kw">aes</span>(<span class="dt">x =</span> z_<span class="dv">1</span>, <span class="dt">y =</span> z_<span class="dv">2</span>, <span class="dt">z =</span> val, <span class="dt">colour =</span> ..level..)) <span class="op">+</span><span class="st"> </span>
-<span class="st">   </span><span class="kw">geom_point</span>(<span class="dt">data =</span> <span class="kw">data.frame</span>(iteraciones), <span class="kw">aes</span>(<span class="dt">x=</span>X1, <span class="dt">y=</span>X2), <span class="dt">colour =</span> <span class="st">&#39;red&#39;</span>)</code></pre>
-<p><img src="02-reg-lineal_files/figure-html/unnamed-chunk-22-1.png" width="384" /></p>
+df_iteraciones &lt;-<span class="st"> </span><span class="kw">data.frame</span>(iteraciones) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">iteracion =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(iteraciones))
+graf_descenso_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> df_iteraciones) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_contour</span>(<span class="dt">data=</span> grid_graf, <span class="dt">binwidth =</span> <span class="fl">1.5</span>, 
+    <span class="kw">aes</span>(<span class="dt">x =</span> z_<span class="dv">1</span>, <span class="dt">y =</span> z_<span class="dv">2</span>, <span class="dt">z =</span> val, <span class="dt">colour =</span> ..level..)) <span class="op">+</span><span class="st"> </span>
+<span class="st">   </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x=</span>X1, <span class="dt">y=</span>X2), <span class="dt">colour =</span> <span class="st">&#39;red&#39;</span>)
+<span class="cf">if</span>(<span class="ot">FALSE</span>){
+    <span class="kw">library</span>(gganimate)
+    graf_descenso_<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>
+<span class="st">        </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;Iteración: {frame_time}&#39;</span>) <span class="op">+</span>
+<span class="st">        </span><span class="kw">transition_time</span>(iteracion)
+    <span class="kw">anim_save</span>(<span class="dt">filename =</span> <span class="st">&quot;figuras/descenso_2.gif&quot;</span>)
+}
+knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&quot;figuras/descenso_2.gif&quot;</span>)</code></pre>
+<p><img src="figuras/descenso_2.gif" /><!-- --></p>
 </div>
 </div>
 <div id="descenso-en-gradiente-para-regresion-lineal" class="section level2">
@@ -769,7 +757,7 @@ iteraciones &lt;-<span class="st"> </span><span class="kw">descenso</span>(<span
 <p><img src="02-reg-lineal_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
 <p>Si incrementamos el tamaño de paso observamos también convergencia lenta. En este
 caso particular, subir más el tamaño de paso produce divergencia:</p>
-<pre class="sourceCode r"><code class="sourceCode r">iteraciones &lt;-<span class="st"> </span><span class="kw">descenso</span>(<span class="dv">10</span>, <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">-0.25</span>, <span class="fl">-0.75</span>), <span class="fl">0.0008</span>, grad_sin_norm)
+<pre class="sourceCode r"><code class="sourceCode r">iteraciones &lt;-<span class="st"> </span><span class="kw">descenso</span>(<span class="dv">10</span>, <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">-0.25</span>, <span class="fl">-0.75</span>), <span class="fl">0.0007</span>, grad_sin_norm)
 <span class="kw">ggplot</span>(dat_x) <span class="op">+</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">geom_contour</span>(<span class="kw">aes</span>(<span class="dt">x =</span> beta1, <span class="dt">y =</span> beta2, <span class="dt">z =</span> rss_<span class="dv">1</span>), <span class="dt">binwidth =</span> <span class="fl">0.5</span>) <span class="op">+</span>
 <span class="st">    </span><span class="kw">coord_equal</span>() <span class="op">+</span>

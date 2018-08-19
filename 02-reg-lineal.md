@@ -355,7 +355,7 @@ Y vemos que estamos cerca de la convergencia.
 
 
 ```r
-dat_iteraciones <- data_frame(iteracion = as.integer(1:nrow(z)), 
+dat_iteraciones <- data_frame(iteracion = 1:nrow(z), 
                               x = z[, 1], y = h(z[, 1]))
 graf_descenso <- ggplot(dat_iteraciones, aes(x = x, y = y)) +
     stat_function(fun = h) +
@@ -366,12 +366,11 @@ graf_descenso <- ggplot(dat_iteraciones, aes(x = x, y = y)) +
 
 ```r
 if(FALSE){
-    library(gganimate)
-    graf_descenso + 
+   library(gganimate)
+   graf_descenso + 
         labs(title = 'Iteración: {frame_time}') +
         transition_time(iteracion)
-    magick::image_write(animate(graf_descenso), path="figuras/descenso_1.gif", )
-    #anim_save()
+    anim_save(filename = "figuras/descenso_1.gif")
 }
 knitr::include_graphics("figuras/descenso_1.gif")
 ```
@@ -492,43 +491,27 @@ gr_contour +
 Y aplicamos descenso en gradiente:
 
 
+
 ```r
 inicial <- c(3, 1)
 iteraciones <- descenso(20, inicial , 0.1, h_grad)
-iteraciones
+df_iteraciones <- data.frame(iteraciones) %>%
+    mutate(iteracion = 1:nrow(iteraciones))
+graf_descenso_2 <- ggplot(data = df_iteraciones) + 
+  geom_contour(data= grid_graf, binwidth = 1.5, 
+    aes(x = z_1, y = z_2, z = val, colour = ..level..)) + 
+   geom_point(aes(x=X1, y=X2), colour = 'red')
+if(FALSE){
+    library(gganimate)
+    graf_descenso_2 + 
+        labs(title = 'Iteración: {frame_time}') +
+        transition_time(iteracion)
+    anim_save(filename = "figuras/descenso_2.gif")
+}
+knitr::include_graphics("figuras/descenso_2.gif")
 ```
 
-```
-##            [,1]      [,2]
-##  [1,] 3.0000000 1.0000000
-##  [2,] 2.5000000 1.1000000
-##  [3,] 2.1100000 1.1300000
-##  [4,] 1.8010000 1.1150000
-##  [5,] 1.5523000 1.0721000
-##  [6,] 1.3490500 1.0129100
-##  [7,] 1.1805310 0.9452330
-##  [8,] 1.0389481 0.8742395
-##  [9,] 0.9185824 0.8032864
-## [10,] 0.8151946 0.7344874
-## [11,] 0.7256044 0.6691094
-## [12,] 0.6473945 0.6078479
-## [13,] 0.5787004 0.5510178
-## [14,] 0.5180621 0.4986843
-## [15,] 0.4643181 0.4507536
-## [16,] 0.4165298 0.4070347
-## [17,] 0.3739273 0.3672807
-## [18,] 0.3358699 0.3312173
-## [19,] 0.3018177 0.2985609
-## [20,] 0.2713102 0.2690305
-```
-
-```r
- ggplot(data= grid_graf) + 
-  geom_contour(binwidth = 1.5, aes(x = z_1, y = z_2, z = val, colour = ..level..)) + 
-   geom_point(data = data.frame(iteraciones), aes(x=X1, y=X2), colour = 'red')
-```
-
-<img src="02-reg-lineal_files/figure-html/unnamed-chunk-22-1.png" width="384" />
+![](figuras/descenso_2.gif)<!-- -->
 
 
 ## Descenso en gradiente para regresión lineal
@@ -788,7 +771,7 @@ caso particular, subir más el tamaño de paso produce divergencia:
 
 
 ```r
-iteraciones <- descenso(10, c(0, -0.25, -0.75), 0.0008, grad_sin_norm)
+iteraciones <- descenso(10, c(0, -0.25, -0.75), 0.0007, grad_sin_norm)
 ggplot(dat_x) + 
     geom_contour(aes(x = beta1, y = beta2, z = rss_1), binwidth = 0.5) +
     coord_equal() +

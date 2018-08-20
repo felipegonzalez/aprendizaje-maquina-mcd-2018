@@ -248,7 +248,7 @@ descenso <- function(n, z_0, eta, h_deriv){
   }
   z
 }
-z <- descenso(15, 5, 0.1, h_deriv)
+z <- descenso(15, 5, eta, h_deriv)
 z
 ```
 
@@ -387,7 +387,7 @@ $$RSS(\beta) = \frac{1}{2}\sum_{i=1}^N (y^{(i)} - f_\beta(x^{(i)}))^2$$
 La derivada de la suma es la suma de las derivadas, así nos concentramos
 en derivar uno de los términos
 
-$$  \frac{1}{2}(y^{(i)} - f_\beta(x^{(i)}))^2 $$
+$$  u^{(i)}=\frac{1}{2}(y^{(i)} - f_\beta(x^{(i)}))^2 $$
 Usamos la regla de la cadena para obtener
 $$ \frac{1}{2}\frac{\partial}{\partial \beta_j} (y^{(i)} - f_\beta(x^{(i)}))^2 =
 -(y^{(i)} - f_\beta(x^{(i)})) \frac{\partial f_\beta(x^{(i)})}{\partial \beta_j}$$
@@ -402,12 +402,13 @@ y  si $j=1,2,\ldots, p$ entonces
 
 $$\frac{\partial f_\beta(x^{(i)})}{\partial \beta_j} = x_j^{(i)}$$
 
-Entonces:
+Entonces, si ponemos $  u^{(i)}=\frac{1}{2}(y^{(i)} - f_\beta(x^{(i)}))^2 $:
 
-$$\frac{\partial f_\beta(x^{(i)})}{\partial \beta_0} = -(y^{(i)} - f_\beta(x^{(i)}))$$
+
+$$\frac{\partial u^{(i)}}{\partial \beta_0} = -(y^{(i)} - f_\beta(x^{(i)}))$$
 y 
 
-$$\frac{\partial f_\beta(x^{(i)})}{\partial \beta_j} = - x_j^{(i)}(y^{(i)} - f_\beta(x^{(i)}))$$
+$$\frac{\partial u^{(i)}}{\partial \beta_j} = - x_j^{(i)}(y^{(i)} - f_\beta(x^{(i)}))$$
 
 
 Y sumando todos los términos (uno para cada caso de entrenamiento):
@@ -469,7 +470,7 @@ delta <- 0.001
 Y ahora iteramos para obtener
 
 ```{r}
-iteraciones <- descenso(30, c(0,0), 0.005, grad_prostata)
+iteraciones <- descenso(100, c(0,0), 0.005, grad_prostata)
 iteraciones
 ```
 
@@ -478,7 +479,12 @@ Y checamos que efectivamente el error total de entrenamiento decrece
 apply(iteraciones, 1, rss_prostata)
 ```
 
+Verificamos el gradiente, que si convergió al mínimo debe ser muy
+cercano a 0:
 
+```{r}
+grad_prostata(iteraciones[100, ])
+```
 
 
 #### Notación y forma matricial {-}

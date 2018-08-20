@@ -328,27 +328,27 @@ descenso <- function(n, z_0, eta, h_deriv){
   }
   z
 }
-z <- descenso(15, 5, 0.1, h_deriv)
+z <- descenso(15, 5, eta, h_deriv)
 z
 ```
 
 ```
-##           [,1]
-##  [1,] 5.000000
-##  [2,] 3.438462
-##  [3,] 2.516706
-##  [4,] 1.978657
-##  [5,] 1.667708
-##  [6,] 1.488834
-##  [7,] 1.385872
-##  [8,] 1.326425
-##  [9,] 1.291993
-## [10,] 1.272002
-## [11,] 1.260375
-## [12,] 1.253606
-## [13,] 1.249663
-## [14,] 1.247364
-## [15,] 1.246025
+##             [,1]
+##  [1,]  5.0000000
+##  [2,] -1.2461538
+##  [3,]  1.9571861
+##  [4,]  0.7498212
+##  [5,]  1.5340816
+##  [6,]  1.0455267
+##  [7,]  1.3722879
+##  [8,]  1.1573987
+##  [9,]  1.3013251
+## [10,]  1.2057209
+## [11,]  1.2696685
+## [12,]  1.2270627
+## [13,]  1.2555319
+## [14,]  1.2365431
+## [15,]  1.2492245
 ```
 
 Y vemos que estamos cerca de la convergencia.
@@ -526,7 +526,7 @@ $$RSS(\beta) = \frac{1}{2}\sum_{i=1}^N (y^{(i)} - f_\beta(x^{(i)}))^2$$
 La derivada de la suma es la suma de las derivadas, así nos concentramos
 en derivar uno de los términos
 
-$$  \frac{1}{2}(y^{(i)} - f_\beta(x^{(i)}))^2 $$
+$$  u^{(i)}=\frac{1}{2}(y^{(i)} - f_\beta(x^{(i)}))^2 $$
 Usamos la regla de la cadena para obtener
 $$ \frac{1}{2}\frac{\partial}{\partial \beta_j} (y^{(i)} - f_\beta(x^{(i)}))^2 =
 -(y^{(i)} - f_\beta(x^{(i)})) \frac{\partial f_\beta(x^{(i)})}{\partial \beta_j}$$
@@ -541,12 +541,13 @@ y  si $j=1,2,\ldots, p$ entonces
 
 $$\frac{\partial f_\beta(x^{(i)})}{\partial \beta_j} = x_j^{(i)}$$
 
-Entonces:
+Entonces, si ponemos $  u^{(i)}=\frac{1}{2}(y^{(i)} - f_\beta(x^{(i)}))^2 $:
 
-$$\frac{\partial f_\beta(x^{(i)})}{\partial \beta_0} = -(y^{(i)} - f_\beta(x^{(i)}))$$
+
+$$\frac{\partial u^{(i)}}{\partial \beta_0} = -(y^{(i)} - f_\beta(x^{(i)}))$$
 y 
 
-$$\frac{\partial f_\beta(x^{(i)})}{\partial \beta_j} = - x_j^{(i)}(y^{(i)} - f_\beta(x^{(i)}))$$
+$$\frac{\partial u^{(i)}}{\partial \beta_j} = - x_j^{(i)}(y^{(i)} - f_\beta(x^{(i)}))$$
 
 
 Y sumando todos los términos (uno para cada caso de entrenamiento):
@@ -635,42 +636,112 @@ Y ahora iteramos para obtener
 
 
 ```r
-iteraciones <- descenso(30, c(0,0), 0.005, grad_prostata)
+iteraciones <- descenso(100, c(0,0), 0.005, grad_prostata)
 iteraciones
 ```
 
 ```
-##            [,1]      [,2]
-##  [1,] 0.0000000 0.0000000
-##  [2,] 0.8215356 1.4421892
-##  [3,] 0.7332652 0.9545169
-##  [4,] 0.8891507 1.0360252
-##  [5,] 0.9569494 0.9603012
-##  [6,] 1.0353555 0.9370937
-##  [7,] 1.0977074 0.9046239
-##  [8,] 1.1534587 0.8800287
-##  [9,] 1.2013557 0.8576489
-## [10,] 1.2430547 0.8385314
-## [11,] 1.2791967 0.8218556
-## [12,] 1.3105688 0.8074114
-## [13,] 1.3377869 0.7948709
-## [14,] 1.3614051 0.7839915
-## [15,] 1.3818983 0.7745509
-## [16,] 1.3996803 0.7663595
-## [17,] 1.4151098 0.7592518
-## [18,] 1.4284979 0.7530844
-## [19,] 1.4401148 0.7477329
-## [20,] 1.4501947 0.7430895
-## [21,] 1.4589411 0.7390604
-## [22,] 1.4665303 0.7355643
-## [23,] 1.4731155 0.7325308
-## [24,] 1.4788295 0.7298986
-## [25,] 1.4837875 0.7276146
-## [26,] 1.4880895 0.7256328
-## [27,] 1.4918224 0.7239132
-## [28,] 1.4950614 0.7224211
-## [29,] 1.4978719 0.7211265
-## [30,] 1.5003106 0.7200031
+##             [,1]      [,2]
+##   [1,] 0.0000000 0.0000000
+##   [2,] 0.8215356 1.4421892
+##   [3,] 0.7332652 0.9545169
+##   [4,] 0.8891507 1.0360252
+##   [5,] 0.9569494 0.9603012
+##   [6,] 1.0353555 0.9370937
+##   [7,] 1.0977074 0.9046239
+##   [8,] 1.1534587 0.8800287
+##   [9,] 1.2013557 0.8576489
+##  [10,] 1.2430547 0.8385314
+##  [11,] 1.2791967 0.8218556
+##  [12,] 1.3105688 0.8074114
+##  [13,] 1.3377869 0.7948709
+##  [14,] 1.3614051 0.7839915
+##  [15,] 1.3818983 0.7745509
+##  [16,] 1.3996803 0.7663595
+##  [17,] 1.4151098 0.7592518
+##  [18,] 1.4284979 0.7530844
+##  [19,] 1.4401148 0.7477329
+##  [20,] 1.4501947 0.7430895
+##  [21,] 1.4589411 0.7390604
+##  [22,] 1.4665303 0.7355643
+##  [23,] 1.4731155 0.7325308
+##  [24,] 1.4788295 0.7298986
+##  [25,] 1.4837875 0.7276146
+##  [26,] 1.4880895 0.7256328
+##  [27,] 1.4918224 0.7239132
+##  [28,] 1.4950614 0.7224211
+##  [29,] 1.4978719 0.7211265
+##  [30,] 1.5003106 0.7200031
+##  [31,] 1.5024267 0.7190283
+##  [32,] 1.5042627 0.7181825
+##  [33,] 1.5058559 0.7174486
+##  [34,] 1.5072383 0.7168117
+##  [35,] 1.5084378 0.7162592
+##  [36,] 1.5094786 0.7157797
+##  [37,] 1.5103817 0.7153637
+##  [38,] 1.5111654 0.7150027
+##  [39,] 1.5118453 0.7146895
+##  [40,] 1.5124353 0.7144177
+##  [41,] 1.5129473 0.7141819
+##  [42,] 1.5133915 0.7139772
+##  [43,] 1.5137769 0.7137997
+##  [44,] 1.5141114 0.7136456
+##  [45,] 1.5144016 0.7135119
+##  [46,] 1.5146534 0.7133959
+##  [47,] 1.5148718 0.7132953
+##  [48,] 1.5150614 0.7132079
+##  [49,] 1.5152259 0.7131322
+##  [50,] 1.5153687 0.7130664
+##  [51,] 1.5154925 0.7130093
+##  [52,] 1.5156000 0.7129598
+##  [53,] 1.5156933 0.7129169
+##  [54,] 1.5157742 0.7128796
+##  [55,] 1.5158444 0.7128473
+##  [56,] 1.5159053 0.7128192
+##  [57,] 1.5159582 0.7127948
+##  [58,] 1.5160040 0.7127737
+##  [59,] 1.5160438 0.7127554
+##  [60,] 1.5160784 0.7127395
+##  [61,] 1.5161083 0.7127257
+##  [62,] 1.5161343 0.7127137
+##  [63,] 1.5161569 0.7127033
+##  [64,] 1.5161765 0.7126943
+##  [65,] 1.5161934 0.7126865
+##  [66,] 1.5162082 0.7126797
+##  [67,] 1.5162210 0.7126738
+##  [68,] 1.5162321 0.7126687
+##  [69,] 1.5162417 0.7126642
+##  [70,] 1.5162501 0.7126604
+##  [71,] 1.5162573 0.7126570
+##  [72,] 1.5162636 0.7126541
+##  [73,] 1.5162690 0.7126516
+##  [74,] 1.5162738 0.7126495
+##  [75,] 1.5162779 0.7126476
+##  [76,] 1.5162815 0.7126459
+##  [77,] 1.5162846 0.7126445
+##  [78,] 1.5162872 0.7126433
+##  [79,] 1.5162896 0.7126422
+##  [80,] 1.5162916 0.7126412
+##  [81,] 1.5162933 0.7126404
+##  [82,] 1.5162949 0.7126397
+##  [83,] 1.5162962 0.7126391
+##  [84,] 1.5162973 0.7126386
+##  [85,] 1.5162983 0.7126381
+##  [86,] 1.5162992 0.7126377
+##  [87,] 1.5162999 0.7126374
+##  [88,] 1.5163006 0.7126371
+##  [89,] 1.5163012 0.7126368
+##  [90,] 1.5163016 0.7126366
+##  [91,] 1.5163021 0.7126364
+##  [92,] 1.5163024 0.7126363
+##  [93,] 1.5163028 0.7126361
+##  [94,] 1.5163030 0.7126360
+##  [95,] 1.5163033 0.7126359
+##  [96,] 1.5163035 0.7126358
+##  [97,] 1.5163037 0.7126357
+##  [98,] 1.5163038 0.7126356
+##  [99,] 1.5163040 0.7126356
+## [100,] 1.5163041 0.7126355
 ```
 
 Y checamos que efectivamente el error total de entrenamiento decrece
@@ -680,14 +751,35 @@ apply(iteraciones, 1, rss_prostata)
 ```
 
 ```
-##  [1] 249.60960  51.70986  32.49921  28.96515  27.22475  25.99191  25.07023
-##  [8]  24.37684  23.85483  23.46181  23.16591  22.94312  22.77538  22.64910
-## [15]  22.55401  22.48242  22.42852  22.38794  22.35739  22.33438  22.31706
-## [22]  22.30402  22.29421  22.28681  22.28125  22.27706  22.27390  22.27153
-## [29]  22.26974  22.26839
+##   [1] 249.60960  51.70986  32.49921  28.96515  27.22475  25.99191  25.07023
+##   [8]  24.37684  23.85483  23.46181  23.16591  22.94312  22.77538  22.64910
+##  [15]  22.55401  22.48242  22.42852  22.38794  22.35739  22.33438  22.31706
+##  [22]  22.30402  22.29421  22.28681  22.28125  22.27706  22.27390  22.27153
+##  [29]  22.26974  22.26839  22.26738  22.26662  22.26604  22.26561  22.26528
+##  [36]  22.26504  22.26485  22.26471  22.26461  22.26453  22.26447  22.26443
+##  [43]  22.26439  22.26437  22.26435  22.26434  22.26432  22.26432  22.26431
+##  [50]  22.26431  22.26430  22.26430  22.26430  22.26430  22.26429  22.26429
+##  [57]  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429
+##  [64]  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429
+##  [71]  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429
+##  [78]  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429
+##  [85]  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429
+##  [92]  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429  22.26429
+##  [99]  22.26429  22.26429
 ```
 
+Verificamos el gradiente, que si convergió al mínimo debe ser muy
+cercano a 0:
 
+
+```r
+grad_prostata(iteraciones[100, ])
+```
+
+```
+##     Intercept        lcavol 
+## -2.053148e-05  9.458051e-06
+```
 
 
 #### Notación y forma matricial {-}
@@ -742,7 +834,7 @@ ggplot(dat_x, aes(x = beta1, y = beta2, z = rss_1)) +
     coord_equal() 
 ```
 
-<img src="02-reg-lineal_files/figure-html/unnamed-chunk-27-1.png" width="672" />
+<img src="02-reg-lineal_files/figure-html/unnamed-chunk-28-1.png" width="672" />
 
 En algunas direcciones el gradiente es muy grande, y en otras chico. 
 Esto implica que la convergencia puede ser muy lenta en algunas direcciones,
@@ -764,7 +856,7 @@ ggplot(dat_x) +
   geom_point(data = data.frame(iteraciones[, 2:3]), aes(x=X1, y=X2), colour = 'red')
 ```
 
-<img src="02-reg-lineal_files/figure-html/unnamed-chunk-28-1.png" width="672" />
+<img src="02-reg-lineal_files/figure-html/unnamed-chunk-29-1.png" width="672" />
 
 Si incrementamos el tamaño de paso observamos también convergencia lenta. En este
 caso particular, subir más el tamaño de paso produce divergencia:
@@ -779,7 +871,7 @@ ggplot(dat_x) +
   geom_point(data = data.frame(iteraciones[, 2:3]), aes(x=X1, y=X2), colour = 'red')
 ```
 
-<img src="02-reg-lineal_files/figure-html/unnamed-chunk-29-1.png" width="672" />
+<img src="02-reg-lineal_files/figure-html/unnamed-chunk-30-1.png" width="672" />
 
 Una normalización usual es con la media y desviación estándar, donde hacemos,
 para cada variable de entrada $j=1,2,\ldots, p$
@@ -810,7 +902,7 @@ ggplot(dat_x, aes(x = beta1, y = beta2, z = rss_1)) +
     coord_equal() 
 ```
 
-<img src="02-reg-lineal_files/figure-html/unnamed-chunk-30-1.png" width="672" />
+<img src="02-reg-lineal_files/figure-html/unnamed-chunk-31-1.png" width="672" />
 
 Nótese que los coeficientes ajustados serán diferentes a los del caso no
 normalizado. 
@@ -828,7 +920,7 @@ ggplot(dat_x) +
   geom_point(data = data.frame(iteraciones[, 2:3]), aes(x=X1, y=X2), colour = 'red')
 ```
 
-<img src="02-reg-lineal_files/figure-html/unnamed-chunk-31-1.png" width="672" />
+<img src="02-reg-lineal_files/figure-html/unnamed-chunk-32-1.png" width="672" />
 
 
 <div class="comment">
@@ -1132,7 +1224,7 @@ ggplot(datos_entrena, aes(x = peso_kg, y = rendimiento_kpl)) +
   geom_point()
 ```
 
-<img src="02-reg-lineal_files/figure-html/unnamed-chunk-39-1.png" width="672" />
+<img src="02-reg-lineal_files/figure-html/unnamed-chunk-40-1.png" width="672" />
 
 Consideremos un modelo de $k=15$ vecinos más cercanos. La función de predicción
 ajustada es entonces:
@@ -1153,7 +1245,7 @@ ggplot(datos_entrena, aes(x = peso_kg, y = rendimiento_kpl)) +
   geom_line(data=dat_graf, col='red', size = 1.2)
 ```
 
-<img src="02-reg-lineal_files/figure-html/unnamed-chunk-40-1.png" width="672" />
+<img src="02-reg-lineal_files/figure-html/unnamed-chunk-41-1.png" width="672" />
 
 Y para $k=5$ vecinos más cercanos:
 
@@ -1169,7 +1261,7 @@ ggplot(datos_entrena, aes(x = peso_kg, y = rendimiento_kpl)) +
   geom_line(data=dat_graf, col='red', size = 1.2)
 ```
 
-<img src="02-reg-lineal_files/figure-html/unnamed-chunk-41-1.png" width="672" />
+<img src="02-reg-lineal_files/figure-html/unnamed-chunk-42-1.png" width="672" />
 
 En nuestro caso, los errores de prueba son
 
@@ -1230,7 +1322,7 @@ dat$y <- apply(dat, 1, fun_exp)
 ggplot(dat, aes(x = x_1, y = x_2, colour = y)) + geom_point()
 ```
 
-<img src="02-reg-lineal_files/figure-html/unnamed-chunk-43-1.png" width="672" />
+<img src="02-reg-lineal_files/figure-html/unnamed-chunk-44-1.png" width="672" />
 
 La mejor predicción en $x_0 = (0,0)$ es $f((0,0)) = 1$. Eñ vecino más
 cercano al origen es

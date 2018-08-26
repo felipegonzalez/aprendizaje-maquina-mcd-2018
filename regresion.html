@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-08-20">
+<meta name="date" content="2018-08-26">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="introduccion.html">
-
+<link rel="next" href="logistica.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -166,6 +166,30 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="2.8.1" data-path="regresion.html"><a href="regresion.html#k-vecinos-mas-cercanos"><i class="fa fa-check"></i><b>2.8.1</b> k vecinos más cercanos</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="regresion.html"><a href="regresion.html#tarea-1"><i class="fa fa-check"></i>Tarea</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="logistica.html"><a href="logistica.html"><i class="fa fa-check"></i><b>3</b> Regresión logística</a><ul>
+<li class="chapter" data-level="3.1" data-path="logistica.html"><a href="logistica.html#el-problema-de-clasificacion"><i class="fa fa-check"></i><b>3.1</b> El problema de clasificación</a><ul>
+<li class="chapter" data-level="" data-path="logistica.html"><a href="logistica.html#que-estimar-en-problemas-de-clasificacion"><i class="fa fa-check"></i>¿Qué estimar en problemas de clasificación?</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="logistica.html"><a href="logistica.html#estimacion-de-probabilidades-de-clase"><i class="fa fa-check"></i><b>3.2</b> Estimación de probabilidades de clase</a><ul>
+<li class="chapter" data-level="" data-path="logistica.html"><a href="logistica.html#ejemplo-9"><i class="fa fa-check"></i>Ejemplo</a></li>
+<li class="chapter" data-level="3.2.1" data-path="logistica.html"><a href="logistica.html#k-vecinos-mas-cercanos-1"><i class="fa fa-check"></i><b>3.2.1</b> k-vecinos más cercanos</a></li>
+<li class="chapter" data-level="" data-path="logistica.html"><a href="logistica.html#ejemplo-11"><i class="fa fa-check"></i>Ejemplo</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="logistica.html"><a href="logistica.html#error-para-modelos-de-clasificacion"><i class="fa fa-check"></i><b>3.3</b> Error para modelos de clasificación</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="logistica.html"><a href="logistica.html#ejercicio-1"><i class="fa fa-check"></i><b>3.3.1</b> Ejercicio</a></li>
+<li class="chapter" data-level="3.3.2" data-path="logistica.html"><a href="logistica.html#error-de-clasificacion-y-funcion-de-perdida-0-1"><i class="fa fa-check"></i><b>3.3.2</b> Error de clasificación y función de pérdida 0-1</a></li>
+<li class="chapter" data-level="3.3.3" data-path="logistica.html"><a href="logistica.html#discusion-relacion-entre-devianza-y-error-de-clasificacion"><i class="fa fa-check"></i><b>3.3.3</b> Discusión: relación entre devianza y error de clasificación</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="logistica.html"><a href="logistica.html#regresion-logistica"><i class="fa fa-check"></i><b>3.4</b> Regresión logística</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="logistica.html"><a href="logistica.html#regresion-logistica-simple"><i class="fa fa-check"></i><b>3.4.1</b> Regresión logística simple</a></li>
+<li class="chapter" data-level="3.4.2" data-path="logistica.html"><a href="logistica.html#funcion-logistica"><i class="fa fa-check"></i><b>3.4.2</b> Función logística</a></li>
+<li class="chapter" data-level="3.4.3" data-path="logistica.html"><a href="logistica.html#regresion-logistica-1"><i class="fa fa-check"></i><b>3.4.3</b> Regresión logística</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="logistica.html"><a href="logistica.html#aprendizaje-de-coeficientes-para-regresion-logistica-binomial."><i class="fa fa-check"></i><b>3.5</b> Aprendizaje de coeficientes para regresión logística (binomial).</a></li>
+<li class="chapter" data-level="3.6" data-path="logistica.html"><a href="logistica.html#ejercicio-datos-de-diabetes"><i class="fa fa-check"></i><b>3.6</b> Ejercicio: datos de diabetes</a><ul>
+<li class="chapter" data-level="" data-path="logistica.html"><a href="logistica.html#tarea-2"><i class="fa fa-check"></i>Tarea</a></li>
+</ul></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>
@@ -1260,23 +1284,6 @@ vecinos más cercanos, y evalúa su desempeño. ¿Cuál es la mejor <span class=
 el error de prueba?</li>
 </ul>
 
-<div id="refs" class="references">
-<div>
-<p>Bishop, Christopher M. 2006. <em>Pattern Recognition and Machine Learning (Information Science and Statistics)</em>. Secaucus, NJ, USA: Springer-Verlag New York, Inc.</p>
-</div>
-<div>
-<p>Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep Learning</em>. MIT Press.</p>
-</div>
-<div>
-<p>Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2017. <em>The Elements of Statistical Learning</em>. Springer Series in Statistics. Springer New York Inc. <a href="http://web.stanford.edu/~hastie/ElemStatLearn/" class="uri">http://web.stanford.edu/~hastie/ElemStatLearn/</a>.</p>
-</div>
-<div>
-<p>James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. <em>An Introduction to Statistical Learning: With Applications in R</em>. Springer Publishing Company, Incorporated. <a href="http://www-bcf.usc.edu/~gareth/ISL/" class="uri">http://www-bcf.usc.edu/~gareth/ISL/</a>.</p>
-</div>
-<div>
-<p>Ng, Andrew. 2017. “Machine Learning.” <a href="https://www.coursera.org/learn/machine-learning" class="uri">https://www.coursera.org/learn/machine-learning</a>.</p>
-</div>
-</div>
 </div>
 </div>
             </section>
@@ -1284,8 +1291,8 @@ el error de prueba?</li>
           </div>
         </div>
       </div>
-<a href="introduccion.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="introduccion.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="logistica.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

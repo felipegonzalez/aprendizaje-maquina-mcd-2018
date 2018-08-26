@@ -611,14 +611,17 @@ al margen):
 ```{block2, type='comentario'}
 La función logística está dada por
 $$h(x)=\frac{e^x}{1+e^x}$$
+``` 
+
 ```{r}
 h <- function(x){exp(x)/(1+exp(x)) }
-curve(h, from=-6, to =6)
+ggplot(data_frame(x = seq(-6, 6, 0.01)), aes(x = x)) + stat_function(fun = h)
 ```
 
 
 Esta función comprime adecuadamente (para nuestros propósitos) 
-el rango de todos los reales dentro del intervalo $[0,1]$.
+el rango de todos los reales dentro del intervalo $[0,1]$. Si aplicamos
+al predictor lineal que consideramos, obtenemos:
 
 
 ```{block2, type='comentario'}
@@ -634,13 +637,13 @@ Este es un modelo paramétrico con 2 parámetros.
 
 - Demostrar que, si $p_1(x)$ está dado como en la ecuación anterior, entonces
 también podemos escribir:
-$$p_o(x)=\frac{1}{1+e^{\beta_0+\beta_1x_1}}.$$
+$$p_0(x)=\frac{1}{1+e^{\beta_0+\beta_1x_1}}.$$
 
 - Graficar las funciones $p_1(x;\beta)$ para distintos
 valores de $\beta_0$ y $\beta_1$.
 
 #### Ejemplo {-}
-En nuestro ejemplo:
+En nuestro ejemplo, teníamos el siguiente ajuste con k-vecinos más cercanos:
 
 ```{r}
 graf_data <- data_frame(x = seq(0,100, 1))
@@ -649,9 +652,9 @@ vmc_graf <- kknn(g ~ x, train = dat_ent,  k = 60,
 graf_data$p_1 <- vmc_graf$prob[ ,1]
 graf_verdadero <- data_frame(x = 0:100, p_1 = p_1(x))
 graf_1 + 
-  geom_line(data = graf_data, aes(y = p_1), colour = 'red', size=1.2) +
-  geom_line(data = graf_verdadero, aes(y = p_1)) +
-  ylab('Probabilidad al corriente') + xlab('% crédito usado')
+    geom_line(data = graf_data, aes(y = p_1), colour = 'red', size=1.2) +
+    geom_line(data = graf_verdadero, aes(y = p_1)) +
+    ylab('Probabilidad al corriente') + xlab('% crédito usado')
 ```
 
 Ahora intentaremos ajustar a mano (intenta cambiar
@@ -688,8 +691,8 @@ graf_data <- graf_data %>%
   mutate(p_mod_f = p_mod_final(x))
 
 graf_1 + 
-  geom_line(data = graf_data, aes(y = p_mod_f), colour = 'red', size=1.2) +
-    geom_line(data = graf_data, aes(y = p_mod_1), colour = 'orange', size=1.2) +
+  geom_line(data = graf_data, aes(y = p_mod_f), colour = 'red', size = 1.2) +
+  geom_line(data = graf_data, aes(y = p_mod_1), colour = 'orange', size = 1.2) +
   geom_line(data = graf_verdadero, aes(y = p_1)) +
   ylab('Probabilidad al corriente') + xlab('% crédito usado')
 ```
@@ -779,17 +782,44 @@ $j=0,1,\ldots, p$, donde fijamos $x_0^{(i)}=1$.
 
 
 Podríamos usar las siguientes implementaciones, que representan cambios
-menores de lo que hicimos en regresión lineal:
+menores de lo que hicimos en regresión lineal. En primer lugar,
+escribimos la función que calcula la devianza. Podríamos poner:
 
 ```{r}
-devianza_calc <- function(x, y){
+devianza_calc_simple <- function(x, y){
   dev_fun <- function(beta){
     p_beta <- h(as.matrix(cbind(1, x)) %*% beta) 
    -2*sum(y*log(p_beta) + (1-y)*log(1-p_beta))
   }
   dev_fun
 }
+```
 
+
+***Observación** 
+Sin embargo, podemos hacer una simplificación para tener mejor desempeño y estabilidad.
+Observamos que 
+$$\log (p_1(x;\beta)) = \log\frac{ e^{x^t \beta}}{1+ e^{x^t\beta}} =
+x^t\beta - \log Z$$
+
+donde $Z = 1+ e^{x^t\beta}$. Por otra parte
+$$\log(p_0(x;\beta)) = \log\frac{ 1}{1+ e^{x^t\beta}} = - \log Z$$
+De modo que 
+$$y\log(p_1(x;\beta)) + (1- y)\log(p_0(x;\beta)) = yx^t\beta - \log Z= yx^t\beta - \log (1+e^{x^t\beta})$$
+
+Así que podemos escribir:
+
+```{r}
+devianza_calc <- function(x, y){
+  dev_fun <- function(beta){
+    x_beta <- as.matrix(cbind(1, x)) %*% beta
+   -2*sum(y*x_beta - log(1 + exp(x_beta)))
+  }
+  dev_fun
+}
+```
+
+```{r}
 grad_calc <- function(x_ent, y_ent){
   salida_grad <- function(beta){
     p_beta <- h(as.matrix(cbind(1, x_ent)) %*% beta) 
@@ -816,7 +846,7 @@ Probemos nuestros cálculos con el ejemplo de 1 entrada de tarjetas de crédito.
 ```{r}
 dat_ent$y <- as.numeric(dat_ent$g==1)
 dat_ent <- dat_ent %>% ungroup %>% mutate(x_s = (x - mean(x))/sd(x))
-devianza <- devianza_calc(dat_ent[, 'x_s', drop = FALSE], dat_ent$y)
+devianza <- devianza_calc_simple(dat_ent[, 'x_s', drop = FALSE], dat_ent$y)
 grad <- grad_calc(dat_ent[, 'x_s', drop = FALSE], dat_ent$y)
 grad(c(0,1))
 grad(c(0.5,-0.1))
@@ -828,10 +858,12 @@ Verificamos cálculo de gradiente:
 ```
 Y hacemos descenso:
 ```{r, fig.width=5, fig.asp=0.8}
-iteraciones <- descenso(200, z_0=c(0,0), eta = 0.001, h_deriv = grad)
+iteraciones <- descenso(200, z_0 = c(0,0), eta = 0.001, h_deriv = grad)
 tail(iteraciones, 20)
+#Checamos devianza
 plot(apply(iteraciones, 1, devianza))
-matplot(iteraciones)
+# Y gradiente de devianza en la iteración final:
+grad(iteraciones[nrow(iteraciones), ])
 ```
 
 Comparamos con glm:
@@ -842,13 +874,12 @@ mod_1$deviance
 devianza(iteraciones[200,])
 ```
 
-Nótese que esta devianza está calculada sin dividir intre entre el número de casos. Podemos calcular la devianza promedio de entrenamiento haciendo:
+Nótese que esta devianza está calculada sin dividirentre el número de casos. Podemos calcular la devianza promedio de entrenamiento haciendo:
 
 ```{r}
 devianza(iteraciones[200,])/nrow(dat_ent)
 ```
 
-## Observaciones adicionales
 
 
 #### Máxima verosimilitud {-}

@@ -1,9 +1,9 @@
 # Regresión logística {#logistica}
 
 ```{r, include = FALSE}
-library(ggplot2)
-theme_set(theme_bw())
+library(tidyverse)
 cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+theme_set(theme_minimal())
 ```
 
 ## El problema de clasificación
@@ -127,12 +127,11 @@ permanezca al corriente o no en sus pagos más allá de información contenida e
 porcentaje de crédito usado. Nótese que estas probabilidades son diferentes
 a las no condicionadas, por ejempo, podríamos tener que a total $P(G=1)=0.83$.
 
-```{r, fig.width = 4, fig.asp = 1 }
+```{r, fig.width = 5, fig.asp = 0.7 }
 p_1 <- function(x){
   ifelse(x < 15, 0.95, 0.95 - 0.007 * (x - 15))
 }
-curve(p_1, 0,100, xlab = 'Porcentaje de crédito máximo', ylab = 'p_1(x)',
-  ylim = c(0,1))
+ggplot(data_frame(x = 0:100), aes(x = x)) + stat_function(fun = p_1) 
 ```
 
 ¿Por qué en este ejemplo ya no mostramos la función $p_2(x)$? 
@@ -161,26 +160,38 @@ Vamos a generar unos datos con el modelo simple del ejemplo anterior:
 ```{r, warning = FALSE, message = FALSE}
 library(tidyverse)
 library(kknn) # para hacer vecinos más cercanos
+simular_impago <- function(n = 100){
+    # suponemos que los valores de x están concentrados en valores bajos,
+    # quizá la manera en que los créditos son otorgados
+    x <- pmin(rexp(500,1/40),100)
+    # las probabilidades de estar al corriente:
+    probs <- p_1(x)
+    # finalmente, simulamos cuáles clientes siguen en al corriente y cuales no:
+    g <- ifelse(rbinom(length(x), 1, probs)==1 ,1, 2)
+    dat_ent <- data_frame(x = x, p_1 = probs, g = factor(g))
+    dat_ent
+}
 set.seed(1933)
-# suponemos que los valores de x están concentrados en valores bajos,
-# quizá la manera en que los créditos son otorgados
-x <- pmin(rexp(500,1/40),100)
-# las probabilidades de estar al corriente:
-probs <- p_1(x)
-# finalmente, simulamos cuáles clientes siguen en al corriente y cuales no:
-g <- ifelse(rbinom(length(x), 1, probs)==1 ,1, 2)
-dat_ent <- data_frame(x = x, p_1 = probs, g = factor(g))
-dat_ent %>% select(x, g) 
+dat_ent  <- simular_impago() %>% select(x, g) 
+dat_ent
 ```
 
-Como este problema es de dos clases, podemos graficar como sigue (nótese que la
-variación alreddor de 1 y 0 es artificial, solo graficamos así para ver 
-los puntos individuales):
+Como este problema es de dos clases, podemos graficar como sigue:
 
-```{r}
+```{r, fig.width = 5, fig.asp = 0.7}
 graf_1 <- ggplot(dat_ent, aes(x = x)) +
-  geom_jitter(aes(colour = g, y = as.numeric(g=='1')), width=0.5, height=0.05)
+  geom_point(aes(colour = g, y = as.numeric(g=='1')))
 graf_1
+```
+
+Esta gráfica tiene el problema de que hay mucho trasplape entre los puntos.
+Podemos agregar variación artificial alrededor de 1 y 0, y también 
+alrededor de los valores de $x$ para evitar traslape en los extremos:
+
+```{r, fig.width = 5, fig.asp = 0.7}
+graf_1 <- ggplot(dat_ent, aes(x = x)) +
+  geom_jitter(aes(colour = factor(g), y = as.numeric(g=='1')), width=0.5, height=0.05)
+graf_1 
 ```
 
 
@@ -228,7 +239,7 @@ más cercanos (curva roja):
 
 
 
-```{r}
+```{r,fig.width = 5, fig.asp = 0.7}
 graf_data <- data_frame(x = seq(0,100, 1))
 vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = graf_data, kernel = 'rectangular')
@@ -237,7 +248,7 @@ graf_verdadero <- data_frame(x = 0:100, p_1 = p_1(x))
 graf_1 + 
   geom_line(data = graf_data, aes(y = p_1), colour = 'red', size=1.2) +
   geom_line(data = graf_verdadero, aes(y = p_1)) +
-  ylab('Probabilidad al corriente') + xlab('% crédito usado')
+  ylab('Probabilidad al corriente') + xlab('% crédito usado') 
 ```
 
 Igual que en el caso de regresión, ahora tenemos qué pensar cómo validar nuestra
@@ -271,7 +282,7 @@ diabetes_ent
 
 Intentaremos predecir diabetes dependiendo del BMI:
 
-```{r}
+```{r, fig.width=5, fig.asp=0.7}
 library(ggplot2)
 ggplot(diabetes_ent, aes(x = bmi, y= as.numeric(type=='Yes'), colour = type)) +
   geom_point()
@@ -280,7 +291,7 @@ ggplot(diabetes_ent, aes(x = bmi, y= as.numeric(type=='Yes'), colour = type)) +
 Usamos $20$ vecinos más cercanos para estimar $p_g(x)$:
 
 
-```{r}
+```{r, fig.width=5, fig.asp=0.7}
 graf_data <- data_frame(bmi = seq(20,45, 1))
 vmc_5 <- kknn(type ~ bmi, train = diabetes_ent,  k = 20,
               test = graf_data, kernel = 'rectangular')
@@ -326,11 +337,12 @@ y que cumpla con los puntos arriba señalados. Entonces tenemos que
 - $s(p)$ debe ser muy grande is $p$ es muy chica.
 
 Una opción analíticamente conveniente es
-$$s(z) = - 2log(z)$$
+$$s(p) = - 2log(p)$$
 
-```{r, fig.width=3, fig.asp=1}
+```{r, fig.width=5, fig.asp=0.7}
 s <- function(z){ -2*log(z)}
-curve(s, 0, 1)
+ggplot(data_frame(p = (0:100)/100), aes(x = p)) + 
+    stat_function(fun = s) + ylab("Devianza")
 ```
 
 
@@ -342,10 +354,11 @@ $$
 $$
 
 Su valor esperado (según el proceso que genera los datos) es nuestra medición
-del desempeño del modelo $\hat{p}_g (x)$:
+del desempeño del modelo $\hat{p}_g (x)$, es decir, el error de predicción es:
 
 $$-2E\left [ \log(\hat{p}_G(X)) \right ]$$
 
+que podemos estimar con una muestra de prueba.
 
 **Observaciones**:
 
@@ -385,7 +398,7 @@ $$-2E\left [ \log(\hat{p}_G(X)) \right ]$$
 
 #### Ejemplo {-}
 
-Regresamos a nuestros ejemplo de impago de tarjetas de crédito. Primero
+Regresamos a nuestros ejemplo simulado de impago de tarjetas de crédito. Primero
 calculamos la devianza de entrenamiento
 
 ```{r}
@@ -419,11 +432,7 @@ desempeño del modelo. Hagamos el cálculo entonces para una muestra de prueba:
 
 ```{r}
 set.seed(1213)
-x <- pmin(rexp(1000,1/30),100)
-probs <- p_1(x)
-g <- ifelse(rbinom(length(x), 1, probs)==1 ,1, 2)
-dat_prueba <- data_frame(x = x, g = factor(g))
-
+dat_prueba <- simular_impago(n = 500) %>% select(x, g)
 vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = dat_prueba, kernel = 'rectangular')
 dat_dev <- dat_prueba %>% select(x,g)
@@ -492,6 +501,8 @@ dat_dev %>% mutate(correcto = hat_G == g) %>%
   mutate(error_clasif = 1 - p_correctos)
 ```
 
+Y calculamos el error de clasificación de prueba:
+
 ```{r}
 vmc_2 <- kknn(g ~ x, train = dat_ent,  k = 3,
               test = dat_prueba, kernel = 'rectangular')
@@ -508,7 +519,7 @@ el mejor desempeño se alcanza cuando las probabilidades $\hat{p}_g (x)$
 están bien calibradas, es decir, están cercanas a las probabilidades 
 verdaderas $p_g (x)$. Esto se puede ver demostrando que las probabilidades
 $\hat{p}_g (x)$ que minimizan la devianza 
-$$-2E(\log (\hat{p}_G (X))) = -2E_X \left[  \sum_{k=1}^K p_g(X)\log\hat{p}_g(X)    \right]$$
+$$-2E(\log (\hat{p}_G (X))) = -2E_X \left[  \sum_{g=1}^K p_g(X)\log\hat{p}_g(X)    \right]$$
 
 son precisamente $\hat{p}_g (x)=p_g (x)$. 
 
@@ -524,7 +535,7 @@ el clasificador $\hat{G}(x)$ producido a partir de las $\hat{p}_g(x)$ deberá
 estar cercano a $G_{bayes}(x)$, que es el clasificador que minimiza el error
 de clasificación.
 
-Este argumento explica que buscar modelos con devianza baja no está alineado
+Este argumento explica que buscar modelos con devianza baja está alineado
 con buscar modelos con error de clasificación bajo.
 
 Cuando sea posible, es mejor trabajar con probabilidades de clase y devianza que solamente
@@ -546,12 +557,15 @@ se equivoca).
 ## Regresión logística
 
 En $k$ vecinos más cercanos, intentamos estimar directamente con promedios
-las probabilidades de clase. Regresión logística (y otros métodos, como redes neuronales),
+las probabilidades de clase, sin considerar ninguna estructura. 
+Regresión logística (y otros métodos, como redes neuronales),
 son ajustados intentando minimizar la devianza de entrenamiento. Esto es necesario
-si queremos aprovechar la estructura adicional que estos modelos aportan (recordemos
+si queremos aprovechar la estructura adicional que estos modelos aportan.
+En el caso de regresion logística, establecemos una estructura lineal de cierto tipo.
+Recordemos
 el caso de regresión lineal: intentamos minimizar el error de entrenamiento para
 estimar nuestro predictor, y así podíamos explotar apropiadamente
-la estructura lineal del problema).
+la estructura lineal del problema.
 
 
 Regresión logística es un método lineal de clasificación, en el sentido de
@@ -560,8 +574,8 @@ que produce fronteras lineales de decisión para el clasificador asociado.
 #### Ejemplo {-}
 Mostramos aquí una frontera de decisión de regresión logística y una de
 k vecinos más cercanos:
-```{r, out.width= 320}
-knitr::include_graphics(path = c("imagenes/clas_lineal.png", "imagenes/clas_nolineal.png"))
+```{r, out.width= 420}
+knitr::include_graphics(path = c("figuras/clas_lineal.png", "figuras/clas_nolineal.png"))
 ```
 
 
@@ -569,10 +583,9 @@ knitr::include_graphics(path = c("imagenes/clas_lineal.png", "imagenes/clas_noli
 ### Regresión logística simple
 
 Vamos a construir el modelo de regresión logística (binaria) 
-para una sola entrada.
-Suponemos que
-tenemos una sola entrada $X_1$, y  
-que $G\in\{1,2\}$. Nos convendrá crear una nueva variable $Y$ dada por
+para una sola entrada. Suponemos que
+tenemos una sola entrada $X_1$, y que $G\in\{1,2\}$. 
+Nos convendrá crear una nueva variable $Y$ dada por
 $Y=1$ si $G=2$, $Y=0$ si $G=1$. 
 
 Nótese que intentar estimar las probabilidades de clase $p_1(x)$ de forma lineal con
@@ -602,7 +615,7 @@ $$h(x)=\frac{e^x}{1+e^x}$$
 h <- function(x){exp(x)/(1+exp(x)) }
 curve(h, from=-6, to =6)
 ```
-```
+
 
 Esta función comprime adecuadamente (para nuestros propósitos) 
 el rango de todos los reales dentro del intervalo $[0,1]$.
@@ -626,7 +639,7 @@ $$p_o(x)=\frac{1}{1+e^{\beta_0+\beta_1x_1}}.$$
 - Graficar las funciones $p_1(x;\beta)$ para distintos
 valores de $\beta_0$ y $\beta_1$.
 
-#### Ejemplo
+#### Ejemplo {-}
 En nuestro ejemplo:
 
 ```{r}

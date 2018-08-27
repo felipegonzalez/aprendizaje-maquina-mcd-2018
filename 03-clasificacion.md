@@ -1361,4 +1361,4 @@ mean(y_prueba != y_pred)
 
 ### Tarea {-}
 
-La tarea está en el documento *scripts/tarea_3.Rmd* del repositorio.
+La tarea está en el documento *tareas/tarea_3.Rmd* del repositorio.

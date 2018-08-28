@@ -163,17 +163,17 @@ library(kknn) # para hacer vecinos más cercanos
 simular_impago <- function(n = 100){
     # suponemos que los valores de x están concentrados en valores bajos,
     # quizá la manera en que los créditos son otorgados
-    x <- pmin(rexp(500,1/40),100)
+    x <- pmin(rexp(500, 1 / 40), n)
     # las probabilidades de estar al corriente:
     probs <- p_1(x)
     # finalmente, simulamos cuáles clientes siguen en al corriente y cuales no:
-    g <- ifelse(rbinom(length(x), 1, probs)==1 ,1, 2)
+    g <- ifelse(rbinom(length(x), 1, probs) == 1 ,1, 2)
     dat_ent <- data_frame(x = x, p_1 = probs, g = factor(g))
     dat_ent
 }
 set.seed(1933)
 dat_ent  <- simular_impago() %>% select(x, g) 
-dat_ent
+dat_ent %>% sample_n(20)
 ```
 
 Como este problema es de dos clases, podemos graficar como sigue:
@@ -416,7 +416,8 @@ Nótese que dependiendo de qué clase observamos (columna $g$), extraemos la
 probabilidad correspondiente a la columna hat_p_g:
 
 ```{r}
-head(dat_dev, 50)
+set.seed(125)
+dat_dev %>% sample_n(20)
 ```
 
 Ahora aplicamos la función $s$ que describimos arriba, y promediamos sobre
@@ -1058,4 +1059,6 @@ mean(y_prueba != y_pred)
 
 ### Tarea {-}
 
-La tarea está en el documento *tareas/tarea_3.Rmd* del repositorio.
+- **Ojo**: La tarea actualizada 
+estará disponible a más tardar el 29 de agosto.
+

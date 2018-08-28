@@ -1,0 +1,162 @@
+---
+title: "Tarea 3: clasificación y devianza"
+author: "FG"
+date: "8/28/2018"
+output: html_document
+---
+
+
+### Instrucciones
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+En este ejercicio tienes que completar algunas líneas de código para 
+contestar las preguntas
+
+Consideramos los datos que vimos en clase, donde *diabetes* es la variable
+indicadora si la persona tiene o no diabetes:
+
+```{r}
+library(tidyverse)
+diabetes_ent <- as_data_frame(MASS::Pima.tr)
+diabetes_pr <- as_data_frame(MASS::Pima.te)
+datos_ent <- diabetes_ent %>% 
+    mutate(diabetes = as.numeric(type == "Yes")) %>%
+    select(diabetes, glu) 
+set.seed(886)
+# Usamos una muestra chica de prueba para examinar los resultados
+datos_pr <- diabetes_pr %>% 
+    mutate(diabetes = as.numeric(type == "Yes")) %>%
+    select(diabetes, glu) %>%
+    sample_n(10)
+datos_ent
+```
+
+Trabajaremos con una muestra chica de prueba para entender los resultados:
+
+```{r}
+datos_pr <- datos_pr %>% arrange(glu)
+datos_pr
+```
+
+
+### Preguntas
+
+1. (Modelo sin covariables) Si no tuviéramos covariables, ¿cómo estimamos la probabilidad de clase 
+$$p_1 = P(G = 1),$$
+donde G=diabetes? Usa la muestra de entrenamiento para hacer esta estimación.
+
+```{r}
+# termina esta línea
+p_1_simple <- 
+```
+
+2. Agregar la probabilidad estimada a la tabla de datos de prueba y examina la tabla:
+
+```{r}
+datos_pr$p_1_simple <- p_1_simple
+datos_pr
+```
+
+
+2. **Calcula la devianza de prueba para cada caso** según el modelo
+simple (el error de cada caso de prueba). Examina la tabla resultante:
+
+```{r}
+# explica por qué esta es la fórmula correcta:
+devianza <- function(g, p_1){
+     -2*(g * log(p_1) + (1 - g) * log(1 - p_1))
+}
+# termina esta línea
+datos_pr$devianza_simple <- 
+datos_pr
+```
+
+3. **Calcula la devianza promedio** de prueba para este modelo simple:
+
+```{r}
+# termina esta línea
+mean(  )
+```
+
+
+4. Repite el inciso anterior usando el modelo $p_1=0.75$ (a cada quien se le asigna
+probabilidad 1/2 de tener diabetes). **¿Cuál tiene menor devianza promedio de prueba?
+Explica intuitivamente examinando las tablas que construiste.**
+
+
+5. Ahora construimos un modelo de una sola variable (glucosa) que no nos
+va a servir. Intentamos
+usaremos regresión lineal:
+
+```{r}
+ggplot(datos_ent, aes(x = glu, y = diabetes)) + 
+    geom_jitter(width=0.1, height=0.1) + geom_smooth(se = FALSE, method = "lm")
+```
+
+**¿Qué defecto ves en este modelo? ¿Es posible calcular la devianza de este modelo?
+¿Por qué sí o no?
+Demuestra que este modelo simple no nos da probabilidades de clase evaluando
+la predicción en algún valor**:
+
+```{r}
+# escoge un valor problemático para este modelo problemático
+valor_malo <- 
+#
+mod_lineal <- lm(diabetes ~ glu, data = datos_ent)
+predict(mod_lineal, data_frame(glu = valor_malo))
+```
+
+6. Consideremos una mejora usando k-vecinos más cercanos:
+
+```{r}
+library(kknn)
+# escoge entre 50 o 60 k-vecinos más cercanos
+k <- 
+#
+graf_datos <- data_frame(glu = seq(50, 200))
+mod_vmc <- kknn(diabetes ~ glu, k = k, train = datos_ent, 
+              test = graf_datos)
+graf_datos$p_1 <- mod_vmc$fitted.values
+ggplot(graf_datos, aes(x = glu, y = p_1)) + geom_line() + ylim(c(0,1))
+```
+
+**Explica por qué este modelo es más apropiado para este problema de clasificación**
+¿Nos da probabilidades?
+
+
+7. Agregar la probabilidad estimada según el modelo del inciso anterior
+a la misma tabla de datos de prueba. Examina la tabla:
+
+```{r}
+preds_vmc <- kknn(diabetes ~ glu, k = k, train = datos_ent, test = datos_pr)
+datos_pr$p_1_vmc <- predict(preds_vmc)
+datos_pr
+```
+
+Examinando la tabla, ¿por qué piensas que este nuevo modelo que usa una covariable
+puede tener menor devianza? (examina la varaible diabetes y la probabilidad p_1_vmc)
+
+8. Calcula la devianza para cada caso de prueba según el modelo de vecinos más cercanos, 
+y agrega a la tabla. ¿Cúales son los errores más grandes y más chicos con este nuevo modelo?
+Explica los casos de devianza grande.
+
+```{r}
+# termina la siguiente línea
+datos_pr$devianza_vmc <- 
+datos_pr
+```
+
+9. Calcula la devianza promedio de prueba para el modelo de vecinos más cercanos
+
+```{r}
+# escribe aquí la línea de código que calcula la devianza promedio 
+
+```
+
+
+10. Aunque la muestra de prueba es chica, ¿cuál es el mejor modelo según la devianza
+de prueba, el simple o el de vecinos más cercanos? 
+
+

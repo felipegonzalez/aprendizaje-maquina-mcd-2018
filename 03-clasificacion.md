@@ -159,34 +159,43 @@ library(kknn) # para hacer vecinos más cercanos
 simular_impago <- function(n = 100){
     # suponemos que los valores de x están concentrados en valores bajos,
     # quizá la manera en que los créditos son otorgados
-    x <- pmin(rexp(500,1/40),100)
+    x <- pmin(rexp(500, 1 / 40), n)
     # las probabilidades de estar al corriente:
     probs <- p_1(x)
     # finalmente, simulamos cuáles clientes siguen en al corriente y cuales no:
-    g <- ifelse(rbinom(length(x), 1, probs)==1 ,1, 2)
+    g <- ifelse(rbinom(length(x), 1, probs) == 1 ,1, 2)
     dat_ent <- data_frame(x = x, p_1 = probs, g = factor(g))
     dat_ent
 }
 set.seed(1933)
 dat_ent  <- simular_impago() %>% select(x, g) 
-dat_ent
+dat_ent %>% sample_n(20)
 ```
 
 ```
-## # A tibble: 500 x 2
-##         x g    
-##     <dbl> <fct>
-##  1  0.709 1    
-##  2 33.9   1    
-##  3 50.0   1    
-##  4 27.8   1    
-##  5 94.5   1    
-##  6 19.8   1    
-##  7 65.9   1    
-##  8 27.9   1    
-##  9 47.3   1    
-## 10 13.1   1    
-## # ... with 490 more rows
+## # A tibble: 20 x 2
+##          x g    
+##      <dbl> <fct>
+##  1  88.8   2    
+##  2  97.0   1    
+##  3  43.1   1    
+##  4  43.2   1    
+##  5   8.42  1    
+##  6   6.19  1    
+##  7  10.6   1    
+##  8  15.2   1    
+##  9  54.7   1    
+## 10  93.6   2    
+## 11  20.4   1    
+## 12 100     1    
+## 13  23.8   1    
+## 14  49.6   2    
+## 15   0.709 1    
+## 16  77.1   1    
+## 17  29.7   1    
+## 18   6.50  1    
+## 19   6.52  1    
+## 20  28.7   2
 ```
 
 Como este problema es de dos clases, podemos graficar como sigue:
@@ -458,24 +467,34 @@ probabilidad correspondiente a la columna hat_p_g:
 
 
 ```r
-head(dat_dev, 50)
+set.seed(125)
+dat_dev %>% sample_n(20)
 ```
 
 ```
-## # A tibble: 50 x 5
+## # A tibble: 20 x 5
 ##         x g     hat_p_1 hat_p_2 hat_p_g
 ##     <dbl> <fct>   <dbl>   <dbl>   <dbl>
-##  1  0.709 1       0.967  0.0333   0.967
-##  2 33.9   1       0.867  0.133    0.867
-##  3 50.0   1       0.783  0.217    0.783
-##  4 27.8   1       0.85   0.15     0.85 
-##  5 94.5   1       0.417  0.583    0.417
-##  6 19.8   1       0.9    0.1      0.9  
-##  7 65.9   1       0.733  0.267    0.733
-##  8 27.9   1       0.867  0.133    0.867
-##  9 47.3   1       0.683  0.317    0.683
-## 10 13.1   1       0.933  0.0667   0.933
-## # ... with 40 more rows
+##  1   9.47 1       0.967  0.0333   0.967
+##  2 100    2       0.417  0.583    0.583
+##  3   6.70 1       0.983  0.0167   0.983
+##  4  57.6  2       0.683  0.317    0.317
+##  5  54.1  1       0.683  0.317    0.683
+##  6  37.4  1       0.817  0.183    0.817
+##  7  69.5  1       0.667  0.333    0.667
+##  8   6.82 1       0.983  0.0167   0.983
+##  9  50.8  2       0.767  0.233    0.233
+## 10  59.3  1       0.7    0.3      0.7  
+## 11  65.9  1       0.733  0.267    0.733
+## 12   9.64 1       0.967  0.0333   0.967
+## 13  67.3  1       0.717  0.283    0.717
+## 14  10.3  1       0.967  0.0333   0.967
+## 15  25.8  1       0.867  0.133    0.867
+## 16  30.4  1       0.867  0.133    0.867
+## 17  12.0  1       0.967  0.0333   0.967
+## 18   2.42 1       0.967  0.0333   0.967
+## 19  36.4  1       0.833  0.167    0.833
+## 20  84.8  2       0.483  0.517    0.517
 ```
 
 Ahora aplicamos la función $s$ que describimos arriba, y promediamos sobre
@@ -501,6 +520,13 @@ desempeño del modelo. Hagamos el cálculo entonces para una muestra de prueba:
 ```r
 set.seed(1213)
 dat_prueba <- simular_impago(n = 500) %>% select(x, g)
+```
+
+```
+## Warning in rbinom(length(x), 1, probs): NAs produced
+```
+
+```r
 vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = dat_prueba, kernel = 'rectangular')
 dat_dev <- dat_prueba %>% select(x,g)
@@ -515,7 +541,7 @@ dat_dev %>% ungroup %>% summarise(dev_prueba = mean(dev))
 ## # A tibble: 1 x 1
 ##   dev_prueba
 ##        <dbl>
-## 1      0.919
+## 1         NA
 ```
 
 
@@ -577,7 +603,7 @@ dat_dev %>% mutate(correcto = hat_G == g) %>%
 ## # A tibble: 1 x 2
 ##   p_correctos error_clasif
 ##         <dbl>        <dbl>
-## 1       0.784        0.216
+## 1          NA           NA
 ```
 
 Y calculamos el error de clasificación de prueba:
@@ -596,7 +622,7 @@ dat_dev %>% mutate(correcto = hat_G == g) %>%
 ## # A tibble: 1 x 2
 ##   p_correctos error_clasif
 ##         <dbl>        <dbl>
-## 1       0.744        0.256
+## 1          NA           NA
 ```
 
 ### Discusión: relación entre devianza y error de clasificación
@@ -1361,4 +1387,6 @@ mean(y_prueba != y_pred)
 
 ### Tarea {-}
 
-La tarea está en el documento *tareas/tarea_3.Rmd* del repositorio.
+- **Ojo**: La tarea actualizada 
+estará disponible a más tardar el 29 de agosto.
+

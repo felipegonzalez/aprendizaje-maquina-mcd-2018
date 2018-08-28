@@ -1387,6 +1387,7 @@ mean(y_prueba != y_pred)
 
 ### Tarea {-}
 
-- **Ojo**: La tarea actualizada 
-estará disponible a más tardar el 29 de agosto.
+La tarea está en *tareas/tarea_3_actualizada.Rmd*. (Nota: la versión anterior la 
+dejaremos para más tarde. Si ya resolvieron la versión anterior no hay problema. 
+Si tienen dudas pueden escribirme a felipexgonzalez at gmail dot com).
 

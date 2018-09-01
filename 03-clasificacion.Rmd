@@ -160,10 +160,10 @@ Vamos a generar unos datos con el modelo simple del ejemplo anterior:
 ```{r, warning = FALSE, message = FALSE}
 library(tidyverse)
 library(kknn) # para hacer vecinos más cercanos
-simular_impago <- function(n = 100){
+simular_impago <- function(n = 500){
     # suponemos que los valores de x están concentrados en valores bajos,
     # quizá la manera en que los créditos son otorgados
-    x <- pmin(rexp(500, 1 / 40), n)
+    x <- pmin(rexp(n, 1 / 40), 100)
     # las probabilidades de estar al corriente:
     probs <- p_1(x)
     # finalmente, simulamos cuáles clientes siguen en al corriente y cuales no:
@@ -242,7 +242,7 @@ más cercanos (curva roja):
 ```{r,fig.width = 5, fig.asp = 0.7}
 graf_data <- data_frame(x = seq(0,100, 1))
 vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
-              test = graf_data, kernel = 'rectangular')
+              test = graf_data)
 graf_data$p_1 <- vmc$prob[ ,1]
 graf_verdadero <- data_frame(x = 0:100, p_1 = p_1(x))
 graf_1 + 
@@ -403,7 +403,6 @@ calculamos la devianza de entrenamiento
 
 ```{r}
 s <- function(x) -2*log(x)
-
 vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = dat_ent, kernel = 'rectangular')
 dat_dev <- dat_ent %>% select(x,g)

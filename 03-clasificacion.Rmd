@@ -646,7 +646,7 @@ valores de $\beta_0$ y $\beta_1$.
 #### Ejemplo {-}
 En nuestro ejemplo, teníamos el siguiente ajuste con k-vecinos más cercanos:
 
-```{r}
+```{r, fig.width = 5, fig.asp = 0.7}
 graf_data <- data_frame(x = seq(0,100, 1))
 vmc_graf <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = graf_data, kernel = 'rectangular')
@@ -663,7 +663,7 @@ las betas para p_mod_1 y p_mod_2 en el ejemplo de abajo)
 algunos modelos logísticos para las probabilidades
 de clase:
 
-```{r}
+```{r, fig.width = 5, fig.asp = 0.7}
 h <- function(z) exp(z)/(1+exp(z))
 p_logistico <- function(beta_0, beta_1){
   p <- function(x){

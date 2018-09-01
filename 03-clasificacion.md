@@ -156,10 +156,10 @@ Vamos a generar unos datos con el modelo simple del ejemplo anterior:
 ```r
 library(tidyverse)
 library(kknn) # para hacer vecinos más cercanos
-simular_impago <- function(n = 100){
+simular_impago <- function(n = 500){
     # suponemos que los valores de x están concentrados en valores bajos,
     # quizá la manera en que los créditos son otorgados
-    x <- pmin(rexp(500, 1 / 40), n)
+    x <- pmin(rexp(n, 1 / 40), 100)
     # las probabilidades de estar al corriente:
     probs <- p_1(x)
     # finalmente, simulamos cuáles clientes siguen en al corriente y cuales no:
@@ -266,7 +266,7 @@ más cercanos (curva roja):
 ```r
 graf_data <- data_frame(x = seq(0,100, 1))
 vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
-              test = graf_data, kernel = 'rectangular')
+              test = graf_data)
 graf_data$p_1 <- vmc$prob[ ,1]
 graf_verdadero <- data_frame(x = 0:100, p_1 = p_1(x))
 graf_1 + 
@@ -453,7 +453,6 @@ calculamos la devianza de entrenamiento
 
 ```r
 s <- function(x) -2*log(x)
-
 vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = dat_ent, kernel = 'rectangular')
 dat_dev <- dat_ent %>% select(x,g)
@@ -520,13 +519,6 @@ desempeño del modelo. Hagamos el cálculo entonces para una muestra de prueba:
 ```r
 set.seed(1213)
 dat_prueba <- simular_impago(n = 500) %>% select(x, g)
-```
-
-```
-## Warning in rbinom(length(x), 1, probs): NAs produced
-```
-
-```r
 vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = dat_prueba, kernel = 'rectangular')
 dat_dev <- dat_prueba %>% select(x,g)
@@ -541,7 +533,7 @@ dat_dev %>% ungroup %>% summarise(dev_prueba = mean(dev))
 ## # A tibble: 1 x 1
 ##   dev_prueba
 ##        <dbl>
-## 1         NA
+## 1      0.919
 ```
 
 
@@ -603,7 +595,7 @@ dat_dev %>% mutate(correcto = hat_G == g) %>%
 ## # A tibble: 1 x 2
 ##   p_correctos error_clasif
 ##         <dbl>        <dbl>
-## 1          NA           NA
+## 1       0.784        0.216
 ```
 
 Y calculamos el error de clasificación de prueba:
@@ -622,7 +614,7 @@ dat_dev %>% mutate(correcto = hat_G == g) %>%
 ## # A tibble: 1 x 2
 ##   p_correctos error_clasif
 ##         <dbl>        <dbl>
-## 1          NA           NA
+## 1       0.744        0.256
 ```
 
 ### Discusión: relación entre devianza y error de clasificación
@@ -773,7 +765,7 @@ graf_1 +
     ylab('Probabilidad al corriente') + xlab('% crédito usado')
 ```
 
-<img src="03-clasificacion_files/figure-html/unnamed-chunk-28-1.png" width="672" />
+<img src="03-clasificacion_files/figure-html/unnamed-chunk-28-1.png" width="480" />
 
 Ahora intentaremos ajustar a mano (intenta cambiar
 las betas para p_mod_1 y p_mod_2 en el ejemplo de abajo) 
@@ -800,7 +792,7 @@ graf_1 +
   ylab('Probabilidad al corriente') + xlab('% crédito usado')
 ```
 
-<img src="03-clasificacion_files/figure-html/unnamed-chunk-29-1.png" width="672" />
+<img src="03-clasificacion_files/figure-html/unnamed-chunk-29-1.png" width="480" />
 
 Podemos usar también la función glm de R para ajustar los coeficientes:
 

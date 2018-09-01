@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-08-28">
+<meta name="date" content="2018-09-01">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -346,10 +346,10 @@ dos métodos: k-vecinos más cercanos y regresión logística.</p>
 <p>Vamos a generar unos datos con el modelo simple del ejemplo anterior:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
 <span class="kw">library</span>(kknn) <span class="co"># para hacer vecinos más cercanos</span>
-simular_impago &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">n =</span> <span class="dv">100</span>){
+simular_impago &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">n =</span> <span class="dv">500</span>){
     <span class="co"># suponemos que los valores de x están concentrados en valores bajos,</span>
     <span class="co"># quizá la manera en que los créditos son otorgados</span>
-    x &lt;-<span class="st"> </span><span class="kw">pmin</span>(<span class="kw">rexp</span>(<span class="dv">500</span>, <span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="dv">40</span>), n)
+    x &lt;-<span class="st"> </span><span class="kw">pmin</span>(<span class="kw">rexp</span>(n, <span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="dv">40</span>), <span class="dv">100</span>)
     <span class="co"># las probabilidades de estar al corriente:</span>
     probs &lt;-<span class="st"> </span><span class="kw">p_1</span>(x)
     <span class="co"># finalmente, simulamos cuáles clientes siguen en al corriente y cuales no:</span>
@@ -429,7 +429,7 @@ probabilidad condicional de estar al corriente usando k vecinos
 más cercanos (curva roja):</p>
 <pre class="sourceCode r"><code class="sourceCode r">graf_data &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">x =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">100</span>, <span class="dv">1</span>))
 vmc &lt;-<span class="st"> </span><span class="kw">kknn</span>(g <span class="op">~</span><span class="st"> </span>x, <span class="dt">train =</span> dat_ent,  <span class="dt">k =</span> <span class="dv">60</span>,
-              <span class="dt">test =</span> graf_data, <span class="dt">kernel =</span> <span class="st">&#39;rectangular&#39;</span>)
+              <span class="dt">test =</span> graf_data)
 graf_data<span class="op">$</span>p_<span class="dv">1</span> &lt;-<span class="st"> </span>vmc<span class="op">$</span>prob[ ,<span class="dv">1</span>]
 graf_verdadero &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">x =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">100</span>, <span class="dt">p_1 =</span> <span class="kw">p_1</span>(x))
 graf_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>
@@ -574,7 +574,6 @@ que es una estimación de la devianza de predicción
 <p>Regresamos a nuestros ejemplo simulado de impago de tarjetas de crédito. Primero
 calculamos la devianza de entrenamiento</p>
 <pre class="sourceCode r"><code class="sourceCode r">s &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="dv">-2</span><span class="op">*</span><span class="kw">log</span>(x)
-
 vmc &lt;-<span class="st"> </span><span class="kw">kknn</span>(g <span class="op">~</span><span class="st"> </span>x, <span class="dt">train =</span> dat_ent,  <span class="dt">k =</span> <span class="dv">60</span>,
               <span class="dt">test =</span> dat_ent, <span class="dt">kernel =</span> <span class="st">&#39;rectangular&#39;</span>)
 dat_dev &lt;-<span class="st"> </span>dat_ent <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(x,g)
@@ -619,9 +618,8 @@ dat_dev <span class="op">%&gt;%</span><span class="st"> </span>ungroup <span cla
 <p>Recordemos que la devianza de entrenamiento no es la cantidad que evalúa el
 desempeño del modelo. Hagamos el cálculo entonces para una muestra de prueba:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1213</span>)
-dat_prueba &lt;-<span class="st"> </span><span class="kw">simular_impago</span>(<span class="dt">n =</span> <span class="dv">500</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(x, g)</code></pre>
-<pre><code>## Warning in rbinom(length(x), 1, probs): NAs produced</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r">vmc &lt;-<span class="st"> </span><span class="kw">kknn</span>(g <span class="op">~</span><span class="st"> </span>x, <span class="dt">train =</span> dat_ent,  <span class="dt">k =</span> <span class="dv">60</span>,
+dat_prueba &lt;-<span class="st"> </span><span class="kw">simular_impago</span>(<span class="dt">n =</span> <span class="dv">500</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(x, g)
+vmc &lt;-<span class="st"> </span><span class="kw">kknn</span>(g <span class="op">~</span><span class="st"> </span>x, <span class="dt">train =</span> dat_ent,  <span class="dt">k =</span> <span class="dv">60</span>,
               <span class="dt">test =</span> dat_prueba, <span class="dt">kernel =</span> <span class="st">&#39;rectangular&#39;</span>)
 dat_dev &lt;-<span class="st"> </span>dat_prueba <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(x,g)
 dat_dev<span class="op">$</span>hat_p_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc, <span class="dt">type =</span><span class="st">&#39;prob&#39;</span>)[,<span class="dv">1</span>]
@@ -632,7 +630,7 @@ dat_dev <span class="op">%&gt;%</span><span class="st"> </span>ungroup <span cla
 <pre><code>## # A tibble: 1 x 1
 ##   dev_prueba
 ##        &lt;dbl&gt;
-## 1         NA</code></pre>
+## 1      0.919</code></pre>
 </div>
 <div id="ejercicio-1" class="section level3">
 <h3><span class="header-section-number">3.3.1</span> Ejercicio</h3>
@@ -684,7 +682,7 @@ dat_dev <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">
 <pre><code>## # A tibble: 1 x 2
 ##   p_correctos error_clasif
 ##         &lt;dbl&gt;        &lt;dbl&gt;
-## 1          NA           NA</code></pre>
+## 1       0.784        0.216</code></pre>
 <p>Y calculamos el error de clasificación de prueba:</p>
 <pre class="sourceCode r"><code class="sourceCode r">vmc_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">kknn</span>(g <span class="op">~</span><span class="st"> </span>x, <span class="dt">train =</span> dat_ent,  <span class="dt">k =</span> <span class="dv">3</span>,
               <span class="dt">test =</span> dat_prueba, <span class="dt">kernel =</span> <span class="st">&#39;rectangular&#39;</span>)
@@ -695,7 +693,7 @@ dat_dev <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">
 <pre><code>## # A tibble: 1 x 2
 ##   p_correctos error_clasif
 ##         &lt;dbl&gt;        &lt;dbl&gt;
-## 1          NA           NA</code></pre>
+## 1       0.744        0.256</code></pre>
 </div>
 </div>
 <div id="discusion-relacion-entre-devianza-y-error-de-clasificacion" class="section level3">
@@ -822,7 +820,7 @@ graf_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span
 <span class="st">    </span><span class="kw">geom_line</span>(<span class="dt">data =</span> graf_data, <span class="kw">aes</span>(<span class="dt">y =</span> p_<span class="dv">1</span>), <span class="dt">colour =</span> <span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="fl">1.2</span>) <span class="op">+</span>
 <span class="st">    </span><span class="kw">geom_line</span>(<span class="dt">data =</span> graf_verdadero, <span class="kw">aes</span>(<span class="dt">y =</span> p_<span class="dv">1</span>)) <span class="op">+</span>
 <span class="st">    </span><span class="kw">ylab</span>(<span class="st">&#39;Probabilidad al corriente&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">xlab</span>(<span class="st">&#39;% crédito usado&#39;</span>)</code></pre>
-<p><img src="03-clasificacion_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<p><img src="03-clasificacion_files/figure-html/unnamed-chunk-28-1.png" width="480" /></p>
 <p>Ahora intentaremos ajustar a mano (intenta cambiar
 las betas para p_mod_1 y p_mod_2 en el ejemplo de abajo)
 algunos modelos logísticos para las probabilidades
@@ -843,7 +841,7 @@ graf_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span
 <span class="st">    </span><span class="kw">geom_line</span>(<span class="dt">data =</span> graf_data, <span class="kw">aes</span>(<span class="dt">y =</span> p_mod_<span class="dv">1</span>), <span class="dt">colour =</span> <span class="st">&#39;orange&#39;</span>, <span class="dt">size=</span><span class="fl">1.2</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data =</span> graf_verdadero, <span class="kw">aes</span>(<span class="dt">y =</span> p_<span class="dv">1</span>)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">ylab</span>(<span class="st">&#39;Probabilidad al corriente&#39;</span>) <span class="op">+</span><span class="st"> </span><span class="kw">xlab</span>(<span class="st">&#39;% crédito usado&#39;</span>)</code></pre>
-<p><img src="03-clasificacion_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p><img src="03-clasificacion_files/figure-html/unnamed-chunk-29-1.png" width="480" /></p>
 <p>Podemos usar también la función glm de R para ajustar los coeficientes:</p>
 <pre class="sourceCode r"><code class="sourceCode r">mod_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">glm</span>(g<span class="op">==</span><span class="dv">1</span> <span class="op">~</span><span class="st"> </span>x, <span class="dt">data =</span> dat_ent, <span class="dt">family =</span> <span class="st">&#39;binomial&#39;</span>)
 <span class="kw">coef</span>(mod_<span class="dv">1</span>)</code></pre>

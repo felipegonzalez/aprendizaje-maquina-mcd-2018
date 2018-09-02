@@ -403,11 +403,11 @@ calculamos la devianza de entrenamiento
 
 ```{r}
 s <- function(x) -2*log(x)
-vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
+vmc_entrena <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = dat_ent, kernel = 'rectangular')
 dat_dev <- dat_ent %>% select(x,g)
-dat_dev$hat_p_1 <- predict(vmc, type ='prob')[,1]
-dat_dev$hat_p_2 <- predict(vmc, type ='prob')[,2]
+dat_dev$hat_p_1 <- predict(vmc_entrena, type ='prob')[,1]
+dat_dev$hat_p_2 <- predict(vmc_entrena, type ='prob')[,2]
 dat_dev <- dat_dev %>% mutate(hat_p_g = ifelse(g==1, hat_p_1, hat_p_2))
 ```
 
@@ -432,12 +432,12 @@ desempeño del modelo. Hagamos el cálculo entonces para una muestra de prueba:
 
 ```{r}
 set.seed(1213)
-dat_prueba <- simular_impago(n = 500) %>% select(x, g)
-vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
+dat_prueba <- simular_impago(n = 1000) %>% select(x, g)
+vmc_prueba <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = dat_prueba, kernel = 'rectangular')
 dat_dev <- dat_prueba %>% select(x,g)
-dat_dev$hat_p_1 <- predict(vmc, type ='prob')[,1]
-dat_dev$hat_p_2 <- predict(vmc, type ='prob')[,2]
+dat_dev$hat_p_1 <- predict(vmc_prueba, type ='prob')[,1]
+dat_dev$hat_p_2 <- predict(vmc_prueba, type ='prob')[,2]
 dat_dev <- dat_dev %>% mutate(hat_p_g = ifelse(g==1, hat_p_1, hat_p_2))
 dat_dev <- dat_dev %>% mutate(dev = s(hat_p_g))
 dat_dev %>% ungroup %>% summarise(dev_prueba = mean(dev))
@@ -454,7 +454,6 @@ Nota: ten cuidado con probabilidades iguales a 0 o 1, pues en en estos casos
 la devianza puede dar $\infty$. Puedes por ejemplo hacer que las probabilidades
 siempre estén en $[\epsilon, 1-\epsilon]$ para $\epsilon>0$ chica.
 
-Empieza con el código en *clase_3_ejercicio.R*.
 
 
 
@@ -471,7 +470,6 @@ ser construido a partir de probabilidades de clase),
 decimos que su **error de clasificación** es
 
 $$P(\hat{G}\neq G)$$
-
 
 ```
 
@@ -495,6 +493,8 @@ es decir, la proporción de casos de prueba que son clasificados incorrectamente
 Veamos cómo se comporta en términos de error de clasificación nuestro último modelo:
 
 ```{r}
+vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
+              test = dat_ent, kernel = 'rectangular')
 dat_dev$hat_G <- predict(vmc)
 dat_dev %>% mutate(correcto = hat_G == g) %>% 
   ungroup %>% summarise(p_correctos = mean(correcto)) %>%
@@ -504,7 +504,7 @@ dat_dev %>% mutate(correcto = hat_G == g) %>%
 Y calculamos el error de clasificación de prueba:
 
 ```{r}
-vmc_2 <- kknn(g ~ x, train = dat_ent,  k = 3,
+vmc_2 <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = dat_prueba, kernel = 'rectangular')
 dat_dev$hat_G <- predict(vmc_2)
 dat_dev %>% mutate(correcto = hat_G == g) %>% 

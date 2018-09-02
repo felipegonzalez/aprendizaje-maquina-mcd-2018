@@ -40,16 +40,16 @@ donde el objetivo
 es estimar lo mejor que podamos la función $f$ mediante un estimador
 $\hat{f}$. Usamos entonces $\hat{f}$ para hacer predicciónes. En el caso de regresión:
   
-  - $f(X)$ es la relación sistemática de $Y$ en función de $X$
-  - Dada $X$, la variable observada $Y$ es una variable aleatoria
+- $f(X)$ es la relación sistemática de $Y$ en función de $X$
+- Dada $X$, la variable observada $Y$ es una variable aleatoria
   ($\epsilon$ depende de otras variables que no conocemos)
 
 No podemos usar un modelo así
 en clasificación pues $G$ no es numérica. Sin embargo, podemos pensar que $X$
-  nos da cierta información probabilística acerca de las clases que pueden ocurrir:
+nos da cierta información probabilística acerca de las clases que pueden ocurrir:
   
-  - $P(G|X)$ es la probabilidad condicional de observar $G$ si tenemos $X$. Esto es la información sistemática de $G$ en función de $X$
-  - Dada $X$, la clase observada $G$ es una variable aleatoria 
+- $P(G|X)$ es la probabilidad condicional de observar $G$ si tenemos $X$. Esto es la información sistemática de $G$ en función de $X$
+- Dada $X$, la clase observada $G$ es una variable aleatoria 
 (depende de otras variables que no conocemos).
 
 En analogía con el problema de regresión, quisiéramos estimar las probabilidades condicionales $P(G|X)$, que es la parte sistemática de la relación de $G$ en función de $X$.
@@ -453,11 +453,11 @@ calculamos la devianza de entrenamiento
 
 ```r
 s <- function(x) -2*log(x)
-vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
+vmc_entrena <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = dat_ent, kernel = 'rectangular')
 dat_dev <- dat_ent %>% select(x,g)
-dat_dev$hat_p_1 <- predict(vmc, type ='prob')[,1]
-dat_dev$hat_p_2 <- predict(vmc, type ='prob')[,2]
+dat_dev$hat_p_1 <- predict(vmc_entrena, type ='prob')[,1]
+dat_dev$hat_p_2 <- predict(vmc_entrena, type ='prob')[,2]
 dat_dev <- dat_dev %>% mutate(hat_p_g = ifelse(g==1, hat_p_1, hat_p_2))
 ```
 
@@ -518,22 +518,22 @@ desempeño del modelo. Hagamos el cálculo entonces para una muestra de prueba:
 
 ```r
 set.seed(1213)
-dat_prueba <- simular_impago(n = 500) %>% select(x, g)
-vmc <- kknn(g ~ x, train = dat_ent,  k = 60,
+dat_prueba <- simular_impago(n = 1000) %>% select(x, g)
+vmc_prueba <- kknn(g ~ x, train = dat_ent,  k = 60,
               test = dat_prueba, kernel = 'rectangular')
-dat_dev <- dat_prueba %>% select(x,g)
-dat_dev$hat_p_1 <- predict(vmc, type ='prob')[,1]
-dat_dev$hat_p_2 <- predict(vmc, type ='prob')[,2]
-dat_dev <- dat_dev %>% mutate(hat_p_g = ifelse(g==1, hat_p_1, hat_p_2))
-dat_dev <- dat_dev %>% mutate(dev = s(hat_p_g))
-dat_dev %>% ungroup %>% summarise(dev_prueba = mean(dev))
+dat_dev_prueba <- dat_prueba %>% select(x,g)
+dat_dev_prueba$hat_p_1 <- predict(vmc_prueba, type ='prob')[,1]
+dat_dev_prueba$hat_p_2 <- predict(vmc_prueba, type ='prob')[,2]
+dat_dev_prueba <- dat_dev_prueba %>% mutate(hat_p_g = ifelse(g==1, hat_p_1, hat_p_2))
+dat_dev_prueba <- dat_dev_prueba %>% mutate(dev = s(hat_p_g))
+dat_dev_prueba %>% ungroup %>% summarise(dev_prueba = mean(dev))
 ```
 
 ```
 ## # A tibble: 1 x 1
 ##   dev_prueba
 ##        <dbl>
-## 1      0.919
+## 1      0.851
 ```
 
 
@@ -547,7 +547,6 @@ Nota: ten cuidado con probabilidades iguales a 0 o 1, pues en en estos casos
 la devianza puede dar $\infty$. Puedes por ejemplo hacer que las probabilidades
 siempre estén en $[\epsilon, 1-\epsilon]$ para $\epsilon>0$ chica.
 
-Empieza con el código en *clase_3_ejercicio.R*.
 
 
 
@@ -563,7 +562,6 @@ ser construido a partir de probabilidades de clase),
 decimos que su **error de clasificación** es
 
 $$P(\hat{G}\neq G)$$
-
 </div>\EndKnitrBlock{comentario}
 
 Aunque esta definición aplica para cualquier clasificador, podemos usarlo
@@ -585,7 +583,7 @@ Veamos cómo se comporta en términos de error de clasificación nuestro último
 
 
 ```r
-dat_dev$hat_G <- predict(vmc)
+dat_dev$hat_G <- predict(vmc_entrena)
 dat_dev %>% mutate(correcto = hat_G == g) %>% 
   ungroup %>% summarise(p_correctos = mean(correcto)) %>%
   mutate(error_clasif = 1 - p_correctos)
@@ -595,17 +593,15 @@ dat_dev %>% mutate(correcto = hat_G == g) %>%
 ## # A tibble: 1 x 2
 ##   p_correctos error_clasif
 ##         <dbl>        <dbl>
-## 1       0.784        0.216
+## 1       0.828        0.172
 ```
 
 Y calculamos el error de clasificación de prueba:
 
 
 ```r
-vmc_2 <- kknn(g ~ x, train = dat_ent,  k = 3,
-              test = dat_prueba, kernel = 'rectangular')
-dat_dev$hat_G <- predict(vmc_2)
-dat_dev %>% mutate(correcto = hat_G == g) %>% 
+dat_dev_prueba$hat_G <- predict(vmc_prueba)
+dat_dev_prueba %>% mutate(correcto = hat_G == g) %>% 
   ungroup %>% summarise(p_correctos = mean(correcto)) %>%
   mutate(error_clasif = 1 - p_correctos)
 ```
@@ -614,7 +610,7 @@ dat_dev %>% mutate(correcto = hat_G == g) %>%
 ## # A tibble: 1 x 2
 ##   p_correctos error_clasif
 ##         <dbl>        <dbl>
-## 1       0.744        0.256
+## 1       0.799        0.201
 ```
 
 ### Discusión: relación entre devianza y error de clasificación
@@ -657,8 +653,6 @@ se equivoca).
 
 
 
-
-
 ## Regresión logística
 
 En $k$ vecinos más cercanos, intentamos estimar directamente con promedios
@@ -684,8 +678,7 @@ k vecinos más cercanos:
 knitr::include_graphics(path = c("figuras/clas_lineal.png", "figuras/clas_nolineal.png"))
 ```
 
-<img src="figuras/clas_lineal.png" width="420" /><img src="figuras/clas_nolineal.png" width="420" />
-
+<img src="figuras/clas_lineal.png" width="350" /><img src="figuras/clas_nolineal.png" width="350" />
 
 
 ### Regresión logística simple
@@ -1160,47 +1153,50 @@ head(dat_ent)
 
 ```r
 coeficientes <- iteraciones[200,]
+names(coeficientes) <- c("Intercept", "x_s")
 coeficientes
 ```
 
 ```
-## [1]  1.772442 -1.100099
+## Intercept       x_s 
+##  1.772442 -1.100099
 ```
-Como centramos todas las entradas, la ordenada al origen se interpreta
+Como centramos todas las entradas, la ordenada al origen (*Intercept*) se interpreta
 como la probabilidad de clase cuando todas las variables están en su media:
+
+```r
+options(digits = 2)
+coeficientes[1]
+```
+
+```
+## Intercept 
+##       1.8
+```
 
 ```r
 h(coeficientes[1])
 ```
 
 ```
-## [1] 0.8547611
+## Intercept 
+##      0.85
 ```
 
-
-Esto quiere decir que la probabilidad de estar al corriente ds de 87\% cuando
+Esto quiere decir que la probabilidad de estar al corriente es de 87\% cuando
 la variable $x$ está en su media.
 
 Si $x$ se incrementa en una desviación estándar, la cantidad
 $$z = \beta_0 + \beta_1x$$
-baja por la cantidad
+ la probabilidad de estar al corriente cambia a 67\%:
 
 ```r
-coeficientes[2]
+h(coeficientes[1]+ coeficientes[2]*1)
 ```
 
 ```
-## [1] -1.100099
-```
-
-Y la probabilidad de estar al corriente cambia a 70\%:
-
-```r
-h(coeficientes[1]+ coeficientes[2])
-```
-
-```
-## [1] 0.6620277
+## Intercept 
+##      0.66
 ```
 
 Nótese que una desviación estándar de $x$ equivale a
@@ -1211,14 +1207,30 @@ sd(dat_ent$x)
 ```
 
 ```
-## [1] 29.4762
+## [1] 29
 ```
+
+Así que en las unidades originales, un incremento de 30 en la variable $x$
+implica un cambio de 
+
+
+```r
+h(coeficientes[1] + coeficientes[2]) - h(coeficientes[1])
+```
+
+```
+## Intercept 
+##     -0.19
+```
+
+es decir, la probabilidad de manenterse al corriente baja 19 puntos porcentuales,
+de 85\% a 67%
 
 **Ojo**: En regresión lineal, las variables contribuyen independientemente
 de otras al predictor. Eso no pasa en regresión logística debido a la no linealidad
 introducida por la función logística $h$. Por ejemplo, imaginemos el modelo:
 
-$$p(z) = h(0.5 + 0.2 x_1 -0.5 x_2),$$
+$$p(z) = h(0.5 + 0.2 x_1 -0.5 x_2 + 0.7x_3),$$
 y suponemos las entradas normalizadas.
 Si todas las variables están en su media, la probabilidad de clase 1 es
 
@@ -1227,7 +1239,7 @@ h(0.5)
 ```
 
 ```
-## [1] 0.6224593
+## [1] 0.62
 ```
 
 Si todas las variables están en su media, y cambiamos en 1 desviación estándar la
@@ -1238,7 +1250,7 @@ h(0.5+0.2)
 ```
 
 ```
-## [1] 0.6681878
+## [1] 0.67
 ```
 
 Y el cambio en puntos de probabilidad es:
@@ -1248,7 +1260,7 @@ h(0.5+0.2) - h(0.5)
 ```
 
 ```
-## [1] 0.04572844
+## [1] 0.046
 ```
 
 Pero si la variable $x_2 = -1$, por ejemplo, el cambio en probabilidad es de
@@ -1258,8 +1270,9 @@ h(0.5+ 0.2 + 0.5*1) - h(0.5 + 0.5*1)
 ```
 
 ```
-## [1] 0.0374662
+## [1] 0.037
 ```
+
 
 ## Ejercicio: datos de diabetes
 
@@ -1361,7 +1374,7 @@ dev_prueba(iteraciones[1000,])/nrow(x_prueba)
 ```
 
 ```
-## [1] 0.8813972
+## [1] 0.88
 ```
 
 Y para el error clasificación de prueba, necesitamos las probabilidades de clase ajustadas:
@@ -1374,7 +1387,7 @@ mean(y_prueba != y_pred)
 ```
 
 ```
-## [1] 0.1987952
+## [1] 0.2
 ```
 
 ### Tarea {-}

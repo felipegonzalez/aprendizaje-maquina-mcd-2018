@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-09-01">
+<meta name="date" content="2018-09-02">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="regresion.html">
-
+<link rel="next" href="mas-sobre-problemas-de-clasificacion.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -191,6 +191,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="logistica.html"><a href="logistica.html#tarea-2"><i class="fa fa-check"></i>Tarea</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="4" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html"><i class="fa fa-check"></i><b>4</b> Más sobre problemas de clasificación</a><ul>
+<li class="chapter" data-level="4.1" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#analisis-de-error-para-clasificadores-binarios"><i class="fa fa-check"></i><b>4.1</b> Análisis de error para clasificadores binarios</a><ul>
+<li class="chapter" data-level="" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#medidas-resumen-de-desempeno"><i class="fa fa-check"></i>Medidas resumen de desempeño</a></li>
+<li class="chapter" data-level="" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#interpetacion-de-resumenes-de-desempeno-y-tasas-base"><i class="fa fa-check"></i>Interpetación de resúmenes de desempeño y tasas base</a></li>
+<li class="chapter" data-level="4.1.1" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#puntos-de-corte-para-un-clasificador-binario"><i class="fa fa-check"></i><b>4.1.1</b> Puntos de corte para un clasificador binario</a></li>
+<li class="chapter" data-level="4.1.2" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#espacio-roc-de-clasificadores"><i class="fa fa-check"></i><b>4.1.2</b> Espacio ROC de clasificadores</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#perfil-de-un-clasificador-binario-y-curvas-roc"><i class="fa fa-check"></i><b>4.2</b> Perfil de un clasificador binario y curvas ROC</a></li>
+<li class="chapter" data-level="4.3" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#regresion-logistica-para-problemas-de-mas-de-2-clases"><i class="fa fa-check"></i><b>4.3</b> Regresión logística para problemas de más de 2 clases</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#regresion-logistica-multinomial"><i class="fa fa-check"></i><b>4.3.1</b> Regresión logística multinomial</a></li>
+<li class="chapter" data-level="4.3.2" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#interpretacion-de-coeficientes"><i class="fa fa-check"></i><b>4.3.2</b> Interpretación de coeficientes</a></li>
+<li class="chapter" data-level="4.3.3" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#ejemplo-clasificacion-de-digitos-con-regresion-multinomial"><i class="fa fa-check"></i><b>4.3.3</b> Ejemplo: Clasificación de dígitos con regresión multinomial</a></li>
+<li class="chapter" data-level="" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#discusion"><i class="fa fa-check"></i>Discusión</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#descenso-en-gradiente-para-regresion-multinomial-logistica"><i class="fa fa-check"></i><b>4.4</b> Descenso en gradiente para regresión multinomial logística</a></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>
 
@@ -248,21 +264,17 @@ donde el objetivo
 es estimar lo mejor que podamos la función <span class="math inline">\(f\)</span> mediante un estimador
 <span class="math inline">\(\hat{f}\)</span>. Usamos entonces <span class="math inline">\(\hat{f}\)</span> para hacer predicciónes. En el caso de regresión:</p>
 <ul>
-<li><span class="math inline">\(f(X)\)</span> es la relación sistemática de <span class="math inline">\(Y\)</span> en función de <span class="math inline">\(X\)</span>
-<ul>
+<li><span class="math inline">\(f(X)\)</span> es la relación sistemática de <span class="math inline">\(Y\)</span> en función de <span class="math inline">\(X\)</span></li>
 <li>Dada <span class="math inline">\(X\)</span>, la variable observada <span class="math inline">\(Y\)</span> es una variable aleatoria
 (<span class="math inline">\(\epsilon\)</span> depende de otras variables que no conocemos)</li>
-</ul></li>
 </ul>
 <p>No podemos usar un modelo así
 en clasificación pues <span class="math inline">\(G\)</span> no es numérica. Sin embargo, podemos pensar que <span class="math inline">\(X\)</span>
 nos da cierta información probabilística acerca de las clases que pueden ocurrir:</p>
 <ul>
-<li><span class="math inline">\(P(G|X)\)</span> es la probabilidad condicional de observar <span class="math inline">\(G\)</span> si tenemos <span class="math inline">\(X\)</span>. Esto es la información sistemática de <span class="math inline">\(G\)</span> en función de <span class="math inline">\(X\)</span>
-<ul>
+<li><span class="math inline">\(P(G|X)\)</span> es la probabilidad condicional de observar <span class="math inline">\(G\)</span> si tenemos <span class="math inline">\(X\)</span>. Esto es la información sistemática de <span class="math inline">\(G\)</span> en función de <span class="math inline">\(X\)</span></li>
 <li>Dada <span class="math inline">\(X\)</span>, la clase observada <span class="math inline">\(G\)</span> es una variable aleatoria
 (depende de otras variables que no conocemos).</li>
-</ul></li>
 </ul>
 <p>En analogía con el problema de regresión, quisiéramos estimar las probabilidades condicionales <span class="math inline">\(P(G|X)\)</span>, que es la parte sistemática de la relación de <span class="math inline">\(G\)</span> en función de <span class="math inline">\(X\)</span>.</p>
 <p>Normalmente codificamos las clases <span class="math inline">\(g\)</span> con una etiqueta numérica, de modo
@@ -574,11 +586,11 @@ que es una estimación de la devianza de predicción
 <p>Regresamos a nuestros ejemplo simulado de impago de tarjetas de crédito. Primero
 calculamos la devianza de entrenamiento</p>
 <pre class="sourceCode r"><code class="sourceCode r">s &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="dv">-2</span><span class="op">*</span><span class="kw">log</span>(x)
-vmc &lt;-<span class="st"> </span><span class="kw">kknn</span>(g <span class="op">~</span><span class="st"> </span>x, <span class="dt">train =</span> dat_ent,  <span class="dt">k =</span> <span class="dv">60</span>,
+vmc_entrena &lt;-<span class="st"> </span><span class="kw">kknn</span>(g <span class="op">~</span><span class="st"> </span>x, <span class="dt">train =</span> dat_ent,  <span class="dt">k =</span> <span class="dv">60</span>,
               <span class="dt">test =</span> dat_ent, <span class="dt">kernel =</span> <span class="st">&#39;rectangular&#39;</span>)
 dat_dev &lt;-<span class="st"> </span>dat_ent <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(x,g)
-dat_dev<span class="op">$</span>hat_p_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc, <span class="dt">type =</span><span class="st">&#39;prob&#39;</span>)[,<span class="dv">1</span>]
-dat_dev<span class="op">$</span>hat_p_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc, <span class="dt">type =</span><span class="st">&#39;prob&#39;</span>)[,<span class="dv">2</span>]
+dat_dev<span class="op">$</span>hat_p_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc_entrena, <span class="dt">type =</span><span class="st">&#39;prob&#39;</span>)[,<span class="dv">1</span>]
+dat_dev<span class="op">$</span>hat_p_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc_entrena, <span class="dt">type =</span><span class="st">&#39;prob&#39;</span>)[,<span class="dv">2</span>]
 dat_dev &lt;-<span class="st"> </span>dat_dev <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">hat_p_g =</span> <span class="kw">ifelse</span>(g<span class="op">==</span><span class="dv">1</span>, hat_p_<span class="dv">1</span>, hat_p_<span class="dv">2</span>))</code></pre>
 <p>Nótese que dependiendo de qué clase observamos (columna <span class="math inline">\(g\)</span>), extraemos la
 probabilidad correspondiente a la columna hat_p_g:</p>
@@ -618,19 +630,19 @@ dat_dev <span class="op">%&gt;%</span><span class="st"> </span>ungroup <span cla
 <p>Recordemos que la devianza de entrenamiento no es la cantidad que evalúa el
 desempeño del modelo. Hagamos el cálculo entonces para una muestra de prueba:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1213</span>)
-dat_prueba &lt;-<span class="st"> </span><span class="kw">simular_impago</span>(<span class="dt">n =</span> <span class="dv">500</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(x, g)
-vmc &lt;-<span class="st"> </span><span class="kw">kknn</span>(g <span class="op">~</span><span class="st"> </span>x, <span class="dt">train =</span> dat_ent,  <span class="dt">k =</span> <span class="dv">60</span>,
+dat_prueba &lt;-<span class="st"> </span><span class="kw">simular_impago</span>(<span class="dt">n =</span> <span class="dv">1000</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(x, g)
+vmc_prueba &lt;-<span class="st"> </span><span class="kw">kknn</span>(g <span class="op">~</span><span class="st"> </span>x, <span class="dt">train =</span> dat_ent,  <span class="dt">k =</span> <span class="dv">60</span>,
               <span class="dt">test =</span> dat_prueba, <span class="dt">kernel =</span> <span class="st">&#39;rectangular&#39;</span>)
-dat_dev &lt;-<span class="st"> </span>dat_prueba <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(x,g)
-dat_dev<span class="op">$</span>hat_p_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc, <span class="dt">type =</span><span class="st">&#39;prob&#39;</span>)[,<span class="dv">1</span>]
-dat_dev<span class="op">$</span>hat_p_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc, <span class="dt">type =</span><span class="st">&#39;prob&#39;</span>)[,<span class="dv">2</span>]
-dat_dev &lt;-<span class="st"> </span>dat_dev <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">hat_p_g =</span> <span class="kw">ifelse</span>(g<span class="op">==</span><span class="dv">1</span>, hat_p_<span class="dv">1</span>, hat_p_<span class="dv">2</span>))
-dat_dev &lt;-<span class="st"> </span>dat_dev <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">dev =</span> <span class="kw">s</span>(hat_p_g))
-dat_dev <span class="op">%&gt;%</span><span class="st"> </span>ungroup <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">dev_prueba =</span> <span class="kw">mean</span>(dev))</code></pre>
+dat_dev_prueba &lt;-<span class="st"> </span>dat_prueba <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(x,g)
+dat_dev_prueba<span class="op">$</span>hat_p_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc_prueba, <span class="dt">type =</span><span class="st">&#39;prob&#39;</span>)[,<span class="dv">1</span>]
+dat_dev_prueba<span class="op">$</span>hat_p_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc_prueba, <span class="dt">type =</span><span class="st">&#39;prob&#39;</span>)[,<span class="dv">2</span>]
+dat_dev_prueba &lt;-<span class="st"> </span>dat_dev_prueba <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">hat_p_g =</span> <span class="kw">ifelse</span>(g<span class="op">==</span><span class="dv">1</span>, hat_p_<span class="dv">1</span>, hat_p_<span class="dv">2</span>))
+dat_dev_prueba &lt;-<span class="st"> </span>dat_dev_prueba <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">dev =</span> <span class="kw">s</span>(hat_p_g))
+dat_dev_prueba <span class="op">%&gt;%</span><span class="st"> </span>ungroup <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">dev_prueba =</span> <span class="kw">mean</span>(dev))</code></pre>
 <pre><code>## # A tibble: 1 x 1
 ##   dev_prueba
 ##        &lt;dbl&gt;
-## 1      0.919</code></pre>
+## 1      0.851</code></pre>
 </div>
 <div id="ejercicio-1" class="section level3">
 <h3><span class="header-section-number">3.3.1</span> Ejercicio</h3>
@@ -641,7 +653,6 @@ crees que la devianza es muy grande para los modelos malos?</p>
 <p>Nota: ten cuidado con probabilidades iguales a 0 o 1, pues en en estos casos
 la devianza puede dar <span class="math inline">\(\infty\)</span>. Puedes por ejemplo hacer que las probabilidades
 siempre estén en <span class="math inline">\([\epsilon, 1-\epsilon]\)</span> para <span class="math inline">\(\epsilon&gt;0\)</span> chica.</p>
-<p>Empieza con el código en <em>clase_3_ejercicio.R</em>.</p>
 </div>
 <div id="error-de-clasificacion-y-funcion-de-perdida-0-1" class="section level3">
 <h3><span class="header-section-number">3.3.2</span> Error de clasificación y función de pérdida 0-1</h3>
@@ -675,25 +686,23 @@ es decir, la proporción de casos de prueba que son clasificados incorrectamente
 <div id="ejemplo-13" class="section level4 unnumbered">
 <h4>Ejemplo</h4>
 <p>Veamos cómo se comporta en términos de error de clasificación nuestro último modelo:</p>
-<pre class="sourceCode r"><code class="sourceCode r">dat_dev<span class="op">$</span>hat_G &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc)
+<pre class="sourceCode r"><code class="sourceCode r">dat_dev<span class="op">$</span>hat_G &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc_entrena)
 dat_dev <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">correcto =</span> hat_G <span class="op">==</span><span class="st"> </span>g) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span>ungroup <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">p_correctos =</span> <span class="kw">mean</span>(correcto)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">error_clasif =</span> <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>p_correctos)</code></pre>
 <pre><code>## # A tibble: 1 x 2
 ##   p_correctos error_clasif
 ##         &lt;dbl&gt;        &lt;dbl&gt;
-## 1       0.784        0.216</code></pre>
+## 1       0.828        0.172</code></pre>
 <p>Y calculamos el error de clasificación de prueba:</p>
-<pre class="sourceCode r"><code class="sourceCode r">vmc_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">kknn</span>(g <span class="op">~</span><span class="st"> </span>x, <span class="dt">train =</span> dat_ent,  <span class="dt">k =</span> <span class="dv">3</span>,
-              <span class="dt">test =</span> dat_prueba, <span class="dt">kernel =</span> <span class="st">&#39;rectangular&#39;</span>)
-dat_dev<span class="op">$</span>hat_G &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc_<span class="dv">2</span>)
-dat_dev <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">correcto =</span> hat_G <span class="op">==</span><span class="st"> </span>g) <span class="op">%&gt;%</span><span class="st"> </span>
+<pre class="sourceCode r"><code class="sourceCode r">dat_dev_prueba<span class="op">$</span>hat_G &lt;-<span class="st"> </span><span class="kw">predict</span>(vmc_prueba)
+dat_dev_prueba <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">correcto =</span> hat_G <span class="op">==</span><span class="st"> </span>g) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span>ungroup <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summarise</span>(<span class="dt">p_correctos =</span> <span class="kw">mean</span>(correcto)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">error_clasif =</span> <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>p_correctos)</code></pre>
 <pre><code>## # A tibble: 1 x 2
 ##   p_correctos error_clasif
 ##         &lt;dbl&gt;        &lt;dbl&gt;
-## 1       0.744        0.256</code></pre>
+## 1       0.799        0.201</code></pre>
 </div>
 </div>
 <div id="discusion-relacion-entre-devianza-y-error-de-clasificacion" class="section level3">
@@ -749,7 +758,7 @@ que produce fronteras lineales de decisión para el clasificador asociado.</p>
 <p>Mostramos aquí una frontera de decisión de regresión logística y una de
 k vecinos más cercanos:</p>
 <pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="dt">path =</span> <span class="kw">c</span>(<span class="st">&quot;figuras/clas_lineal.png&quot;</span>, <span class="st">&quot;figuras/clas_nolineal.png&quot;</span>))</code></pre>
-<p><img src="figuras/clas_lineal.png" width="420" /><img src="figuras/clas_nolineal.png" width="420" /></p>
+<p><img src="figuras/clas_lineal.png" width="350" /><img src="figuras/clas_nolineal.png" width="350" /></p>
 </div>
 <div id="regresion-logistica-simple" class="section level3">
 <h3><span class="header-section-number">3.4.1</span> Regresión logística simple</h3>
@@ -1082,43 +1091,55 @@ no linealidad introducida por la función logística.</p>
 ## 5 94.5   1         1  1.98  
 ## 6 19.8   1         1 -0.553</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">coeficientes &lt;-<span class="st"> </span>iteraciones[<span class="dv">200</span>,]
+<span class="kw">names</span>(coeficientes) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Intercept&quot;</span>, <span class="st">&quot;x_s&quot;</span>)
 coeficientes</code></pre>
-<pre><code>## [1]  1.772442 -1.100099</code></pre>
-<p>Como centramos todas las entradas, la ordenada al origen se interpreta
+<pre><code>## Intercept       x_s 
+##  1.772442 -1.100099</code></pre>
+<p>Como centramos todas las entradas, la ordenada al origen (<em>Intercept</em>) se interpreta
 como la probabilidad de clase cuando todas las variables están en su media:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">options</span>(<span class="dt">digits =</span> <span class="dv">2</span>)
+coeficientes[<span class="dv">1</span>]</code></pre>
+<pre><code>## Intercept 
+##       1.8</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">h</span>(coeficientes[<span class="dv">1</span>])</code></pre>
-<pre><code>## [1] 0.8547611</code></pre>
-<p>Esto quiere decir que la probabilidad de estar al corriente ds de 87% cuando
+<pre><code>## Intercept 
+##      0.85</code></pre>
+<p>Esto quiere decir que la probabilidad de estar al corriente es de 87% cuando
 la variable <span class="math inline">\(x\)</span> está en su media.</p>
 <p>Si <span class="math inline">\(x\)</span> se incrementa en una desviación estándar, la cantidad
 <span class="math display">\[z = \beta_0 + \beta_1x\]</span>
-baja por la cantidad</p>
-<pre class="sourceCode r"><code class="sourceCode r">coeficientes[<span class="dv">2</span>]</code></pre>
-<pre><code>## [1] -1.100099</code></pre>
-<p>Y la probabilidad de estar al corriente cambia a 70%:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">h</span>(coeficientes[<span class="dv">1</span>]<span class="op">+</span><span class="st"> </span>coeficientes[<span class="dv">2</span>])</code></pre>
-<pre><code>## [1] 0.6620277</code></pre>
+la probabilidad de estar al corriente cambia a 67%:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">h</span>(coeficientes[<span class="dv">1</span>]<span class="op">+</span><span class="st"> </span>coeficientes[<span class="dv">2</span>]<span class="op">*</span><span class="dv">1</span>)</code></pre>
+<pre><code>## Intercept 
+##      0.66</code></pre>
 <p>Nótese que una desviación estándar de <span class="math inline">\(x\)</span> equivale a</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sd</span>(dat_ent<span class="op">$</span>x)</code></pre>
-<pre><code>## [1] 29.4762</code></pre>
+<pre><code>## [1] 29</code></pre>
+<p>Así que en las unidades originales, un incremento de 30 en la variable <span class="math inline">\(x\)</span>
+implica un cambio de</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">h</span>(coeficientes[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>coeficientes[<span class="dv">2</span>]) <span class="op">-</span><span class="st"> </span><span class="kw">h</span>(coeficientes[<span class="dv">1</span>])</code></pre>
+<pre><code>## Intercept 
+##     -0.19</code></pre>
+<p>es decir, la probabilidad de manenterse al corriente baja 19 puntos porcentuales,
+de 85% a 67%</p>
 <p><strong>Ojo</strong>: En regresión lineal, las variables contribuyen independientemente
 de otras al predictor. Eso no pasa en regresión logística debido a la no linealidad
 introducida por la función logística <span class="math inline">\(h\)</span>. Por ejemplo, imaginemos el modelo:</p>
-<p><span class="math display">\[p(z) = h(0.5 + 0.2 x_1 -0.5 x_2),\]</span>
+<p><span class="math display">\[p(z) = h(0.5 + 0.2 x_1 -0.5 x_2 + 0.7x_3),\]</span>
 y suponemos las entradas normalizadas.
 Si todas las variables están en su media, la probabilidad de clase 1 es</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">h</span>(<span class="fl">0.5</span>)</code></pre>
-<pre><code>## [1] 0.6224593</code></pre>
+<pre><code>## [1] 0.62</code></pre>
 <p>Si todas las variables están en su media, y cambiamos en 1 desviación estándar la
 variable <span class="math inline">\(x_1\)</span>, la probabilidad de clase 1 es:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">h</span>(<span class="fl">0.5+0.2</span>)</code></pre>
-<pre><code>## [1] 0.6681878</code></pre>
+<pre><code>## [1] 0.67</code></pre>
 <p>Y el cambio en puntos de probabilidad es:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">h</span>(<span class="fl">0.5+0.2</span>) <span class="op">-</span><span class="st"> </span><span class="kw">h</span>(<span class="fl">0.5</span>)</code></pre>
-<pre><code>## [1] 0.04572844</code></pre>
+<pre><code>## [1] 0.046</code></pre>
 <p>Pero si la variable <span class="math inline">\(x_2 = -1\)</span>, por ejemplo, el cambio en probabilidad es de</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">h</span>(<span class="fl">0.5</span><span class="op">+</span><span class="st"> </span><span class="fl">0.2</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span><span class="dv">1</span>) <span class="op">-</span><span class="st"> </span><span class="kw">h</span>(<span class="fl">0.5</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span><span class="dv">1</span>)</code></pre>
-<pre><code>## [1] 0.0374662</code></pre>
+<pre><code>## [1] 0.037</code></pre>
 </div>
 </div>
 <div id="ejercicio-datos-de-diabetes" class="section level2">
@@ -1187,36 +1208,19 @@ diabetes_coef</code></pre>
 y_prueba &lt;-<span class="st"> </span>diabetes_pr_s<span class="op">$</span>type <span class="op">==</span><span class="st"> &#39;Yes&#39;</span>
 dev_prueba &lt;-<span class="st"> </span><span class="kw">devianza_calc</span>(x_prueba, y_prueba)
 <span class="kw">dev_prueba</span>(iteraciones[<span class="dv">1000</span>,])<span class="op">/</span><span class="kw">nrow</span>(x_prueba)</code></pre>
-<pre><code>## [1] 0.8813972</code></pre>
+<pre><code>## [1] 0.88</code></pre>
 <p>Y para el error clasificación de prueba, necesitamos las probabilidades de clase ajustadas:</p>
 <pre class="sourceCode r"><code class="sourceCode r">beta &lt;-<span class="st"> </span>iteraciones[<span class="dv">1000</span>, ]
 p_beta &lt;-<span class="st"> </span><span class="kw">h</span>(<span class="kw">as.matrix</span>(<span class="kw">cbind</span>(<span class="dv">1</span>, x_prueba)) <span class="op">%*%</span><span class="st"> </span>beta) 
 y_pred &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(p_beta <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>)
 <span class="kw">mean</span>(y_prueba <span class="op">!=</span><span class="st"> </span>y_pred)</code></pre>
-<pre><code>## [1] 0.1987952</code></pre>
+<pre><code>## [1] 0.2</code></pre>
 <div id="tarea-2" class="section level3 unnumbered">
 <h3>Tarea</h3>
 <p>La tarea está en <em>tareas/tarea_3_actualizada.Rmd</em>. (Nota: la versión anterior la
 dejaremos para más tarde. Si ya resolvieron la versión anterior no hay problema.
 Si tienen dudas pueden escribirme a felipexgonzalez at gmail dot com).</p>
 
-<div id="refs" class="references">
-<div>
-<p>Bishop, Christopher M. 2006. <em>Pattern Recognition and Machine Learning (Information Science and Statistics)</em>. Secaucus, NJ, USA: Springer-Verlag New York, Inc.</p>
-</div>
-<div>
-<p>Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep Learning</em>. MIT Press.</p>
-</div>
-<div>
-<p>Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2017. <em>The Elements of Statistical Learning</em>. Springer Series in Statistics. Springer New York Inc. <a href="http://web.stanford.edu/~hastie/ElemStatLearn/" class="uri">http://web.stanford.edu/~hastie/ElemStatLearn/</a>.</p>
-</div>
-<div>
-<p>James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. <em>An Introduction to Statistical Learning: With Applications in R</em>. Springer Publishing Company, Incorporated. <a href="http://www-bcf.usc.edu/~gareth/ISL/" class="uri">http://www-bcf.usc.edu/~gareth/ISL/</a>.</p>
-</div>
-<div>
-<p>Ng, Andrew. 2017. “Machine Learning.” <a href="https://www.coursera.org/learn/machine-learning" class="uri">https://www.coursera.org/learn/machine-learning</a>.</p>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -1225,8 +1229,8 @@ Si tienen dudas pueden escribirme a felipexgonzalez at gmail dot com).</p>
           </div>
         </div>
       </div>
-<a href="regresion.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="regresion.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="mas-sobre-problemas-de-clasificacion.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

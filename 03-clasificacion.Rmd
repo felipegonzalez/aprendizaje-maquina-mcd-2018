@@ -44,16 +44,16 @@ donde el objetivo
 es estimar lo mejor que podamos la función $f$ mediante un estimador
 $\hat{f}$. Usamos entonces $\hat{f}$ para hacer predicciónes. En el caso de regresión:
   
-  - $f(X)$ es la relación sistemática de $Y$ en función de $X$
-  - Dada $X$, la variable observada $Y$ es una variable aleatoria
+- $f(X)$ es la relación sistemática de $Y$ en función de $X$
+- Dada $X$, la variable observada $Y$ es una variable aleatoria
   ($\epsilon$ depende de otras variables que no conocemos)
 
 No podemos usar un modelo así
 en clasificación pues $G$ no es numérica. Sin embargo, podemos pensar que $X$
-  nos da cierta información probabilística acerca de las clases que pueden ocurrir:
+nos da cierta información probabilística acerca de las clases que pueden ocurrir:
   
-  - $P(G|X)$ es la probabilidad condicional de observar $G$ si tenemos $X$. Esto es la información sistemática de $G$ en función de $X$
-  - Dada $X$, la clase observada $G$ es una variable aleatoria 
+- $P(G|X)$ es la probabilidad condicional de observar $G$ si tenemos $X$. Esto es la información sistemática de $G$ en función de $X$
+- Dada $X$, la clase observada $G$ es una variable aleatoria 
 (depende de otras variables que no conocemos).
 
 En analogía con el problema de regresión, quisiéramos estimar las probabilidades condicionales $P(G|X)$, que es la parte sistemática de la relación de $G$ en función de $X$.

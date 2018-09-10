@@ -638,7 +638,7 @@ dos métodos dan resultados similares.
 ### Interpretación de coeficientes
 
 Los coeficientes mostrados en la parametrización de arriba se intrepretan
-más fácilmente como comparaciones de la clase $j$ contra la clase $K$, pues
+más fácilmente como comparaciones de la clase $g$ contra la clase $K$, pues
 
 $$\log\left (\frac{p_g(x)}{p_K(x)}\right ) = \beta_{0,{g}} + \beta_{1,{g}}x_2 + \ldots + \beta_{p,{g}} x_p$$
 
@@ -1024,7 +1024,7 @@ dev_ent(beta)
 ```
 
 ```
-## [1] 241532.8
+## [1] 257699.2
 ```
 
 Hacemos algunas revisiones del gradiente:
@@ -1039,7 +1039,7 @@ beta_2[1000] <- beta[1000] + epsilon
 ```
 
 ```
-## [1] -971.0596
+## [1] -418.3403
 ```
 
 
@@ -1048,7 +1048,7 @@ grad(beta)[1000]
 ```
 
 ```
-## [1] -971.0603
+## [1] -418.3424
 ```
 
 Ya ahora podemos hacer descenso:

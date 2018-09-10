@@ -830,7 +830,7 @@ dos métodos dan resultados similares.</p>
 <div id="interpretacion-de-coeficientes" class="section level3">
 <h3><span class="header-section-number">4.3.2</span> Interpretación de coeficientes</h3>
 <p>Los coeficientes mostrados en la parametrización de arriba se intrepretan
-más fácilmente como comparaciones de la clase <span class="math inline">\(j\)</span> contra la clase <span class="math inline">\(K\)</span>, pues</p>
+más fácilmente como comparaciones de la clase <span class="math inline">\(g\)</span> contra la clase <span class="math inline">\(K\)</span>, pues</p>
 <p><span class="math display">\[\log\left (\frac{p_g(x)}{p_K(x)}\right ) = \beta_{0,{g}} + \beta_{1,{g}}x_2 + \ldots + \beta_{p,{g}} x_p\]</span></p>
 <p>Para comparar la clase <span class="math inline">\(j\)</span> con la clase <span class="math inline">\(k\)</span> notamos que</p>
 <p><span class="math display">\[\log\left (\frac{p_j(x)}{p_k(x)}\right ) = 
@@ -1086,16 +1086,16 @@ beta &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv
 dev_ent &lt;-<span class="st"> </span><span class="kw">devianza_calc</span>(x_ent_s, y_ent)
 grad &lt;-<span class="st"> </span><span class="kw">grad_calc</span>(x_ent_s, y_ent)
 <span class="kw">dev_ent</span>(beta)</code></pre>
-<pre><code>## [1] 241532.8</code></pre>
+<pre><code>## [1] 257699.2</code></pre>
 <p>Hacemos algunas revisiones del gradiente:</p>
 <pre class="sourceCode r"><code class="sourceCode r">beta_<span class="dv">2</span> &lt;-<span class="st"> </span>beta 
 epsilon &lt;-<span class="st"> </span><span class="fl">0.00001</span>
 beta_<span class="dv">2</span>[<span class="dv">1000</span>] &lt;-<span class="st"> </span>beta[<span class="dv">1000</span>] <span class="op">+</span><span class="st"> </span>epsilon
 
 (<span class="kw">dev_ent</span>(beta_<span class="dv">2</span>) <span class="op">-</span><span class="st"> </span><span class="kw">dev_ent</span>(beta))<span class="op">/</span>epsilon</code></pre>
-<pre><code>## [1] -971.0596</code></pre>
+<pre><code>## [1] -418.3403</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grad</span>(beta)[<span class="dv">1000</span>]</code></pre>
-<pre><code>## [1] -971.0603</code></pre>
+<pre><code>## [1] -418.3424</code></pre>
 <p>Ya ahora podemos hacer descenso:</p>
 <pre class="sourceCode r"><code class="sourceCode r">iteraciones &lt;-<span class="st"> </span><span class="kw">descenso</span>(<span class="dv">2000</span>, <span class="kw">rep</span>(<span class="dv">0</span>, <span class="dv">257</span><span class="op">*</span><span class="dv">9</span>), <span class="dt">eta=</span><span class="fl">0.001</span>, 
                         <span class="dt">h_deriv =</span> grad, <span class="dt">dev_fun =</span> dev_ent)</code></pre>

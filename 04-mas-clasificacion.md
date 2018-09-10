@@ -572,7 +572,7 @@ en este caso, el modelo de una variable puede ser ligeramente superior.
 
 Consideramos ahora un problema con más de dos clases, de manera que $G ∈ {1,2,...,K}$
 ($K$ clases), y tenemos $X = (X1 ...,Xp)$ entradas.
-¿Cómo generalizar el modelo de regresión logística a este problema?
+¿Cómo generalizar el modelo de regresión logística para este problema?
 Una estrategia es la de uno contra todos:
 
 En clasificación *uno contra todos*, hacemos
@@ -1024,7 +1024,7 @@ dev_ent(beta)
 ```
 
 ```
-## [1] 257699.2
+## [1] 272153.9
 ```
 
 Hacemos algunas revisiones del gradiente:
@@ -1039,7 +1039,7 @@ beta_2[1000] <- beta[1000] + epsilon
 ```
 
 ```
-## [1] -418.3403
+## [1] -1202.886
 ```
 
 
@@ -1048,7 +1048,7 @@ grad(beta)[1000]
 ```
 
 ```
-## [1] -418.3424
+## [1] -1202.887
 ```
 
 Ya ahora podemos hacer descenso:

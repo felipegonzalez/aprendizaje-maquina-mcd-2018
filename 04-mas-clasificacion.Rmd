@@ -520,7 +520,7 @@ dos métodos dan resultados similares.
 ### Interpretación de coeficientes
 
 Los coeficientes mostrados en la parametrización de arriba se intrepretan
-más fácilmente como comparaciones de la clase $j$ contra la clase $K$, pues
+más fácilmente como comparaciones de la clase $g$ contra la clase $K$, pues
 
 $$\log\left (\frac{p_g(x)}{p_K(x)}\right ) = \beta_{0,{g}} + \beta_{1,{g}}x_2 + \ldots + \beta_{p,{g}} x_p$$
 

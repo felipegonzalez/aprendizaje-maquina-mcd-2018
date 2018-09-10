@@ -89,7 +89,7 @@ ggplot(sims, aes(x=x, y=y)) + geom_point() +
 Podemos ver todos los modelos una misma gráfica y apreciar mejor la
 variación entre ellos:
 
-```{r}
+```{r, fig.width=5, fig.asp=0.7}
 ggplot(sims, aes(x = x, y = y, group = rep)) + 
     geom_smooth(formula = y~ poly(x, 9, raw = TRUE), method ='lm', 
                                  colour = 'grey40', se = FALSE) + 
@@ -567,7 +567,7 @@ apartar esta muestra si el proceso de validación incluye muchos métodos
 con varios parámetros afinados (como la $\lambda$ de regresión ridge).
 
 ```{r, out.width=450}
-knitr::include_graphics("./imagenes/div_muestra.png")
+knitr::include_graphics("./figuras/div_muestra.png")
 ```
 
 Cuando tenemos datos abundantes, este enfoque es el usual. Por ejemplo,
@@ -600,7 +600,7 @@ ${\mathcal L}=\{ (x_i,y_i)\}_{i=1}^n$:
 $$ {\mathcal L}={\mathcal L}_1\cup {\mathcal L}_2\cup\cdots\cup {\mathcal L}_k.$$
 
 ```{r, out.width=320}
-knitr::include_graphics("./imagenes/div_muestra_cv.png")
+knitr::include_graphics("./figuras/div_muestra_cv.png")
 ```
 
 Construimos $k$ modelos distintos, digamos $\hat{f}_j$, usando solamente
@@ -786,7 +786,7 @@ de estas curvas de nivel. Para el problema restringido, buscamos más
 bien la curva de nivel más baja que intersecta la restricción:
 
 ```{r}
-knitr::include_graphics('./imagenes/ridge_lasso.png')
+knitr::include_graphics('./figuras/ridge_lasso.png')
 ```
 Y obsérvese ahora que la solución de lasso *puede hacer algunos coeficientes
 igual a 0*. Es decir,

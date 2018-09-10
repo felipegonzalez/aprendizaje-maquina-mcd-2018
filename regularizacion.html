@@ -308,7 +308,7 @@ variación entre ellos:</p>
 <span class="st">    </span><span class="kw">geom_smooth</span>(<span class="dt">formula =</span> y<span class="op">~</span><span class="st"> </span><span class="kw">poly</span>(x, <span class="dv">9</span>, <span class="dt">raw =</span> <span class="ot">TRUE</span>), <span class="dt">method =</span><span class="st">&#39;lm&#39;</span>, 
                                  <span class="dt">colour =</span> <span class="st">&#39;grey40&#39;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">geom_smooth</span>(<span class="dt">formula =</span> y<span class="op">~</span>x, <span class="dt">method =</span><span class="st">&#39;lm&#39;</span>, <span class="dt">colour =</span> <span class="st">&#39;red&#39;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre>
-<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-6-1.png" width="480" /></p>
 <p>En este ejemplo, ambos métodos se desempeñan mal, pero por razones distintas.
 El primer método sufre de sesgo: es un método rígido que no aprende de patrones
 en los datos. El segundo método sufre de varianza: es un método flexible que aprende
@@ -752,8 +752,8 @@ final del modelo seleccionado arriba. Es una buena idea
 apartar esta muestra si el proceso de validación incluye muchos métodos
 con varios parámetros afinados (como la <span class="math inline">\(\lambda\)</span> de regresión ridge).</li>
 </ul>
-<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&quot;./imagenes/div_muestra.png&quot;</span>)</code></pre>
-<p><img src="./imagenes/div_muestra.png" width="450" /></p>
+<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&quot;./figuras/div_muestra.png&quot;</span>)</code></pre>
+<p><img src="figuras/div_muestra.png" width="450" /></p>
 <p>Cuando tenemos datos abundantes, este enfoque es el usual. Por ejemplo,
 podemos dividir la muestra en 50-25-25 por ciento. Ajustamos modelos
 con el primer 50%, evaluamos y seleccionamos con el segundo 25% y finalmente,
@@ -777,8 +777,8 @@ del error de predicción.</p>
 construimos al azar una partición, con tamaños similares, de la muestra de entrenamiento
 <span class="math inline">\({\mathcal L}=\{ (x_i,y_i)\}_{i=1}^n\)</span>:</p>
 <p><span class="math display">\[ {\mathcal L}={\mathcal L}_1\cup {\mathcal L}_2\cup\cdots\cup {\mathcal L}_k.\]</span></p>
-<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&quot;./imagenes/div_muestra_cv.png&quot;</span>)</code></pre>
-<p><img src="./imagenes/div_muestra_cv.png" width="320" /></p>
+<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&quot;./figuras/div_muestra_cv.png&quot;</span>)</code></pre>
+<p><img src="figuras/div_muestra_cv.png" width="320" /></p>
 <p>Construimos <span class="math inline">\(k\)</span> modelos distintos, digamos <span class="math inline">\(\hat{f}_j\)</span>, usando solamente
 la muestra <span class="math inline">\({\mathcal L}-{\mathcal L}_j\)</span>. Este modelo lo evaluamos
 usando la parte que no usamos, <span class="math inline">\({\mathcal L}_j\)</span>, para obtener una
@@ -956,8 +956,8 @@ Recordemos que en mínimos cuadrados o regresión logística intentamos minimiza
 esta cantidad sin restricciones, y este mínimo se encuentra en el centro
 de estas curvas de nivel. Para el problema restringido, buscamos más
 bien la curva de nivel más baja que intersecta la restricción:</p>
-<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&#39;./imagenes/ridge_lasso.png&#39;</span>)</code></pre>
-<p><img src="./imagenes/ridge_lasso.png" /><!-- -->
+<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&#39;./figuras/ridge_lasso.png&#39;</span>)</code></pre>
+<p><img src="figuras/ridge_lasso.png" width="318" />
 Y obsérvese ahora que la solución de lasso <em>puede hacer algunos coeficientes
 igual a 0</em>. Es decir,</p>
 

@@ -103,7 +103,7 @@ ggplot(sims, aes(x = x, y = y, group = rep)) +
     geom_smooth(formula = y~x, method ='lm', colour = 'red', se = FALSE)
 ```
 
-<img src="05-regularizacion_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+<img src="05-regularizacion_files/figure-html/unnamed-chunk-6-1.png" width="480" />
 
 En este ejemplo, ambos métodos se desempeñan mal, pero por razones distintas.
 El primer método sufre de sesgo: es un método rígido que no aprende de patrones
@@ -786,10 +786,10 @@ con varios parámetros afinados (como la $\lambda$ de regresión ridge).
 
 
 ```r
-knitr::include_graphics("./imagenes/div_muestra.png")
+knitr::include_graphics("./figuras/div_muestra.png")
 ```
 
-<img src="./imagenes/div_muestra.png" width="450" />
+<img src="./figuras/div_muestra.png" width="450" />
 
 Cuando tenemos datos abundantes, este enfoque es el usual. Por ejemplo,
 podemos dividir la muestra en 50-25-25 por ciento. Ajustamos modelos
@@ -822,10 +822,10 @@ $$ {\mathcal L}={\mathcal L}_1\cup {\mathcal L}_2\cup\cdots\cup {\mathcal L}_k.$
 
 
 ```r
-knitr::include_graphics("./imagenes/div_muestra_cv.png")
+knitr::include_graphics("./figuras/div_muestra_cv.png")
 ```
 
-<img src="./imagenes/div_muestra_cv.png" width="320" />
+<img src="./figuras/div_muestra_cv.png" width="320" />
 
 Construimos $k$ modelos distintos, digamos $\hat{f}_j$, usando solamente
 la muestra ${\mathcal L}-{\mathcal L}_j$. Este modelo lo evaluamos
@@ -1080,10 +1080,10 @@ bien la curva de nivel más baja que intersecta la restricción:
 
 
 ```r
-knitr::include_graphics('./imagenes/ridge_lasso.png')
+knitr::include_graphics('./figuras/ridge_lasso.png')
 ```
 
-![](./imagenes/ridge_lasso.png)<!-- -->
+<img src="./figuras/ridge_lasso.png" width="318" />
 Y obsérvese ahora que la solución de lasso *puede hacer algunos coeficientes
 igual a 0*. Es decir,
 

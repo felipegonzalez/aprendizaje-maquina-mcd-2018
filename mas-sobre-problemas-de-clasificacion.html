@@ -817,7 +817,7 @@ y
 <span class="math display">\[Z = 1 + \sum_{j=1}^{K-1}\exp(\beta_0^j + \beta_1^jx_2 + \ldots + \beta_p^j x_p)\]</span></p>
 <p>Para ajustar coeficientes, usamos el mismo criterio de devianza de entrenamiento.
 Buscamos minimizar:
-<span class="math display">\[D(\beta)=−2 \sum_{i=1}^N p_{g^{(i)}}(x^{(i)}),\]</span>
+<span class="math display">\[D(\beta)=−2 \sum_{i=1}^N \log p_{g^{(i)}}(x^{(i)}),\]</span>
 Donde <span class="math inline">\(\beta\)</span> contiene todos los coeficientes organizados en un vector
 de tamaño <span class="math inline">\((p+1)(K+1)\)</span>:
 <span class="math display">\[\beta = ( \beta_0^1, \beta_1^1, \ldots , \beta_p^1,  \beta_0^2, \beta_1^2, \ldots , \beta_p^2, \ldots \beta_0^{K-1}, \beta_1^{K-1}, \ldots , \beta_p^{K-1} )\]</span></p>
@@ -1086,16 +1086,16 @@ beta &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv
 dev_ent &lt;-<span class="st"> </span><span class="kw">devianza_calc</span>(x_ent_s, y_ent)
 grad &lt;-<span class="st"> </span><span class="kw">grad_calc</span>(x_ent_s, y_ent)
 <span class="kw">dev_ent</span>(beta)</code></pre>
-<pre><code>## [1] 253022.7</code></pre>
+<pre><code>## [1] 241532.8</code></pre>
 <p>Hacemos algunas revisiones del gradiente:</p>
 <pre class="sourceCode r"><code class="sourceCode r">beta_<span class="dv">2</span> &lt;-<span class="st"> </span>beta 
 epsilon &lt;-<span class="st"> </span><span class="fl">0.00001</span>
 beta_<span class="dv">2</span>[<span class="dv">1000</span>] &lt;-<span class="st"> </span>beta[<span class="dv">1000</span>] <span class="op">+</span><span class="st"> </span>epsilon
 
 (<span class="kw">dev_ent</span>(beta_<span class="dv">2</span>) <span class="op">-</span><span class="st"> </span><span class="kw">dev_ent</span>(beta))<span class="op">/</span>epsilon</code></pre>
-<pre><code>## [1] -307.7948</code></pre>
+<pre><code>## [1] -971.0596</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grad</span>(beta)[<span class="dv">1000</span>]</code></pre>
-<pre><code>## [1] -307.7974</code></pre>
+<pre><code>## [1] -971.0603</code></pre>
 <p>Ya ahora podemos hacer descenso:</p>
 <pre class="sourceCode r"><code class="sourceCode r">iteraciones &lt;-<span class="st"> </span><span class="kw">descenso</span>(<span class="dv">2000</span>, <span class="kw">rep</span>(<span class="dv">0</span>, <span class="dv">257</span><span class="op">*</span><span class="dv">9</span>), <span class="dt">eta=</span><span class="fl">0.001</span>, 
                         <span class="dt">h_deriv =</span> grad, <span class="dt">dev_fun =</span> dev_ent)</code></pre>

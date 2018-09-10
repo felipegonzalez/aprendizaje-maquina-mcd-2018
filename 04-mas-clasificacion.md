@@ -624,7 +624,7 @@ $$Z = 1 + \sum_{j=1}^{K-1}\exp(\beta_0^j + \beta_1^jx_2 + \ldots + \beta_p^j x_p
 
 Para ajustar coeficientes, usamos el mismo criterio de devianza de entrenamiento.
 Buscamos minimizar:
-$$D(\beta)=−2 \sum_{i=1}^N p_{g^{(i)}}(x^{(i)}),$$
+$$D(\beta)=−2 \sum_{i=1}^N \log p_{g^{(i)}}(x^{(i)}),$$
 Donde $\beta$ contiene todos los coeficientes organizados en un vector
 de tamaño $(p+1)(K+1)$:
 $$\beta = ( \beta_0^1, \beta_1^1, \ldots , \beta_p^1,  \beta_0^2, \beta_1^2, \ldots , \beta_p^2, \ldots \beta_0^{K-1}, \beta_1^{K-1}, \ldots , \beta_p^{K-1} )$$
@@ -1024,7 +1024,7 @@ dev_ent(beta)
 ```
 
 ```
-## [1] 253022.7
+## [1] 241532.8
 ```
 
 Hacemos algunas revisiones del gradiente:
@@ -1039,7 +1039,7 @@ beta_2[1000] <- beta[1000] + epsilon
 ```
 
 ```
-## [1] -307.7948
+## [1] -971.0596
 ```
 
 
@@ -1048,7 +1048,7 @@ grad(beta)[1000]
 ```
 
 ```
-## [1] -307.7974
+## [1] -971.0603
 ```
 
 Ya ahora podemos hacer descenso:

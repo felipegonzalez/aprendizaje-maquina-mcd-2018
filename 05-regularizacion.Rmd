@@ -548,3 +548,308 @@ de las componentes necesarias (pero no suficiente) para ir hacia interpretación
 del fenómeno que nos interesa.
 
 
+
+## Entrenamiento, Validación y Prueba
+
+El enfoque que vimos arriba, en donde dividemos la muestra en dos
+partes al azar, es la manera más fácil de seleccionar modelos. En general,
+el proceso es el siguiente:
+
+- Una parte con los que ajustamos todos
+los modelos que nos interesa. Esta es la **muestra de entrenamiento**
+- Una parte como muestra de prueba, con el que evaluamos el desempeño
+de cada modelo ajustado en la parte anterior. En este contexto, 
+a esta muestra se le llama **muestra de validación}**.
+- Posiblemente una muestra adicional independiente, que 
+llamamos **muestra de prueba**, con la que hacemos una evaluación
+final del modelo seleccionado arriba. Es una buena idea 
+apartar esta muestra si el proceso de validación incluye muchos métodos
+con varios parámetros afinados (como la $\lambda$ de regresión ridge).
+
+```{r, out.width=450}
+knitr::include_graphics("./imagenes/div_muestra.png")
+```
+
+Cuando tenemos datos abundantes, este enfoque es el usual. Por ejemplo,
+podemos dividir la muestra en 50-25-25 por ciento. Ajustamos modelos
+con el primer 50\%, evaluamos y seleccionamos con el segundo 25\% y finalmente,
+si es necesario, evaluamos el modelo final seleccionado con la muestra 
+final de 25\%. 
+
+La razón de este proceso es que así podemos ir y venir entre
+entrenamiento y validación, buscando mejores enfoques y modelos, y
+no ponemos en riesgo la estimación final del error. (Pregunta: ¿por qué
+probar agresivamente buscando mejorar el error de validación podría
+ponder en riesgo la estimación final del error del modelo seleccionado? )
+
+### Validación cruzada
+
+En muchos casos, no queremos apartar una muestra de validación para seleccionar modelos,
+pues no tenemos muchos datos (al dividir la muestra obtendríamos
+un modelo relativamente malo en relación al que resulta de todos los datos).
+Un criterio para seleccionar la regularización adecuada
+es el de **validación cruzada*, que es un método computacional
+para producir una estimación interna (usando sólo muestra de entrenamiento)
+del error de predicción.
+
+
+En validación cruzada (con $k$ vueltas), 
+construimos al azar una partición, con tamaños similares, de la muestra de entrenamiento
+${\mathcal L}=\{ (x_i,y_i)\}_{i=1}^n$:
+
+$$ {\mathcal L}={\mathcal L}_1\cup {\mathcal L}_2\cup\cdots\cup {\mathcal L}_k.$$
+
+```{r, out.width=320}
+knitr::include_graphics("./imagenes/div_muestra_cv.png")
+```
+
+Construimos $k$ modelos distintos, digamos $\hat{f}_j$, usando solamente
+la muestra ${\mathcal L}-{\mathcal L}_j$. Este modelo lo evaluamos
+usando la parte que no usamos, ${\mathcal L}_j$, para obtener una 
+estimación honesta del error del modelo $\hat{f}_k$, a la que denotamos
+por $\hat{e}_j$. 
+
+Notemos entonces que tenemos $k$ estimaciones del error
+$\hat{e}_1,\ldots, \hat{e}_k$, una para cada uno de los modelos que construimos.
+La idea ahora es que
+
+- Cada uno de los modelos $\hat{f}_j$ es similar al modelo ajustado
+con toda la muestra $\hat{f}$, de forma que podemos pensar
+que cada una de las estimaciones $\hat{e}_j$ es un estimador del error de $\hat{f}$.
+- Dado el punto anterior, podemos construir una mejor estimación
+promediando las $k$ estimaciones anteriores, para obtener:
+$$\widehat{cv} = \frac{1}{k} \sum_{j=1}^k \hat{e}_j.$$
+- ¿Cómo escoger $k$? Usualmente se usan $k=5,10,20$, y $k=10$ es el más popular.
+La razón es que cuando $k$ es muy chico, tendemos a evaluar modelos construidos
+con pocos datos (comparado al modelo con todos los datos de entrenamiento). Por otra
+parte, cuando $k$ es grande el método puede ser muy costoso (por ejemplo, si 
+$k=N$, hay que entrenar un modelo para cada dato de entrada).
+
+
+Por ejemplo, el paquete *glmnet* incluye la función
+*cv.glmnet*, que hace los $k$ ajustes para cada una
+de las lambdas:
+
+```{r}
+library(glmnet)
+set.seed(291)
+cv_mod_ridge <- cv.glmnet(x = x_e, y=dat_e$y, 
+  alpha = 0,
+  family='binomial', intercept = F, nfolds = 10, nlambda=50)
+plot(cv_mod_ridge)
+cv_mod_ridge$lambda.min
+cv_mod_ridge$lambda.1se
+```
+
+Nótese que la estimación del error de predicción por validación
+cruzada incluye un error de estimación (intervalos). Esto nos
+da dos opciones para escoger la lambda final:
+
+- Escoger la que de el mínimo valor de error por validación cruzada
+- Escoger la lambda más grande *que no esté a más de 1 error estándar
+del mínimo.*
+
+En la gráfica anterior se muestran las dos posibilidades. La razón del segundo
+criterio es tomar el modelo más simple que tenga error consistente con el
+mejor modelo.
+
+
+¿Cómo se desempeña validación cruzada como estimación del error?
+```{r}
+cross_valid <- data_frame(devianza_cv = cv_mod_ridge$cvm,
+                          modelo = attr(cv_mod_ridge$glmnet.fit$a0, 'names')[1:49])
+
+devs <- devianzas_prueba %>% left_join(cross_valid) %>%
+  rename(devianza_prueba = devianza) %>%
+  gather(tipo, devianza,  devianza_prueba, devianza_cv)
+
+ggplot(devs, aes(x=log(lambda), y=devianza, colour=tipo)) +
+  geom_point()
+```
+
+
+Vemos que la estimación en algunos casos no es tan buena, aún cuando
+todos los datos fueron usados. Pero el mínimo se encuentra en lugares
+muy similares. 
+
+La razón es que validación cruzada en realidad considera 
+perturbaciones del conjunto de entrenamiento, de forma que lo que 
+intenta evaluar el error producido, para cada lambda, sobre 
+distintas muestras de entrenamiento.
+
+En realidad nosotros queremos evaluar el error de predicción del
+modelo que ajustamos. Validación cruzada es más un estimador
+del error esperado de predicción sobre los modelos que ajustaríamos
+con distintas muestras de entrenamiento.
+
+El resultado es que:
+
+- Usamos validación cruzada para escoger la complejidad adecuada
+de la familia de modelos que consideramos.
+- Como estimación del error de predicción del modelo que ajustamos,
+validación cruzada es más seguro que usar el error de entrenamiento, que
+muchas veces puede estar fuertemente sesgado hacia abajo. Sin embargo, lo
+mejor en este caso es utilizar una muestra de prueba.
+
+
+### Ejercicio {-}
+
+Consideremos el ejemplo de reconocimiento de dígitos.
+
+```{r, message=FALSE, warning=FALSE}
+library(readr)
+digitos_entrena <- read_csv('datos/zip-train.csv')
+digitos_prueba <- read_csv('datos/zip-test.csv')
+names(digitos_entrena)[1] <- 'digito'
+names(digitos_entrena)[2:257] <- paste0('pixel_', 1:256)
+names(digitos_prueba)[1] <- 'digito'
+names(digitos_prueba)[2:257] <- paste0('pixel_', 1:256)
+```
+```{r}
+set.seed(2912)
+if(TRUE){
+  digitos_entrena_s <- sample_n(digitos_entrena, size = 2000)
+} else {
+  digitos_entrena_s <- digitos_entrena
+}
+x_e <- digitos_entrena_s %>% select(-digito) %>% as.matrix
+x_p <- digitos_prueba  %>% select(-digito) %>% as.matrix
+library(doMC)
+registerDoMC(cores=5)
+digitos_cv <- cv.glmnet(x = x_e, y = factor(digitos_entrena_s$digito), 
+                        family = 'multinomial', alpha = 0, 
+                        parallel = TRUE, nfolds = 10, lambda = exp(seq(-12, 2, 1)))
+plot(digitos_cv)
+```
+```{r}
+preds_prueba <- predict(digitos_cv, newx = x_p, s = 'lambda.min')[,,1] # solo un grupo de coeficientes
+dim(preds_prueba)
+preds_clase <- apply(preds_prueba, 1, which.max)
+table(preds_clase, digitos_prueba$digito)
+mean(preds_clase -1 != digitos_prueba$digito)
+```
+
+Este modelo mejora considerablemente al modelo sin regularización.
+
+**Observación**: Cuando vimos regresión multinomial, la última clase es
+uno menos la suma del resto de probabilidades de clase ($(K-1)(p+1)$ parámetros).
+La salida de glmnet,
+sin embargo, tiene coeficientes para todas las clases ($K(p+1)$ parámetros). 
+¿Por qué en regresión ridge no está sobreparametrizado el modelo? 
+
+## Regularización lasso
+
+
+Otra forma de regularización es el **lasso**, que en lugar de penalizar
+con la suma de cuadrados en los coeficientes, penaliza por la suma
+de su valor absoluto.
+
+```{block2, type='comentario'}
+En regresión **lasso** (lineal/logística), para $\lambda>0$ fija minimizamos
+$$D_{\lambda}^2 (\beta)=D(\beta)  + \lambda\sum_{i=1}^p |\beta_j|$$,
+donde suponemos que las entradas están estandarizadas (centradas y escaladas por
+la desviación estándar).
+```
+
+El problema de minimización de ridge y de lasso se pueden reescribir como
+problemas de restricción:
+
+
+```{block2, type='comentario'}
+En regresión **lasso** (lineal/logística), para $s>0$ fija minimizamos
+$$D(\beta), $$
+sujeto a
+$$\sum_{i=1}^p |\beta_j|< s$$
+donde suponemos que las entradas están estandarizadas (centradas y escaladas por
+la desviación estándar).
+```
+
+```{block2, type='comentario'}
+En regresión **ridge** (lineal/logística), para $t>0$ fija minimizamos
+$$D(\beta), $$
+sujeto a
+$$\sum_{i=1}^p \beta_j^2 < t$$
+donde suponemos que las entradas están estandarizadas (centradas y escaladas por
+la desviación estándar).
+```
+$s$ y $t$ chicas corresponden a valores de penalización $\lambda$ grandes.
+
+
+En un principio, puede parecer que ridge y lasso deben dar resultados
+muy similares, pues en ambos casos penalizamos por el tamaño de los coeficientes.
+Sin embargo, son distintos de una manera muy importante.
+
+En la siguiente gráfica regresentamos las curvas de nivel de $D(\beta)$. 
+Recordemos que en mínimos cuadrados o regresión logística intentamos minimizar
+esta cantidad sin restricciones, y este mínimo se encuentra en el centro 
+de estas curvas de nivel. Para el problema restringido, buscamos más
+bien la curva de nivel más baja que intersecta la restricción:
+
+```{r}
+knitr::include_graphics('./imagenes/ridge_lasso.png')
+```
+Y obsérvese ahora que la solución de lasso *puede hacer algunos coeficientes
+igual a 0*. Es decir,
+
+```{block2, type='comentario'}
+En regresión ridge, los coeficientes se encogen gradualmente desde la solución
+no restringida hasta el origen. Ridge es un método de **encogimiento de coeficientes.**
+
+En regresión lasso, los coeficientes se encogen gradualmente, pero también
+se excluyen  variables del modelo. Por eso lasso es un método de
+*encogimiento y selección de variables*.
+```
+
+```{block2, type='comentario'}
+- Regresión ridge es especialmente útil cuando tenemos varias variables de entrada
+fuertemente correlacionadas. Regresión ridge intenta encoger juntos coeficientes de variables
+correlacionadas para reducir varianza en las predicciones.
+- Lasso encoge igualmente coeficientes para reducir varianza, pero también comparte
+similitudes con *regresión de mejor subconjunto*, en donde para cada número de variables $l$
+buscamos escoger las $l$ variables que den el mejor modelo. Sin embargo, el enfoque
+de lasso es más escalable y puede calcularse de manera más simple.
+- Descenso en gradiente no es apropiado para regresión lasso (ver documentación de
+glmnet para ver cómo se hace en este paquete). El problema es que los coeficientes
+nunca se hacen exactamente cero, pues la restricción no es diferenciable en el origen 
+(coeficientes igual a cero).
+```
+
+#### Ejemplo {-}
+
+Consideramos el ejemplo de bodyfat:
+
+```{r, message=FALSE, warning=FALSE}
+library(readr)
+dat_grasa <- read_csv(file = 'datos/bodyfat.csv')
+head(dat_grasa)
+nrow(dat_grasa)
+set.seed(127)
+dat_grasa$unif <- runif(nrow(dat_grasa), 0, 1)
+dat_grasa <- arrange(dat_grasa, unif)
+dat_grasa$id <- 1:nrow(dat_grasa)
+dat_e <- dat_grasa[1:150,]
+dat_p <- dat_grasa[151:252,]
+
+```
+
+```{r}
+x_e <- dat_e %>% select(-grasacorp, -id, -unif) %>% as.matrix
+x_p <- dat_p %>% select(-grasacorp, -id, -unif) %>% as.matrix
+
+mod_bodyfat <- cv.glmnet(x = x_e, y = dat_e$grasacorp, alpha = 1) #alpha=1 para lasso
+plot(mod_bodyfat)
+```
+```{r}
+coeficientes <- predict(mod_bodyfat, s ='lambda.1se', type='coefficients')
+coeficientes
+```
+```{r}
+pred_prueba <- predict(mod_bodyfat, newx = x_p, s ='lambda.1se')
+sqrt(mean((pred_prueba-dat_p$grasacorp)^2))
+```
+Comparado con regresión lineal:
+```{r}
+pred_prueba <- predict(lm(grasacorp ~., data = dat_e %>% select(-id, -unif)), newdata=dat_p)
+sqrt(mean((pred_prueba-dat_p$grasacorp)^2))
+```
+

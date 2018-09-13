@@ -1,0 +1,22 @@
+---
+title: "Tarea 5"
+output: html_document
+---
+
+
+1. En la Tarea 4, construye curvas ROC para cada uno de los 
+tres modelos (una sola variable, todas las variables, y todas
+las variables más variables de ruido). ¿Cuál tiene mejor 
+desempeño? Calcula el AUC para cada una de las tres curvas.
+
+2. Para el ejemplo de regresión logística multinomial que
+vimos en clase (clasificación de dígitos 0-9), construye la
+gráfica de coeficientes (sección 4.3.3) para:
+
+- El modelo que vimos en clase donde no habían convergido los
+coeficientes
+- El modelo después de correr hasta convergencia (usa la
+ función *multinom*)
+ 
+ Compara las gráficas. ¿Cuál es más interpretable? ¿Puedes ver
+ el sobreajuste del segundo modelo en estas gráficas?

@@ -364,7 +364,7 @@ p_prueba$prob_hat_pen <- h(x_p %*% as.numeric(beta_penalizado))
 ```
 
 ```{r}
-ggplot(p_entrena, aes(x=prob_1, y=prob_hat_pen, colour=factor(clase))) + 
+ggplot(p_entrena, aes(x=prob_hat_pen, y=prob_1, colour=factor(clase))) + 
     geom_point() + coord_flip()
 ```
 

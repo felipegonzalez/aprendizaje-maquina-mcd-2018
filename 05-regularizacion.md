@@ -16,7 +16,7 @@ Consideremos que queremos hacer predicciones para una $X=x_0$ particular, de mod
 que el error es
 
 $$Y - \hat{f}(x_0) = (f(x_0) - \hat{f}(x_0)) + \epsilon$$
-Como discutimos antes, no podemos hacer nada por la variación de $\epsilon$.
+Como discutimos antes, no podemos hacer nada por la variación de $\epsilon$ (a menos que incluyamos otros predictores $X$ informativos, por ejemplo).
 La pregunta es entonces ¿por qué podría pasar que $\hat{f}(x_0)$ estuviera lejos
 de $f(x_0)$? Recordemos que $\hat{f}(x_0)$ depende de una muestra
 de entrenamiento ${\mathcal L}$, de modo que:
@@ -106,12 +106,16 @@ ggplot(sims, aes(x = x, y = y, group = rep)) +
 <img src="05-regularizacion_files/figure-html/unnamed-chunk-6-1.png" width="480" />
 
 En este ejemplo, ambos métodos se desempeñan mal, pero por razones distintas.
-El primer método sufre de sesgo: es un método rígido que no aprende de patrones
-en los datos. El segundo método sufre de varianza: es un método flexible que aprende
+El primer método sufre más de sesgo (subajuste): es un método rígido que no aprende de patrones
+en los datos. El segundo método sufre más de varianza (sobreajuste): es un método flexible que aprende
 ruido. Cada uno de estos problemas requiere soluciones diferentes. 
 
+Típicamente, reducciones en sesgo producen incrementos potenciales
+de varianza, y reducciones en varianza tienden a producir incrementos
+potenciales de sesgo.
 En esta parte veremos métodos de *regularización*, que sirven para reducir la
-varianza con lo que esperamos sean costos menores de sesgo.
+varianza. Esta reducción en varianza será exitosa cuando el costo en sesgo
+que paguemos sea menor que esta reducción.
 
 ### Sesgo y varianza en modelos lineales
 
@@ -277,7 +281,7 @@ dat_e <- datos %>% filter(entrena)
 dat_p <- datos %>% filter(!entrena)
 x_e <- dat_e %>% select(-entrena, -y) %>% as.matrix
 x_p <- dat_p %>% select(-entrena, -y) %>% as.matrix
-p_entrena <- data_frame(prob_hat_1 = h(mod_1$fitted.values), 
+p_entrena <- data_frame(prob_hat_1 = (mod_1$fitted.values), 
                         prob_1 = as.numeric(h(x_e %*% beta)),
                         clase = dat_e$y)
 p_prueba <- data_frame(prob_hat_1 = as.numeric(h(x_p %*% (mod_1$coefficients))), 
@@ -287,34 +291,65 @@ p_prueba <- data_frame(prob_hat_1 = as.numeric(h(x_p %*% (mod_1$coefficients))),
 Para los datos de entrenamiento:
 
 ```r
-ggplot(p_entrena, aes(x=prob_1, y=prob_hat_1, colour=factor(clase))) + geom_point() +
-    coord_flip()
+ggplot(p_entrena, aes(x=prob_hat_1, y=prob_1, colour=factor(clase))) + geom_point() + coord_flip()
 ```
 
 <img src="05-regularizacion_files/figure-html/unnamed-chunk-15-1.png" width="672" />
 
-Y con la muestra de prueba:
+Notamos en esta gráfica:
+
+- El ajuste parece discriminar bien entre las dos clases del
+conjunto de entrenamiento
+(cuando la probabilidad estimada es chica, observamos casi todos clase 0,
+y cuando la probabilidad estimada es grande, observamos casi todos clase 1).
+- Sin embargo, vemos que las probabilidades estimadas tienden a ser extremas: muchas veces estimamos probabilidad cercana a 0 o 1, cuando la probabilidad real no es tan extrema (por ejemplo, está entre 0.25 y 0.75).
+
+Estos dos aspectos indican sobreajuste. Podemos verificar comparando
+con los resultados que obtenemos con la muestra de prueba.
+
+Si calculamos la matriz de confusión y 
+sensibilidad y especifidad *de entrenamiento*:
+
 
 ```r
-ggplot(p_prueba, aes(x=prob_1, y=prob_hat_1, colour=factor(clase))) + geom_point() +
-    coord_flip()
+tab <- table(p_entrena$prob_hat_1 > 0.5, p_entrena$clase)
+tab
 ```
 
-<img src="05-regularizacion_files/figure-html/unnamed-chunk-16-1.png" width="672" />
+```
+##        
+##           0   1
+##   FALSE 159  34
+##   TRUE   44 163
+```
 
+```r
+prop.table(tab, margin=2)
+```
 
-Si la estimación fuera perfecta, 
-esta gráfica sería una diagonal. Vemos entonces
-que cometemos errores grandes en la estimación de probabilidades. 
-El problema no es que nuestro modelo no sea apropiado
-(logístico), pues ese es el modelo real. El problema es la variabilidad en la estimación
-de los coeficientes que notamos arriba.
+```
+##        
+##                 0         1
+##   FALSE 0.7832512 0.1725888
+##   TRUE  0.2167488 0.8274112
+```
 
+Pero con la muestra de prueba obtenemos
 
-La matriz de confusión y la sensibilidad y especificidad:
 
 ```r
 tab <- table(p_prueba$prob_hat_1 > 0.5, p_prueba$clase)
+tab
+```
+
+```
+##        
+##           0   1
+##   FALSE 608 374
+##   TRUE  396 622
+```
+
+```r
 prop.table(tab, margin=2)
 ```
 
@@ -324,6 +359,35 @@ prop.table(tab, margin=2)
 ##   FALSE 0.6055777 0.3755020
 ##   TRUE  0.3944223 0.6244980
 ```
+
+Que es un desempeño pobre comparado con lo que la muestra 
+de entrenamiento podría indicar. 
+
+Finalmente, podemos también repetir la
+gráfica de arriba con los datos de prueba:
+
+
+
+```r
+ggplot(p_prueba, aes(x=prob_hat_1)) + 
+    geom_point(aes(y=prob_1, colour=factor(clase))) 
+```
+
+<img src="05-regularizacion_files/figure-html/unnamed-chunk-18-1.png" width="672" />
+
+Si la estimación fuera perfecta, 
+esta gráfica sería una diagonal. Vemos entonces
+que 
+
+- Cometemos errores grandes en la estimación de probabilidades. 
+- El desempeño predictivo del modelo es pobre, aún cuando nuestro modelo
+puede discriminar razonablemente bien las dos clases en el conjunto de entrenamiento.
+
+El problema no es que nuestro modelo no sea apropiado
+(logístico), pues ese es el modelo real. El problema es 
+el sobreajuste asociado a la variabilidad de los coeficientes
+que notamos arriba.
+
 
 ### Reduciendo varianza de los coeficientes
 
@@ -338,7 +402,14 @@ con un problema penalizado
 
 $$\min_{\beta} D(\beta) + \lambda\sum_{i=1}^p \beta_j^2$$
 
-escogiendo un valor apropiado de $\lambda$. También es posible poner restricciones
+escogiendo un valor apropiado de $\lambda$.  
+
+Si escogemos un valor
+relativamente grande de $\lambda$, entonces terminaremos con una solución
+donde los coeficientes $\beta_j$ no pueden alejarse mucho de 0, 
+y esto previene parte del sobreajuste que observamos en nuestro primer ajuste. Otra manera de decir esto es: intentamos minimizar la devianza, pero no permitimos que los coeficientes se alejen demasiado de cero.
+
+También es posible poner restricciones
 sobre el tamaño de $\sum_{i=1}^p \beta_j^2$, lo cual es equivalente al problema
 de penalización.
 
@@ -373,7 +444,7 @@ sum(coef(mod_1)^2)
 ## [1] 18.2092
 ```
 
-Los nuevos coeficientes estimados:
+Los nuevos coeficientes estimados tienen menor variación:
 
 ```r
 qplot(beta, beta_penalizado) + 
@@ -387,32 +458,25 @@ qplot(beta, beta_penalizado) +
 ## Warning: Ignoring unknown parameters: xintercept
 ```
 
-<img src="05-regularizacion_files/figure-html/unnamed-chunk-20-1.png" width="672" />
+<img src="05-regularizacion_files/figure-html/unnamed-chunk-21-1.png" width="672" />
 
+Y las probabilidades estimadas son más razonables:
 
 
 ```r
 p_entrena$prob_hat_pen <- h(x_e %*% as.numeric(beta_penalizado))
 p_prueba$prob_hat_pen <- h(x_p %*% as.numeric(beta_penalizado))
 ```
-Para los datos de entrenamiento:
+
 
 ```r
 ggplot(p_entrena, aes(x=prob_1, y=prob_hat_pen, colour=factor(clase))) + 
     geom_point() + coord_flip()
 ```
 
-<img src="05-regularizacion_files/figure-html/unnamed-chunk-22-1.png" width="672" />
-
-Y con la muestra de prueba:
-
-```r
-ggplot(p_prueba, aes(x=prob_1, y=prob_hat_pen, colour=factor(clase))) + 
-    geom_point() + coord_flip()
-```
-
 <img src="05-regularizacion_files/figure-html/unnamed-chunk-23-1.png" width="672" />
 
+El desempeño es considerablemente mejor:
 
 
 ```r
@@ -427,7 +491,9 @@ prop.table(tab, 2)
 ##   TRUE  0.3396414 0.7148594
 ```
 
-Curvas ROC de prueba:
+Y finalmente, comparamos las curvas ROC de prueba para los
+dos modelos, el penalizado y el no penalizado. El modelo penalizado
+es considerablemente mejor:
 
 
 ```r
@@ -444,7 +510,7 @@ abline(a=0, b=1, col ='gray')
 <img src="05-regularizacion_files/figure-html/unnamed-chunk-25-1.png" width="672" />
 
 
-Sin embargo, vemos que en la muestra de entrenamiento se desempeña mejor
+**Observación**: Sin embargo, vemos que en la muestra de entrenamiento se desempeña mejor
 el modelo sin penalización, como es de esperarse (el mínimo irrestricto es
 más bajo que el mínimo del problema con restricción).
 
@@ -505,7 +571,7 @@ pesos y dólares), entonces también los coeficientes $\beta_j$ están en distin
 y una penalización fija no afecta de la misma forma a cada coeficiente.
 
 
-Resolver este problema por descenso en gradiente no tienen dificultad, pues:
+Resolver este problema penalizado por descenso en gradiente no tienen dificultad, pues:
 
 \BeginKnitrBlock{comentario}<div class="comentario">$$\frac{\partial D_{\lambda}^{ridge} (\beta)}{\partial\beta_j} = \frac{\partial D(\beta)}{\beta_j} + 2\lambda\beta_j$$
 para $j=1,\ldots, p$, y 
@@ -515,7 +581,6 @@ De forma que sólo hay que hacer una modificación  mínima al algoritmo de desc
 para el caso no regularizado.
 
 ### Selección de coeficiente de regularización
-
 
 Seleccionamos $\lambda$ para minimizar el error de predicción,
 es decir, para mejorar nuestro modelo ajustado en cuanto a sus 
@@ -530,8 +595,6 @@ una penalización más fuerte, de modo que el mínimo que se alcanza es mayor
 en términos de devianza.
 - Intentamos escoger $\lambda$ de forma que se minimice el error de predicción,
 o el error de prueba (que estima el error de predicción).
-
-
 
 #### Ejemplo (simulación) {-}
 
@@ -691,6 +754,8 @@ prop.table(tab_confusion, margin=2)
 #### Ejemplo: variables correlacionadas {-}
 
 Ridge es efectivo para reducir varianza inducida por variables correlacionadas.
+Consideramos el siguiente ejemplo donde queremos predecir el
+porcentaje de grasa corporal a partir de varias medidas del cuerpo (estas medidas están claramente correlacionadas):
 
 
 ```r
@@ -744,13 +809,17 @@ cor(xbf_e)
 ## biceps   0.18576161 0.8273691 0.7308348 0.78995504 1.0000000
 ```
 
+Ahora ajustamos varios modelos penalizamos, y observamos qué
+pasa con los coeficientes conforme aumentamos la penalización:
+
+
 ```r
 ridge_bodyfat <- glmnet(x = scale(xbf_e), y = bfat_e$grasacorp, alpha=0, 
                         lambda = exp(seq(-5, 5, 0.25)))
 plot(ridge_bodyfat, xvar = 'lambda', label=TRUE)
 ```
 
-<img src="05-regularizacion_files/figure-html/unnamed-chunk-34-1.png" width="672" />
+<img src="05-regularizacion_files/figure-html/unnamed-chunk-35-1.png" width="672" />
 
 Donde notamos que las variables con correlaciones altas se "encogen" juntas
 hacia valores similares conforme aumentamos la constante de penalización $\lambda$.
@@ -764,6 +833,7 @@ en coeficientes con varianza alta y predicciones inestables y ruidosas.
 al problema con regularización. Regularización, en este tipo de problemas, es una
 de las componentes necesarias (pero no suficiente) para ir hacia interpretación
 del fenómeno que nos interesa.
+
 
 
 
@@ -828,8 +898,9 @@ knitr::include_graphics("./figuras/div_muestra_cv.png")
 <img src="./figuras/div_muestra_cv.png" width="320" />
 
 Construimos $k$ modelos distintos, digamos $\hat{f}_j$, usando solamente
-la muestra ${\mathcal L}-{\mathcal L}_j$. Este modelo lo evaluamos
-usando la parte que no usamos, ${\mathcal L}_j$, para obtener una 
+la muestra ${\mathcal L}-{\mathcal L}_j$, para $j=1,2,\ldots, k$. Cada uno de estos modelos lo evaluamos
+usando la parte que no usamos para entrenarlo, ${\mathcal L}_j$, 
+para obtener una 
 estimación honesta del error del modelo $\hat{f}_k$, a la que denotamos
 por $\hat{e}_j$. 
 
@@ -864,7 +935,7 @@ cv_mod_ridge <- cv.glmnet(x = x_e, y=dat_e$y,
 plot(cv_mod_ridge)
 ```
 
-<img src="05-regularizacion_files/figure-html/unnamed-chunk-37-1.png" width="672" />
+<img src="05-regularizacion_files/figure-html/unnamed-chunk-38-1.png" width="672" />
 
 ```r
 cv_mod_ridge$lambda.min
@@ -895,7 +966,7 @@ criterio es tomar el modelo más simple que tenga error consistente con el
 mejor modelo.
 
 
-¿Cómo se desempeña validación cruzada como estimación del error?
+### ¿Cómo se desempeña validación cruzada como estimación del error?
 
 ```r
 cross_valid <- data_frame(devianza_cv = cv_mod_ridge$cvm,
@@ -919,7 +990,7 @@ ggplot(devs, aes(x=log(lambda), y=devianza, colour=tipo)) +
 ## Warning: Removed 1 rows containing missing values (geom_point).
 ```
 
-<img src="05-regularizacion_files/figure-html/unnamed-chunk-38-1.png" width="672" />
+<img src="05-regularizacion_files/figure-html/unnamed-chunk-39-1.png" width="672" />
 
 
 Vemos que la estimación en algunos casos no es tan buena, aún cuando
@@ -928,8 +999,8 @@ muy similares.
 
 La razón es que validación cruzada en realidad considera 
 perturbaciones del conjunto de entrenamiento, de forma que lo que 
-intenta evaluar el error producido, para cada lambda, sobre 
-distintas muestras de entrenamiento.
+intenta evaluar es el error producido, para cada lambda, **sobre 
+distintas muestras de entrenamiento**.
 
 En realidad nosotros queremos evaluar el error de predicción del
 modelo que ajustamos. Validación cruzada es más un estimador
@@ -945,10 +1016,9 @@ validación cruzada es más seguro que usar el error de entrenamiento, que
 muchas veces puede estar fuertemente sesgado hacia abajo. Sin embargo, lo
 mejor en este caso es utilizar una muestra de prueba.
 
-
 ### Ejercicio {-}
 
-Consideremos el ejemplo de reconocimiento de dígitos.
+Consideremos el ejemplo de reconocimiento de dígitos y regresión logística multinomial.
 
 
 ```r
@@ -960,6 +1030,10 @@ names(digitos_entrena)[2:257] <- paste0('pixel_', 1:256)
 names(digitos_prueba)[1] <- 'digito'
 names(digitos_prueba)[2:257] <- paste0('pixel_', 1:256)
 ```
+
+Vamos a correr modelos con varias lambda, y estimar su error 
+con validación cruzada:
+
 
 ```r
 set.seed(2912)
@@ -989,7 +1063,11 @@ digitos_cv <- cv.glmnet(x = x_e, y = factor(digitos_entrena_s$digito),
 plot(digitos_cv)
 ```
 
-<img src="05-regularizacion_files/figure-html/unnamed-chunk-40-1.png" width="672" />
+<img src="05-regularizacion_files/figure-html/unnamed-chunk-41-1.png" width="672" />
+
+Ahora hacemos predicciones para el conjunto de prueba, usando
+la lambda que nos dio el menor error de validación cruzada:
+
 
 ```r
 preds_prueba <- predict(digitos_cv, newx = x_p, s = 'lambda.min')[,,1] # solo un grupo de coeficientes
@@ -999,6 +1077,9 @@ dim(preds_prueba)
 ```
 ## [1] 2007   10
 ```
+
+Y evaluamos la tasa de clasificación incorrecta:
+
 
 ```r
 preds_clase <- apply(preds_prueba, 1, which.max)
@@ -1157,7 +1238,11 @@ mod_bodyfat <- cv.glmnet(x = x_e, y = dat_e$grasacorp, alpha = 1) #alpha=1 para 
 plot(mod_bodyfat)
 ```
 
-<img src="05-regularizacion_files/figure-html/unnamed-chunk-49-1.png" width="672" />
+<img src="05-regularizacion_files/figure-html/unnamed-chunk-51-1.png" width="672" />
+
+Veamos los coeficientes para un modelo regularizado con la $\lambda$
+máxima con error consistente con el mínimo (por validación cruzada):
+
 
 ```r
 coeficientes <- predict(mod_bodyfat, s ='lambda.1se', type='coefficients')
@@ -1182,6 +1267,11 @@ coeficientes
 ## antebrazo     .         
 ## muñeca       -0.51756816
 ```
+
+Y nótese que este modelo solo incluye 4 variables. El error de predicción
+es similar al modelo que incluye todas las variables, y terminamos
+con un modelo considerablemente más simple:
+
 
 ```r
 pred_prueba <- predict(mod_bodyfat, newx = x_p, s ='lambda.1se')

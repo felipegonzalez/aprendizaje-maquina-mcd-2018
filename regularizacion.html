@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-09-13">
+<meta name="date" content="2018-09-17">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -217,6 +217,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="regularizacion.html"><a href="regularizacion.html#entrenamiento-validacion-y-prueba"><i class="fa fa-check"></i><b>5.3</b> Entrenamiento, Validación y Prueba</a><ul>
 <li class="chapter" data-level="5.3.1" data-path="regularizacion.html"><a href="regularizacion.html#validacion-cruzada"><i class="fa fa-check"></i><b>5.3.1</b> Validación cruzada</a></li>
+<li class="chapter" data-level="5.3.2" data-path="regularizacion.html"><a href="regularizacion.html#como-se-desempena-validacion-cruzada-como-estimacion-del-error"><i class="fa fa-check"></i><b>5.3.2</b> ¿Cómo se desempeña validación cruzada como estimación del error?</a></li>
 <li class="chapter" data-level="" data-path="regularizacion.html"><a href="regularizacion.html#ejercicio-4"><i class="fa fa-check"></i>Ejercicio</a></li>
 </ul></li>
 <li class="chapter" data-level="5.4" data-path="regularizacion.html"><a href="regularizacion.html#regularizacion-lasso"><i class="fa fa-check"></i><b>5.4</b> Regularización lasso</a></li>
@@ -253,7 +254,7 @@ datos está dado por
 <p>Consideremos que queremos hacer predicciones para una <span class="math inline">\(X=x_0\)</span> particular, de modo
 que el error es</p>
 <p><span class="math display">\[Y - \hat{f}(x_0) = (f(x_0) - \hat{f}(x_0)) + \epsilon\]</span>
-Como discutimos antes, no podemos hacer nada por la variación de <span class="math inline">\(\epsilon\)</span>.
+Como discutimos antes, no podemos hacer nada por la variación de <span class="math inline">\(\epsilon\)</span> (a menos que incluyamos otros predictores <span class="math inline">\(X\)</span> informativos, por ejemplo).
 La pregunta es entonces ¿por qué podría pasar que <span class="math inline">\(\hat{f}(x_0)\)</span> estuviera lejos
 de <span class="math inline">\(f(x_0)\)</span>? Recordemos que <span class="math inline">\(\hat{f}(x_0)\)</span> depende de una muestra
 de entrenamiento <span class="math inline">\({\mathcal L}\)</span>, de modo que:</p>
@@ -310,11 +311,15 @@ variación entre ellos:</p>
 <span class="st">    </span><span class="kw">geom_smooth</span>(<span class="dt">formula =</span> y<span class="op">~</span>x, <span class="dt">method =</span><span class="st">&#39;lm&#39;</span>, <span class="dt">colour =</span> <span class="st">&#39;red&#39;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre>
 <p><img src="05-regularizacion_files/figure-html/unnamed-chunk-6-1.png" width="480" /></p>
 <p>En este ejemplo, ambos métodos se desempeñan mal, pero por razones distintas.
-El primer método sufre de sesgo: es un método rígido que no aprende de patrones
-en los datos. El segundo método sufre de varianza: es un método flexible que aprende
+El primer método sufre más de sesgo (subajuste): es un método rígido que no aprende de patrones
+en los datos. El segundo método sufre más de varianza (sobreajuste): es un método flexible que aprende
 ruido. Cada uno de estos problemas requiere soluciones diferentes.</p>
-<p>En esta parte veremos métodos de <em>regularización</em>, que sirven para reducir la
-varianza con lo que esperamos sean costos menores de sesgo.</p>
+<p>Típicamente, reducciones en sesgo producen incrementos potenciales
+de varianza, y reducciones en varianza tienden a producir incrementos
+potenciales de sesgo.
+En esta parte veremos métodos de <em>regularización</em>, que sirven para reducir la
+varianza. Esta reducción en varianza será exitosa cuando el costo en sesgo
+que paguemos sea menor que esta reducción.</p>
 </div>
 <div id="sesgo-y-varianza-en-modelos-lineales" class="section level3">
 <h3><span class="header-section-number">5.1.1</span> Sesgo y varianza en modelos lineales</h3>
@@ -425,33 +430,69 @@ con <span class="math inline">\(p_1(x)\)</span>, para la primera simulación:</p
 dat_p &lt;-<span class="st"> </span>datos <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="op">!</span>entrena)
 x_e &lt;-<span class="st"> </span>dat_e <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>entrena, <span class="op">-</span>y) <span class="op">%&gt;%</span><span class="st"> </span>as.matrix
 x_p &lt;-<span class="st"> </span>dat_p <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>entrena, <span class="op">-</span>y) <span class="op">%&gt;%</span><span class="st"> </span>as.matrix
-p_entrena &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">prob_hat_1 =</span> <span class="kw">h</span>(mod_<span class="dv">1</span><span class="op">$</span>fitted.values), 
+p_entrena &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">prob_hat_1 =</span> (mod_<span class="dv">1</span><span class="op">$</span>fitted.values), 
                         <span class="dt">prob_1 =</span> <span class="kw">as.numeric</span>(<span class="kw">h</span>(x_e <span class="op">%*%</span><span class="st"> </span>beta)),
                         <span class="dt">clase =</span> dat_e<span class="op">$</span>y)
 p_prueba &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">prob_hat_1 =</span> <span class="kw">as.numeric</span>(<span class="kw">h</span>(x_p <span class="op">%*%</span><span class="st"> </span>(mod_<span class="dv">1</span><span class="op">$</span>coefficients))), 
                        <span class="dt">prob_1 =</span> <span class="kw">as.numeric</span>(<span class="kw">h</span>(x_p <span class="op">%*%</span><span class="st"> </span>beta)),
                        <span class="dt">clase =</span> dat_p<span class="op">$</span>y)</code></pre>
 <p>Para los datos de entrenamiento:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(p_entrena, <span class="kw">aes</span>(<span class="dt">x=</span>prob_<span class="dv">1</span>, <span class="dt">y=</span>prob_hat_<span class="dv">1</span>, <span class="dt">colour=</span><span class="kw">factor</span>(clase))) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span>
-<span class="st">    </span><span class="kw">coord_flip</span>()</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(p_entrena, <span class="kw">aes</span>(<span class="dt">x=</span>prob_hat_<span class="dv">1</span>, <span class="dt">y=</span>prob_<span class="dv">1</span>, <span class="dt">colour=</span><span class="kw">factor</span>(clase))) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">coord_flip</span>()</code></pre>
 <p><img src="05-regularizacion_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
-<p>Y con la muestra de prueba:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(p_prueba, <span class="kw">aes</span>(<span class="dt">x=</span>prob_<span class="dv">1</span>, <span class="dt">y=</span>prob_hat_<span class="dv">1</span>, <span class="dt">colour=</span><span class="kw">factor</span>(clase))) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span>
-<span class="st">    </span><span class="kw">coord_flip</span>()</code></pre>
-<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
-<p>Si la estimación fuera perfecta,
-esta gráfica sería una diagonal. Vemos entonces
-que cometemos errores grandes en la estimación de probabilidades.
-El problema no es que nuestro modelo no sea apropiado
-(logístico), pues ese es el modelo real. El problema es la variabilidad en la estimación
-de los coeficientes que notamos arriba.</p>
-<p>La matriz de confusión y la sensibilidad y especificidad:</p>
+<p>Notamos en esta gráfica:</p>
+<ul>
+<li>El ajuste parece discriminar bien entre las dos clases del
+conjunto de entrenamiento
+(cuando la probabilidad estimada es chica, observamos casi todos clase 0,
+y cuando la probabilidad estimada es grande, observamos casi todos clase 1).</li>
+<li>Sin embargo, vemos que las probabilidades estimadas tienden a ser extremas: muchas veces estimamos probabilidad cercana a 0 o 1, cuando la probabilidad real no es tan extrema (por ejemplo, está entre 0.25 y 0.75).</li>
+</ul>
+<p>Estos dos aspectos indican sobreajuste. Podemos verificar comparando
+con los resultados que obtenemos con la muestra de prueba.</p>
+<p>Si calculamos la matriz de confusión y
+sensibilidad y especifidad <em>de entrenamiento</em>:</p>
+<pre class="sourceCode r"><code class="sourceCode r">tab &lt;-<span class="st"> </span><span class="kw">table</span>(p_entrena<span class="op">$</span>prob_hat_<span class="dv">1</span> <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>, p_entrena<span class="op">$</span>clase)
+tab</code></pre>
+<pre><code>##        
+##           0   1
+##   FALSE 159  34
+##   TRUE   44 163</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab, <span class="dt">margin=</span><span class="dv">2</span>)</code></pre>
+<pre><code>##        
+##                 0         1
+##   FALSE 0.7832512 0.1725888
+##   TRUE  0.2167488 0.8274112</code></pre>
+<p>Pero con la muestra de prueba obtenemos</p>
 <pre class="sourceCode r"><code class="sourceCode r">tab &lt;-<span class="st"> </span><span class="kw">table</span>(p_prueba<span class="op">$</span>prob_hat_<span class="dv">1</span> <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>, p_prueba<span class="op">$</span>clase)
-<span class="kw">prop.table</span>(tab, <span class="dt">margin=</span><span class="dv">2</span>)</code></pre>
+tab</code></pre>
+<pre><code>##        
+##           0   1
+##   FALSE 608 374
+##   TRUE  396 622</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab, <span class="dt">margin=</span><span class="dv">2</span>)</code></pre>
 <pre><code>##        
 ##                 0         1
 ##   FALSE 0.6055777 0.3755020
 ##   TRUE  0.3944223 0.6244980</code></pre>
+<p>Que es un desempeño pobre comparado con lo que la muestra
+de entrenamiento podría indicar.</p>
+<p>Finalmente, podemos también repetir la
+gráfica de arriba con los datos de prueba:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(p_prueba, <span class="kw">aes</span>(<span class="dt">x=</span>prob_hat_<span class="dv">1</span>)) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>prob_<span class="dv">1</span>, <span class="dt">colour=</span><span class="kw">factor</span>(clase))) </code></pre>
+<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>Si la estimación fuera perfecta,
+esta gráfica sería una diagonal. Vemos entonces
+que</p>
+<ul>
+<li>Cometemos errores grandes en la estimación de probabilidades.</li>
+<li>El desempeño predictivo del modelo es pobre, aún cuando nuestro modelo
+puede discriminar razonablemente bien las dos clases en el conjunto de entrenamiento.</li>
+</ul>
+<p>El problema no es que nuestro modelo no sea apropiado
+(logístico), pues ese es el modelo real. El problema es
+el sobreajuste asociado a la variabilidad de los coeficientes
+que notamos arriba.</p>
 </div>
 </div>
 <div id="reduciendo-varianza-de-los-coeficientes" class="section level3">
@@ -463,7 +504,12 @@ de regresión logística, que es minimizar la devianza:</p>
 <p><span class="math display">\[\min_{\beta} D(\beta)\]</span></p>
 <p>con un problema penalizado</p>
 <p><span class="math display">\[\min_{\beta} D(\beta) + \lambda\sum_{i=1}^p \beta_j^2\]</span></p>
-<p>escogiendo un valor apropiado de <span class="math inline">\(\lambda\)</span>. También es posible poner restricciones
+<p>escogiendo un valor apropiado de <span class="math inline">\(\lambda\)</span>.</p>
+<p>Si escogemos un valor
+relativamente grande de <span class="math inline">\(\lambda\)</span>, entonces terminaremos con una solución
+donde los coeficientes <span class="math inline">\(\beta_j\)</span> no pueden alejarse mucho de 0,
+y esto previene parte del sobreajuste que observamos en nuestro primer ajuste. Otra manera de decir esto es: intentamos minimizar la devianza, pero no permitimos que los coeficientes se alejen demasiado de cero.</p>
+<p>También es posible poner restricciones
 sobre el tamaño de <span class="math inline">\(\sum_{i=1}^p \beta_j^2\)</span>, lo cual es equivalente al problema
 de penalización.</p>
 <p>En este caso obtenemos (veremos más del paquete <em>glmnet</em>):</p>
@@ -478,31 +524,30 @@ beta_penalizado &lt;-<span class="st"> </span><span class="kw">coef</span>(mod_r
 <pre><code>## [1] 0.4837593</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(<span class="kw">coef</span>(mod_<span class="dv">1</span>)<span class="op">^</span><span class="dv">2</span>)</code></pre>
 <pre><code>## [1] 18.2092</code></pre>
-<p>Los nuevos coeficientes estimados:</p>
+<p>Los nuevos coeficientes estimados tienen menor variación:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">qplot</span>(beta, beta_penalizado) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">xlab</span>(<span class="st">&#39;Coeficientes&#39;</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">ylab</span>(<span class="st">&#39;Coeficientes estimados&#39;</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">xintercept=</span><span class="dv">0</span>, <span class="dt">slope =</span><span class="dv">1</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">xlim</span>(<span class="kw">c</span>(<span class="op">-</span><span class="fl">0.5</span>,<span class="fl">0.5</span>))<span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="kw">c</span>(<span class="op">-</span><span class="fl">0.5</span>,<span class="fl">0.5</span>))</code></pre>
 <pre><code>## Warning: Ignoring unknown parameters: xintercept</code></pre>
-<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p>Y las probabilidades estimadas son más razonables:</p>
 <pre class="sourceCode r"><code class="sourceCode r">p_entrena<span class="op">$</span>prob_hat_pen &lt;-<span class="st"> </span><span class="kw">h</span>(x_e <span class="op">%*%</span><span class="st"> </span><span class="kw">as.numeric</span>(beta_penalizado))
 p_prueba<span class="op">$</span>prob_hat_pen &lt;-<span class="st"> </span><span class="kw">h</span>(x_p <span class="op">%*%</span><span class="st"> </span><span class="kw">as.numeric</span>(beta_penalizado))</code></pre>
-<p>Para los datos de entrenamiento:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(p_entrena, <span class="kw">aes</span>(<span class="dt">x=</span>prob_<span class="dv">1</span>, <span class="dt">y=</span>prob_hat_pen, <span class="dt">colour=</span><span class="kw">factor</span>(clase))) <span class="op">+</span><span class="st"> </span>
 <span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">coord_flip</span>()</code></pre>
-<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
-<p>Y con la muestra de prueba:</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(p_prueba, <span class="kw">aes</span>(<span class="dt">x=</span>prob_<span class="dv">1</span>, <span class="dt">y=</span>prob_hat_pen, <span class="dt">colour=</span><span class="kw">factor</span>(clase))) <span class="op">+</span><span class="st"> </span>
-<span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">coord_flip</span>()</code></pre>
 <p><img src="05-regularizacion_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p>El desempeño es considerablemente mejor:</p>
 <pre class="sourceCode r"><code class="sourceCode r">tab &lt;-<span class="st"> </span><span class="kw">table</span>(p_prueba<span class="op">$</span>prob_hat_pen <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>, p_prueba<span class="op">$</span>clase)
 <span class="kw">prop.table</span>(tab, <span class="dv">2</span>)</code></pre>
 <pre><code>##        
 ##                 0         1
 ##   FALSE 0.6603586 0.2851406
 ##   TRUE  0.3396414 0.7148594</code></pre>
-<p>Curvas ROC de prueba:</p>
+<p>Y finalmente, comparamos las curvas ROC de prueba para los
+dos modelos, el penalizado y el no penalizado. El modelo penalizado
+es considerablemente mejor:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ROCR)
 pred &lt;-<span class="st"> </span><span class="kw">prediction</span>(<span class="dt">predictions =</span> p_prueba<span class="op">$</span>prob_hat_<span class="dv">1</span>, <span class="dt">labels =</span> p_prueba<span class="op">$</span>clase)
 perf &lt;-<span class="st"> </span><span class="kw">performance</span>(pred, <span class="dt">measure =</span> <span class="st">&quot;sens&quot;</span>, <span class="dt">x.measure =</span> <span class="st">&quot;fpr&quot;</span>) 
@@ -512,7 +557,7 @@ perf_r &lt;-<span class="st"> </span><span class="kw">performance</span>(pred_r,
 <span class="kw">plot</span>(perf_r, <span class="dt">add =</span>T, <span class="dt">col =</span><span class="st">&#39;red&#39;</span>)
 <span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">1</span>, <span class="dt">col =</span><span class="st">&#39;gray&#39;</span>)</code></pre>
 <p><img src="05-regularizacion_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
-<p>Sin embargo, vemos que en la muestra de entrenamiento se desempeña mejor
+<p><strong>Observación</strong>: Sin embargo, vemos que en la muestra de entrenamiento se desempeña mejor
 el modelo sin penalización, como es de esperarse (el mínimo irrestricto es
 más bajo que el mínimo del problema con restricción).</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ROCR)
@@ -567,7 +612,7 @@ sentido la penalización. Si las variables <span class="math inline">\(x_j\)</sp
 pesos y dólares), entonces también los coeficientes <span class="math inline">\(\beta_j\)</span> están en distintas escalas,
 y una penalización fija no afecta de la misma forma a cada coeficiente.</li>
 </ul>
-<p>Resolver este problema por descenso en gradiente no tienen dificultad, pues:</p>
+<p>Resolver este problema penalizado por descenso en gradiente no tienen dificultad, pues:</p>
 
 <div class="comentario">
 <span class="math display">\[\frac{\partial D_{\lambda}^{ridge} (\beta)}{\partial\beta_j} = \frac{\partial D(\beta)}{\beta_j} + 2\lambda\beta_j\]</span>
@@ -684,7 +729,9 @@ tab_confusion</code></pre>
 </div>
 <div id="ejemplo-variables-correlacionadas" class="section level4 unnumbered">
 <h4>Ejemplo: variables correlacionadas</h4>
-<p>Ridge es efectivo para reducir varianza inducida por variables correlacionadas.</p>
+<p>Ridge es efectivo para reducir varianza inducida por variables correlacionadas.
+Consideramos el siguiente ejemplo donde queremos predecir el
+porcentaje de grasa corporal a partir de varias medidas del cuerpo (estas medidas están claramente correlacionadas):</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
 dat_grasa &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="dt">file =</span> <span class="st">&#39;datos/bodyfat.csv&#39;</span>)
 <span class="kw">head</span>(dat_grasa)</code></pre>
@@ -715,10 +762,12 @@ bfat_p &lt;-<span class="st"> </span>dat_grasa[<span class="dv">101</span><span 
 ## abdomen  0.09283790 0.9059227 1.0000000 0.78986726 0.7308348
 ## muslo    0.04835578 0.8641200 0.7898673 1.00000000 0.7899550
 ## biceps   0.18576161 0.8273691 0.7308348 0.78995504 1.0000000</code></pre>
+<p>Ahora ajustamos varios modelos penalizamos, y observamos qué
+pasa con los coeficientes conforme aumentamos la penalización:</p>
 <pre class="sourceCode r"><code class="sourceCode r">ridge_bodyfat &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="dt">x =</span> <span class="kw">scale</span>(xbf_e), <span class="dt">y =</span> bfat_e<span class="op">$</span>grasacorp, <span class="dt">alpha=</span><span class="dv">0</span>, 
                         <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">5</span>, <span class="fl">0.25</span>)))
 <span class="kw">plot</span>(ridge_bodyfat, <span class="dt">xvar =</span> <span class="st">&#39;lambda&#39;</span>, <span class="dt">label=</span><span class="ot">TRUE</span>)</code></pre>
-<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 <p>Donde notamos que las variables con correlaciones altas se “encogen” juntas
 hacia valores similares conforme aumentamos la constante de penalización <span class="math inline">\(\lambda\)</span>.
 Nótese que para regularización muy baja peso y abdomen por ejemplo, tienen
@@ -780,8 +829,9 @@ construimos al azar una partición, con tamaños similares, de la muestra de ent
 <pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&quot;./figuras/div_muestra_cv.png&quot;</span>)</code></pre>
 <p><img src="figuras/div_muestra_cv.png" width="320" /></p>
 <p>Construimos <span class="math inline">\(k\)</span> modelos distintos, digamos <span class="math inline">\(\hat{f}_j\)</span>, usando solamente
-la muestra <span class="math inline">\({\mathcal L}-{\mathcal L}_j\)</span>. Este modelo lo evaluamos
-usando la parte que no usamos, <span class="math inline">\({\mathcal L}_j\)</span>, para obtener una
+la muestra <span class="math inline">\({\mathcal L}-{\mathcal L}_j\)</span>, para <span class="math inline">\(j=1,2,\ldots, k\)</span>. Cada uno de estos modelos lo evaluamos
+usando la parte que no usamos para entrenarlo, <span class="math inline">\({\mathcal L}_j\)</span>,
+para obtener una
 estimación honesta del error del modelo <span class="math inline">\(\hat{f}_k\)</span>, a la que denotamos
 por <span class="math inline">\(\hat{e}_j\)</span>.</p>
 <p>Notemos entonces que tenemos <span class="math inline">\(k\)</span> estimaciones del error
@@ -809,7 +859,7 @@ cv_mod_ridge &lt;-<span class="st"> </span><span class="kw">cv.glmnet</span>(<sp
   <span class="dt">alpha =</span> <span class="dv">0</span>,
   <span class="dt">family=</span><span class="st">&#39;binomial&#39;</span>, <span class="dt">intercept =</span> F, <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">nlambda=</span><span class="dv">50</span>)
 <span class="kw">plot</span>(cv_mod_ridge)</code></pre>
-<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
 <pre class="sourceCode r"><code class="sourceCode r">cv_mod_ridge<span class="op">$</span>lambda.min</code></pre>
 <pre><code>## [1] 0.2155714</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">cv_mod_ridge<span class="op">$</span>lambda<span class="fl">.1</span>se</code></pre>
@@ -825,7 +875,9 @@ del mínimo.</em></li>
 <p>En la gráfica anterior se muestran las dos posibilidades. La razón del segundo
 criterio es tomar el modelo más simple que tenga error consistente con el
 mejor modelo.</p>
-<p>¿Cómo se desempeña validación cruzada como estimación del error?</p>
+</div>
+<div id="como-se-desempena-validacion-cruzada-como-estimacion-del-error" class="section level3">
+<h3><span class="header-section-number">5.3.2</span> ¿Cómo se desempeña validación cruzada como estimación del error?</h3>
 <pre class="sourceCode r"><code class="sourceCode r">cross_valid &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">devianza_cv =</span> cv_mod_ridge<span class="op">$</span>cvm,
                           <span class="dt">modelo =</span> <span class="kw">attr</span>(cv_mod_ridge<span class="op">$</span>glmnet.fit<span class="op">$</span>a0, <span class="st">&#39;names&#39;</span>)[<span class="dv">1</span><span class="op">:</span><span class="dv">49</span>])
 
@@ -836,14 +888,14 @@ devs &lt;-<span class="st"> </span>devianzas_prueba <span class="op">%&gt;%</spa
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(devs, <span class="kw">aes</span>(<span class="dt">x=</span><span class="kw">log</span>(lambda), <span class="dt">y=</span>devianza, <span class="dt">colour=</span>tipo)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre>
 <pre><code>## Warning: Removed 1 rows containing missing values (geom_point).</code></pre>
-<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
 <p>Vemos que la estimación en algunos casos no es tan buena, aún cuando
 todos los datos fueron usados. Pero el mínimo se encuentra en lugares
 muy similares.</p>
 <p>La razón es que validación cruzada en realidad considera
 perturbaciones del conjunto de entrenamiento, de forma que lo que
-intenta evaluar el error producido, para cada lambda, sobre
-distintas muestras de entrenamiento.</p>
+intenta evaluar es el error producido, para cada lambda, <strong>sobre
+distintas muestras de entrenamiento</strong>.</p>
 <p>En realidad nosotros queremos evaluar el error de predicción del
 modelo que ajustamos. Validación cruzada es más un estimador
 del error esperado de predicción sobre los modelos que ajustaríamos
@@ -860,7 +912,7 @@ mejor en este caso es utilizar una muestra de prueba.</li>
 </div>
 <div id="ejercicio-4" class="section level3 unnumbered">
 <h3>Ejercicio</h3>
-<p>Consideremos el ejemplo de reconocimiento de dígitos.</p>
+<p>Consideremos el ejemplo de reconocimiento de dígitos y regresión logística multinomial.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
 digitos_entrena &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;datos/zip-train.csv&#39;</span>)
 digitos_prueba &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;datos/zip-test.csv&#39;</span>)
@@ -868,6 +920,8 @@ digitos_prueba &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<s
 <span class="kw">names</span>(digitos_entrena)[<span class="dv">2</span><span class="op">:</span><span class="dv">257</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&#39;pixel_&#39;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">256</span>)
 <span class="kw">names</span>(digitos_prueba)[<span class="dv">1</span>] &lt;-<span class="st"> &#39;digito&#39;</span>
 <span class="kw">names</span>(digitos_prueba)[<span class="dv">2</span><span class="op">:</span><span class="dv">257</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&#39;pixel_&#39;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">256</span>)</code></pre>
+<p>Vamos a correr modelos con varias lambda, y estimar su error
+con validación cruzada:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">2912</span>)
 <span class="cf">if</span>(<span class="ot">TRUE</span>){
   digitos_entrena_s &lt;-<span class="st"> </span><span class="kw">sample_n</span>(digitos_entrena, <span class="dt">size =</span> <span class="dv">2000</span>)
@@ -884,10 +938,13 @@ digitos_cv &lt;-<span class="st"> </span><span class="kw">cv.glmnet</span>(<span
                         <span class="dt">family =</span> <span class="st">&#39;multinomial&#39;</span>, <span class="dt">alpha =</span> <span class="dv">0</span>, 
                         <span class="dt">parallel =</span> <span class="ot">TRUE</span>, <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">seq</span>(<span class="op">-</span><span class="dv">12</span>, <span class="dv">2</span>, <span class="dv">1</span>)))
 <span class="kw">plot</span>(digitos_cv)</code></pre>
-<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
+<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+<p>Ahora hacemos predicciones para el conjunto de prueba, usando
+la lambda que nos dio el menor error de validación cruzada:</p>
 <pre class="sourceCode r"><code class="sourceCode r">preds_prueba &lt;-<span class="st"> </span><span class="kw">predict</span>(digitos_cv, <span class="dt">newx =</span> x_p, <span class="dt">s =</span> <span class="st">&#39;lambda.min&#39;</span>)[,,<span class="dv">1</span>] <span class="co"># solo un grupo de coeficientes</span>
 <span class="kw">dim</span>(preds_prueba)</code></pre>
 <pre><code>## [1] 2007   10</code></pre>
+<p>Y evaluamos la tasa de clasificación incorrecta:</p>
 <pre class="sourceCode r"><code class="sourceCode r">preds_clase &lt;-<span class="st"> </span><span class="kw">apply</span>(preds_prueba, <span class="dv">1</span>, which.max)
 <span class="kw">table</span>(preds_clase, digitos_prueba<span class="op">$</span>digito)</code></pre>
 <pre><code>##            
@@ -1015,7 +1072,9 @@ x_p &lt;-<span class="st"> </span>dat_p <span class="op">%&gt;%</span><span clas
 
 mod_bodyfat &lt;-<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="dt">x =</span> x_e, <span class="dt">y =</span> dat_e<span class="op">$</span>grasacorp, <span class="dt">alpha =</span> <span class="dv">1</span>) <span class="co">#alpha=1 para lasso</span>
 <span class="kw">plot</span>(mod_bodyfat)</code></pre>
-<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-49-1.png" width="672" /></p>
+<p><img src="05-regularizacion_files/figure-html/unnamed-chunk-51-1.png" width="672" /></p>
+<p>Veamos los coeficientes para un modelo regularizado con la <span class="math inline">\(\lambda\)</span>
+máxima con error consistente con el mínimo (por validación cruzada):</p>
 <pre class="sourceCode r"><code class="sourceCode r">coeficientes &lt;-<span class="st"> </span><span class="kw">predict</span>(mod_bodyfat, <span class="dt">s =</span><span class="st">&#39;lambda.1se&#39;</span>, <span class="dt">type=</span><span class="st">&#39;coefficients&#39;</span>)
 coeficientes</code></pre>
 <pre><code>## 14 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
@@ -1034,6 +1093,9 @@ coeficientes</code></pre>
 ## biceps        .         
 ## antebrazo     .         
 ## muñeca       -0.51756816</code></pre>
+<p>Y nótese que este modelo solo incluye 4 variables. El error de predicción
+es similar al modelo que incluye todas las variables, y terminamos
+con un modelo considerablemente más simple:</p>
 <pre class="sourceCode r"><code class="sourceCode r">pred_prueba &lt;-<span class="st"> </span><span class="kw">predict</span>(mod_bodyfat, <span class="dt">newx =</span> x_p, <span class="dt">s =</span><span class="st">&#39;lambda.1se&#39;</span>)
 <span class="kw">sqrt</span>(<span class="kw">mean</span>((pred_prueba<span class="op">-</span>dat_p<span class="op">$</span>grasacorp)<span class="op">^</span><span class="dv">2</span>))</code></pre>
 <pre><code>## [1] 4.374339</code></pre>

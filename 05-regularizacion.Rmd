@@ -420,7 +420,7 @@ donde los denotamos de la misma forma para unificar notación.
 
 ```{block2, type='comentario'}
 En regresión **ridge** (lineal/logística), para $\lambda>0$ fija minimizamos
-$$D_{\lambda}^{ridge} (\beta)=D(\beta)  + \lambda\sum_{i=1}^p \beta_j^2$$,
+$$D_{\lambda}^{ridge} (\beta)=D(\beta)  + \lambda\sum_{i=1}^p \beta_j^2,$$
 donde suponemos que las entradas están estandarizadas (centradas y escaladas por
 la desviación estándar).
 ```

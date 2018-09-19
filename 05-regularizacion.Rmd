@@ -765,11 +765,18 @@ if(TRUE){
 }
 x_e <- digitos_entrena_s %>% select(-digito) %>% as.matrix
 x_p <- digitos_prueba  %>% select(-digito) %>% as.matrix
-library(doMC)
-registerDoMC(cores=5)
-digitos_cv <- cv.glmnet(x = x_e, y = factor(digitos_entrena_s$digito), 
+if(.Platform$OS.type == "unix"){
+    library(doMC)
+    registerDoMC(cores=5)
+    digitos_cv <- cv.glmnet(x = x_e, y = factor(digitos_entrena_s$digito), 
                         family = 'multinomial', alpha = 0, 
                         parallel = TRUE, nfolds = 10, lambda = exp(seq(-12, 2, 1)))
+} else {
+    # doMC no está disponible en Windows
+    digitos_cv <- cv.glmnet(x = x_e, y = factor(digitos_entrena_s$digito), 
+                        family = 'multinomial', alpha = 0, 
+                        parallel = FALSE, nfolds = 10, lambda = exp(seq(-12, 2, 1)))
+}
 plot(digitos_cv)
 ```
 

@@ -450,12 +450,8 @@ Los nuevos coeficientes estimados tienen menor variación:
 qplot(beta, beta_penalizado) + 
   xlab('Coeficientes') + 
   ylab('Coeficientes estimados') +
-  geom_abline(xintercept=0, slope =1) +
+  geom_abline(intercept=0, slope =1) +
   xlim(c(-0.5,0.5))+ ylim(c(-0.5,0.5))
-```
-
-```
-## Warning: Ignoring unknown parameters: xintercept
 ```
 
 <img src="05-regularizacion_files/figure-html/unnamed-chunk-21-1.png" width="672" />
@@ -541,7 +537,7 @@ $$D(\beta)=-\frac{2}{n}\sum_{i=1}^n y_i \log(h(\beta_0 + \sum_{j=1}^p \beta_j x_
 donde los denotamos de la misma forma para unificar notación.
 
 \BeginKnitrBlock{comentario}<div class="comentario">En regresión **ridge** (lineal/logística), para $\lambda>0$ fija minimizamos
-$$D_{\lambda}^{ridge} (\beta)=D(\beta)  + \lambda\sum_{i=1}^p \beta_j^2$$,
+$$D_{\lambda}^{ridge} (\beta)=D(\beta)  + \lambda\sum_{i=1}^p \beta_j^2,$$
 donde suponemos que las entradas están estandarizadas (centradas y escaladas por
 la desviación estándar).</div>\EndKnitrBlock{comentario}
 
@@ -1153,7 +1149,7 @@ En un principio, puede parecer que ridge y lasso deben dar resultados
 muy similares, pues en ambos casos penalizamos por el tamaño de los coeficientes.
 Sin embargo, son distintos de una manera muy importante.
 
-En la siguiente gráfica regresentamos las curvas de nivel de $D(\beta)$. 
+En la siguiente gráfica representamos las curvas de nivel de $D(\beta)$. 
 Recordemos que en mínimos cuadrados o regresión logística intentamos minimizar
 esta cantidad sin restricciones, y este mínimo se encuentra en el centro 
 de estas curvas de nivel. Para el problema restringido, buscamos más

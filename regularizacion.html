@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-09-17">
+<meta name="date" content="2018-09-19">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -538,9 +538,8 @@ beta_penalizado &lt;-<span class="st"> </span><span class="kw">coef</span>(mod_r
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">qplot</span>(beta, beta_penalizado) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">xlab</span>(<span class="st">&#39;Coeficientes&#39;</span>) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">ylab</span>(<span class="st">&#39;Coeficientes estimados&#39;</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">xintercept=</span><span class="dv">0</span>, <span class="dt">slope =</span><span class="dv">1</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">intercept=</span><span class="dv">0</span>, <span class="dt">slope =</span><span class="dv">1</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">xlim</span>(<span class="kw">c</span>(<span class="op">-</span><span class="fl">0.5</span>,<span class="fl">0.5</span>))<span class="op">+</span><span class="st"> </span><span class="kw">ylim</span>(<span class="kw">c</span>(<span class="op">-</span><span class="fl">0.5</span>,<span class="fl">0.5</span>))</code></pre>
-<pre><code>## Warning: Ignoring unknown parameters: xintercept</code></pre>
 <p><img src="05-regularizacion_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 <p>Y las probabilidades estimadas son más razonables:</p>
 <pre class="sourceCode r"><code class="sourceCode r">p_entrena<span class="op">$</span>prob_hat_pen &lt;-<span class="st"> </span><span class="kw">h</span>(x_e <span class="op">%*%</span><span class="st"> </span><span class="kw">as.numeric</span>(beta_penalizado))
@@ -592,7 +591,7 @@ donde los denotamos de la misma forma para unificar notación.</p>
 
 <div class="comentario">
 En regresión <strong>ridge</strong> (lineal/logística), para <span class="math inline">\(\lambda&gt;0\)</span> fija minimizamos
-<span class="math display">\[D_{\lambda}^{ridge} (\beta)=D(\beta)  + \lambda\sum_{i=1}^p \beta_j^2\]</span>,
+<span class="math display">\[D_{\lambda}^{ridge} (\beta)=D(\beta)  + \lambda\sum_{i=1}^p \beta_j^2,\]</span>
 donde suponemos que las entradas están estandarizadas (centradas y escaladas por
 la desviación estándar).
 </div>
@@ -1018,7 +1017,7 @@ la desviación estándar).
 <p>En un principio, puede parecer que ridge y lasso deben dar resultados
 muy similares, pues en ambos casos penalizamos por el tamaño de los coeficientes.
 Sin embargo, son distintos de una manera muy importante.</p>
-<p>En la siguiente gráfica regresentamos las curvas de nivel de <span class="math inline">\(D(\beta)\)</span>.
+<p>En la siguiente gráfica representamos las curvas de nivel de <span class="math inline">\(D(\beta)\)</span>.
 Recordemos que en mínimos cuadrados o regresión logística intentamos minimizar
 esta cantidad sin restricciones, y este mínimo se encuentra en el centro
 de estas curvas de nivel. Para el problema restringido, buscamos más

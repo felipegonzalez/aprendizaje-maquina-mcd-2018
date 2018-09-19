@@ -839,7 +839,7 @@ En un principio, puede parecer que ridge y lasso deben dar resultados
 muy similares, pues en ambos casos penalizamos por el tamaño de los coeficientes.
 Sin embargo, son distintos de una manera muy importante.
 
-En la siguiente gráfica regresentamos las curvas de nivel de $D(\beta)$. 
+En la siguiente gráfica representamos las curvas de nivel de $D(\beta)$. 
 Recordemos que en mínimos cuadrados o regresión logística intentamos minimizar
 esta cantidad sin restricciones, y este mínimo se encuentra en el centro 
 de estas curvas de nivel. Para el problema restringido, buscamos más

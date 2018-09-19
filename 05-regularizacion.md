@@ -450,8 +450,12 @@ Los nuevos coeficientes estimados tienen menor variación:
 qplot(beta, beta_penalizado) + 
   xlab('Coeficientes') + 
   ylab('Coeficientes estimados') +
-  geom_abline(intercept=0, slope =1) +
+  geom_abline(xintercept=0, slope =1) +
   xlim(c(-0.5,0.5))+ ylim(c(-0.5,0.5))
+```
+
+```
+## Warning: Ignoring unknown parameters: xintercept
 ```
 
 <img src="05-regularizacion_files/figure-html/unnamed-chunk-21-1.png" width="672" />

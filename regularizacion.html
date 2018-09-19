@@ -489,7 +489,7 @@ de entrenamiento podría indicar.</p>
 <p>Finalmente, podemos también repetir la
 gráfica de arriba con los datos de prueba:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(p_prueba, <span class="kw">aes</span>(<span class="dt">x=</span>prob_hat_<span class="dv">1</span>)) <span class="op">+</span><span class="st"> </span>
-<span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>prob_<span class="dv">1</span>, <span class="dt">colour=</span><span class="kw">factor</span>(clase))) </code></pre>
+<span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>prob_<span class="dv">1</span>, <span class="dt">colour=</span><span class="kw">factor</span>(clase))) <span class="op">+</span><span class="st"> </span><span class="kw">coord_flip</span>()</code></pre>
 <p><img src="05-regularizacion_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 <p>Si la estimación fuera perfecta,
 esta gráfica sería una diagonal. Vemos entonces
@@ -545,7 +545,7 @@ beta_penalizado &lt;-<span class="st"> </span><span class="kw">coef</span>(mod_r
 <pre class="sourceCode r"><code class="sourceCode r">p_entrena<span class="op">$</span>prob_hat_pen &lt;-<span class="st"> </span><span class="kw">h</span>(x_e <span class="op">%*%</span><span class="st"> </span><span class="kw">as.numeric</span>(beta_penalizado))
 p_prueba<span class="op">$</span>prob_hat_pen &lt;-<span class="st"> </span><span class="kw">h</span>(x_p <span class="op">%*%</span><span class="st"> </span><span class="kw">as.numeric</span>(beta_penalizado))</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(p_entrena, <span class="kw">aes</span>(<span class="dt">x=</span>prob_<span class="dv">1</span>, <span class="dt">y=</span>prob_hat_pen, <span class="dt">colour=</span><span class="kw">factor</span>(clase))) <span class="op">+</span><span class="st"> </span>
-<span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">coord_flip</span>()</code></pre>
+<span class="st">    </span><span class="kw">geom_point</span>() </code></pre>
 <p><img src="05-regularizacion_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
 <p>El desempeño es considerablemente mejor:</p>
 <pre class="sourceCode r"><code class="sourceCode r">tab &lt;-<span class="st"> </span><span class="kw">table</span>(p_prueba<span class="op">$</span>prob_hat_pen <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.5</span>, p_prueba<span class="op">$</span>clase)

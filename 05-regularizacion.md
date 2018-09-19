@@ -370,7 +370,7 @@ gráfica de arriba con los datos de prueba:
 
 ```r
 ggplot(p_prueba, aes(x=prob_hat_1)) + 
-    geom_point(aes(y=prob_1, colour=factor(clase))) 
+    geom_point(aes(y=prob_1, colour=factor(clase))) + coord_flip()
 ```
 
 <img src="05-regularizacion_files/figure-html/unnamed-chunk-18-1.png" width="672" />
@@ -467,7 +467,7 @@ p_prueba$prob_hat_pen <- h(x_p %*% as.numeric(beta_penalizado))
 
 ```r
 ggplot(p_entrena, aes(x=prob_1, y=prob_hat_pen, colour=factor(clase))) + 
-    geom_point() + coord_flip()
+    geom_point() 
 ```
 
 <img src="05-regularizacion_files/figure-html/unnamed-chunk-23-1.png" width="672" />

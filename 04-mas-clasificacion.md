@@ -20,7 +20,7 @@ de clasificación que son cualitativamente diferentes.
 #### Ejemplo {-}
 - Por ejemplo, diagnosticar a alguien con una enfermedad cuando no la tiene
 tiene consecuencias distintas a diagnosticar como libre de enfermedad a alguien
-que la tiene. Estas consecuencias dependen de cómo son son los tratamientos consecuentes, de y qué tan peligrosa es la enfermedad.
+que la tiene. Estas consecuencias dependen de cómo son los tratamientos consecuentes, de y qué tan peligrosa es la enfermedad.
 
 - Cuando usamos un buscador como Google, es cualitativamente diferente que el
 buscador omita resultados relevantes a que nos presente resultados irrelevantes.
@@ -1024,7 +1024,7 @@ dev_ent(beta)
 ```
 
 ```
-## [1] 226551.9
+## [1] 260669.6
 ```
 
 Hacemos algunas revisiones del gradiente:
@@ -1039,7 +1039,7 @@ beta_2[1000] <- beta[1000] + epsilon
 ```
 
 ```
-## [1] -965.8718
+## [1] -1091.242
 ```
 
 
@@ -1048,7 +1048,7 @@ grad(beta)[1000]
 ```
 
 ```
-## [1] -965.873
+## [1] -1091.243
 ```
 
 Ya ahora podemos hacer descenso:

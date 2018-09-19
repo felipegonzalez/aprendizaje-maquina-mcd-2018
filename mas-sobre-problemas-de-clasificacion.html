@@ -273,7 +273,7 @@ de clasificación que son cualitativamente diferentes.</p></li>
 <ul>
 <li><p>Por ejemplo, diagnosticar a alguien con una enfermedad cuando no la tiene
 tiene consecuencias distintas a diagnosticar como libre de enfermedad a alguien
-que la tiene. Estas consecuencias dependen de cómo son los tratamientos consecuentes, de y qué tan peligrosa es la enfermedad.</p></li>
+que la tiene. Estas consecuencias dependen de cómo son son los tratamientos consecuentes, y de qué tan peligrosa es la enfermedad.</p></li>
 <li><p>Cuando usamos un buscador como Google, es cualitativamente diferente que el
 buscador omita resultados relevantes a que nos presente resultados irrelevantes.</p></li>
 <li><p>¿Otros ejemplos?</p></li>
@@ -1097,16 +1097,16 @@ beta &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv
 dev_ent &lt;-<span class="st"> </span><span class="kw">devianza_calc</span>(x_ent_s, y_ent)
 grad &lt;-<span class="st"> </span><span class="kw">grad_calc</span>(x_ent_s, y_ent)
 <span class="kw">dev_ent</span>(beta)</code></pre>
-<pre><code>## [1] 234585.3</code></pre>
+<pre><code>## [1] 268799.7</code></pre>
 <p>Hacemos algunas revisiones del gradiente:</p>
 <pre class="sourceCode r"><code class="sourceCode r">beta_<span class="dv">2</span> &lt;-<span class="st"> </span>beta 
 epsilon &lt;-<span class="st"> </span><span class="fl">0.00001</span>
 beta_<span class="dv">2</span>[<span class="dv">1000</span>] &lt;-<span class="st"> </span>beta[<span class="dv">1000</span>] <span class="op">+</span><span class="st"> </span>epsilon
 
 (<span class="kw">dev_ent</span>(beta_<span class="dv">2</span>) <span class="op">-</span><span class="st"> </span><span class="kw">dev_ent</span>(beta))<span class="op">/</span>epsilon</code></pre>
-<pre><code>## [1] -843.5141</code></pre>
+<pre><code>## [1] -709.5571</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grad</span>(beta)[<span class="dv">1000</span>]</code></pre>
-<pre><code>## [1] -843.5157</code></pre>
+<pre><code>## [1] -709.5587</code></pre>
 <p>Ya ahora podemos hacer descenso:</p>
 <pre class="sourceCode r"><code class="sourceCode r">iteraciones &lt;-<span class="st"> </span><span class="kw">descenso</span>(<span class="dv">2000</span>, <span class="kw">rep</span>(<span class="dv">0</span>, <span class="dv">257</span><span class="op">*</span><span class="dv">9</span>), <span class="dt">eta=</span><span class="fl">0.001</span>, 
                         <span class="dt">h_deriv =</span> grad, <span class="dt">dev_fun =</span> dev_ent)</code></pre>

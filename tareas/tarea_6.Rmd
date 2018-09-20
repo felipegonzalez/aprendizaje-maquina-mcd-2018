@@ -1,0 +1,226 @@
+---
+title: "Tarea 6: regularización ridge"
+output: html_notebook
+---
+
+
+En este ejemplo trabajaremos con un 
+[ejemplo de Kaggle](https://www.kaggle.com/c/house-prices-advanced-regression-techniques), 
+en donde queremos predecir el precio listado de una casa dependiendo de 
+varias características.
+
+El diccionario de datos está en el archivo *data_description.txt*
+
+```{r}
+library(tidyverse)
+library(glmnet)
+datos <- read_csv("./tarea_6_datos/data_train.csv", na= "") %>%
+    select(-GarageYrBlt, -LotFrontage, -MasVnrArea, -GarageYrBlt, -MoSold, -PoolQC)
+datos$MSSubClass <- factor(datos$MSSubClass)
+```
+
+
+### Preprocesamiento 
+
+Necesitamos hacer varios pasos de limpieza y preprocesamiento de datos.
+Aquí solo haremos una limpieza y transformación parcial para propósitos de
+nuestro ejemplo.
+
+En primer lugar, nota que muchas de estas variables son categóricas. En los casos donde hay
+datos no disponibles (NA), estas se cuentan como una categoría más, por ejemplo:
+
+```{r}
+table(datos$Alley)
+```
+
+En este caso, la categoría NA indica que la casa no tiene acceso por callejón. Igual que en el ejemplo
+del Titanic, convertimos estas variables con *dummy coding*, o *one hot encoding*.
+
+Podemos usar la función *model.matrix* para hacer este preprocesamiento:
+
+```{r}
+x_datos <- model.matrix(SalePrice ~ ., datos %>% select(-Id))
+x_datos <- x_datos[, -1] # quitamos columna de unos
+y <- datos$SalePrice
+```
+
+Por ejemplo, la variable categórica *Alley* (con 3 niveles) corresponde ahora
+a dos columnas de variables binarias:
+
+```{r}
+x_datos[c(20,21,22,31), c('AlleyNA','AlleyPave')]
+```
+
+que puedes comparar con la variable original
+
+```{r}
+datos[c(20,21,22,31), "Alley"]
+```
+
+Otro ejemplo es la variable *MSZoning*, cuyas categorías son:
+
+```{r}
+table(datos$MSZoning)
+```
+
+y corresponde a las nuevas variables
+
+```{r}
+x_datos[1:10, 15:18]
+```
+
+Aquí mostramos las variables que usaremos para nuestros modelos:
+
+```{r}
+colnames(x_datos)
+```
+
+Finalmente, la variable que queremos predecir es
+*SalePrice*:
+
+```{r}
+qplot((datos$SalePrice))
+```
+
+**Nota: veremos más adelante más pasos de preprocesamiento para
+mejorar considerablemente el modelo que obtenemos abajo.**
+
+### Regresión ridge
+
+Separamos un conjunto de entrenamiento y uno de prueba (1/2 aproximadamente)
+
+```{r}
+set.seed(9911)
+indices_entrena <- sample(1:nrow(x_datos), 700)
+x_ent <- x_datos[indices_entrena, -1] # primera columna es de 1's, la quitamos
+y_ent <- y[indices_entrena] / 1000 # miles de dólares
+x_pr <- x_datos[-indices_entrena, -1]
+y_pr <- y[-indices_entrena] / 1000 #miles de dólares
+```
+
+1. Utiliza la función glmnet para ajustar modelos lineales para 
+valores de regularización. Utiliza la siguiente sucesión de
+valores $\lambda$ de regularización ridge:
+
+```{r}
+lambda <- exp(seq(-10, 10, 1))
+lambda
+```
+
+```{r}
+# completa los parámetros que faltan para ajustar los modelos:
+mod_ridge <- glmnet(y = , x = , alpha = 0, family = "gaussian", 
+                lambda = )
+```
+
+Grafica la traza de los coeficientes:
+
+```{r}
+plot(mod_ridge, xvar= "lambda")
+```
+
+- ¿Qué pasa con los coeficientes cuando aumenta el valor de lambda? 
+- ¿Todos los coeficientes se acercan siempre al valor 0 cuando aumentamos
+la regularización?
+- ¿Por qué parece ser que los coeficientes tienen valores casi constantes 
+para valores suficientemente bajos de lambda?
+
+2. Selecciona el valor de regularización usando validación
+cruzada con la función *cv.glmnet*:
+
+```{r}
+# completa los parámetros que faltan:
+cv_mod_1 <- cv.glmnet(y = , x = , alpha = 0, family = "gaussian",
+                      lambda = , nfolds = )
+plot(cv_mod_1)
+```
+
+¿Qué valores de la regularización dan los errores más bajos 
+(según la estimación de validación cruzada?)
+
+3. Selecciona un modelo con baja regularización, con el valor óptimo
+según validación cruzada, y otro con mucha regularización (utiliza las lambdas
+mostradas abajo).
+Evalúa el
+error de predicción (raíz de error cuadrático media) 
+según la muestra de prueba que separamos arriba:
+
+```{r}
+# rellena tres valores, uno con muy baja regularización , uno con regularización
+#óptima según validación cruzada, y otro con demasiada regularización:
+lambda_pred <- c(lambda[1] , , )
+lambda_pred
+```
+
+Calcula errores de prueba
+
+```{r}
+preds_1 <- predict(mod_ridge, newx = x_pr, s = lambda_pred[1])
+preds_2 <-
+preds_3 <- 
+sqrt(mean((preds_1 - y_pr)^2))
+#
+#
+```
+
+- ¿Qué modelo tiene el error más bajo de prueba? ¿Por qué esperarías esto?
+
+
+Grafica predicciones del modelo con menor error contra los valores observados
+
+```{r}
+# Haz tu gráfica aquí
+```
+
+
+4. Compara los coeficientes del modelo menos regularizado con el de
+regularización óptima
+
+
+```{r}
+coefs_reg_baja <- predict(mod_ridge, 
+                          s = lambda_pred[1], type= "coefficients")
+coefs_reg_baja <- coefs_reg_baja[-1,1] # tomamos la primera columna y quitamos intercept
+# rellena aquí
+coefs_reg_opt <- 
+    
+# ahora grafica estos coeficientes en una gráfica x-y:
+
+```
+
+- ¿Qué puedes decir acerca de la dispersión de los coeficientes del modelo
+con baja regularización en comparación al de regularización media? ¿Cuál
+es el rango de los coeficientes del modelo con baja regularización? 
+
+5. Compara algunos coeficientes de dos modelos, el de regularización baja con
+uno de regularización óptima según validación cruzada
+
+Por ejemplo, compara los coeficientes relacionados con el garage (tipo, terminados,
+Calidad, Condición, coches y área):
+
+```{r}
+nombres <- rownames(coefs_reg_baja)
+coef_garage_baja <- coefs_reg_baja[, 1][str_detect(nombres, "Garage")]
+coef_garage_baja
+```
+
+- ¿Qué efecto puede tener esta variable en tus predicciones? Considera que el tamaño
+de los coeficientes está en miles de dólares,
+- ¿Cuál es el valor mediano de las casas en el conjunto de entrenamiento (y)? ¿Los
+efectos del inciso anterior te parecen razonables?
+
+
+Repite para regularización óptima según validación cruzada:
+
+```{r}
+# calcula para los coeficientes del modelo más regularizado
+
+```
+
+- ¿Qué efecto puede tener esta variable en tus predicciones? Considera que el tamaño
+de los coeficientes está en miles de dólares?
+- ¿Cuál es el valor mediano de las casas en el conjunto de entrenamiento (y)? ¿Los
+efectos del inciso anterior te parecen razonables?
+
+
+

@@ -1,0 +1,169 @@
+---
+title: "Tarea 5: solución"
+output: html_document
+---
+
+
+1. En la Tarea 4, construye curvas ROC para cada uno de los 
+tres modelos (una sola variable, todas las variables, y todas
+las variables más variables de ruido). ¿Cuál tiene mejor 
+desempeño? Calcula el AUC para cada una de las tres curvas.
+```{r}
+library(tidyverse)
+datos_titanic <- read_csv("./tarea_4_datos/train.csv")
+source("tarea_4_codigo.R")
+```
+
+
+
+```{r}
+datos_titanic <- datos_titanic %>% select(Survived, Pclass, Age, Sex, Embarked) %>%
+    filter(!is.na(Age), !is.na(Embarked))
+summary(datos_titanic)
+head(datos_titanic)
+```
+
+La descripción de las variables es:
+
+survival	Survival	0 = No, 1 = Yes
+pclass	Ticket class	1 = 1st, 2 = 2nd, 3 = 3rd
+sex	Sex	
+Age	Age in years	
+embarked	Port of Embarkation	C = Cherbourg, Q = Queenstown, S = Southampton
+
+Convertimos las variables categóricas a numerícas creando indicadoras, como
+sigue:
+
+```{r}
+datos <- datos_titanic %>% 
+         mutate(female = as.numeric(Sex == "female"),
+                southampton = as.numeric(Embarked == "S"),
+                cherbourg = as.numeric(Embarked == "C")) %>%
+        select(-Embarked, -Sex)
+datos
+```
+
+Consierando cómo se ven estos datos, podemos usar una normalización simple
+(puedes también hacerlo como lo hicimos en clase), de forma que todas las variables
+estén aproximadamente en el rango 0 - 1 :
+
+```{r}
+datos$age_n <- datos$Age / 60
+datos$pclass_n <-(datos$Pclass - 1) / 3
+datos_trans <- datos %>% select(Survived, pclass_n, age_n, female, southampton, cherbourg)
+datos_trans
+```
+
+
+
+Y finalmente, separa en entrenamiento y prueba de esta forma (como estamos
+normalizando con cantidades fijas, no tenemos que normalizar por separado):
+
+```{r}
+set.seed(28501)
+datos_trans <- datos_trans %>% 
+    mutate(u = runif(nrow(datos_trans))) 
+entrena <- datos_trans %>% filter(u <= 0.7) %>% select(-u)
+prueba <- datos_trans %>% filter(u > 0.7) %>% select(-u)
+```
+
+```{r}
+nrow(entrena)
+nrow(prueba)
+x_ent <- as.matrix(entrena %>% select(-Survived))
+x_pr <- as.matrix(prueba %>% select(-Survived))
+y_ent <- entrena$Survived
+y_pr <- prueba$Survived
+```
+
+```{r}
+x_ent_1 <- x_ent[ , "cherbourg", drop = FALSE] # drop=false es para no convertir en vector
+devianza_ent <- devianza_calc(x_ent_1, y_ent)
+grad_ent <- grad_calc(x_ent_1, y_ent)
+## termina esta línea
+z <- descenso(n = 100, c(0,0), eta = 0.001, grad_ent)
+beta_una_var <- z[100,]
+```
+
+Todas las variables:
+
+
+```{r}
+devianza_ent <- devianza_calc(x_ent, y_ent)
+grad_ent <- grad_calc(x_ent, y_ent)
+## termina esta línea
+z <- descenso(n = 5000, rep(0, 6), eta = 0.001, grad_ent)
+beta_todas <- z[5000, ]
+```
+
+
+```{r}
+set.seed(201)
+p_ruido <- 50 # agregamos 50 variables sin información
+n_ent <- nrow(x_ent)
+n_pr <- nrow(x_pr)
+mat_ent <- matrix(runif(n_ent * p_ruido), n_ent, p_ruido)
+mat_pr <- matrix(runif(n_pr * p_ruido), n_pr, p_ruido)
+x_ent_ruido <- cbind(x_ent, mat_ent)
+x_pr_ruido <- cbind(x_pr, mat_pr)
+
+```
+
+
+
+```{r}
+devianza_ent <- devianza_calc(cbind(x_ent, mat_ent), y_ent)
+grad_ent <- grad_calc(cbind(x_ent, mat_ent), y_ent)
+## termina esta línea
+z <- descenso(n = 5000, rep(0, 6 + p_ruido), eta = 0.0001, grad_ent)
+beta_ruido <- z[5000, ]
+```
+
+
+```{r}
+x_pr_1 <- x_pr[, "cherbourg", drop = FALSE]
+modelo_simple <- data_frame(prob = as.numeric(p_beta(x_pr_1, beta_una_var)),
+            y = y_pr)
+modelo_todas <- data_frame(prob = as.numeric(p_beta(x_pr, beta_todas)),
+                            y = y_pr)
+modelo_ruido <- data_frame(prob = as.numeric(p_beta(x_pr_ruido, beta_ruido)),
+                            y = y_pr)
+library(ROCR)
+datos_roc <- function(dat_mod, nombre){
+    pred_rocr <- prediction(dat_mod$prob, dat_mod$y) 
+    perf <- performance(pred_rocr, measure = "sens", x.measure = "fpr") 
+    graf_roc_1 <- data_frame(tfp = perf@x.values[[1]], 
+                         sens = perf@y.values[[1]], 
+                         d = perf@alpha.values[[1]])
+    graf_roc_1$modelo <- nombre
+    graf_roc_1
+}
+roc_simple <- datos_roc(modelo_simple, "simple")
+roc_todas <- datos_roc(modelo_todas, "todas")
+roc_ruido <- datos_roc(modelo_ruido, "ruido")
+graf_roc <- bind_rows(roc_simple, roc_todas, roc_ruido)
+
+ggplot(graf_roc, aes(x = tfp, y = sens, colour=modelo)) + 
+    geom_point() + geom_line()+
+  xlab('1-especificidad') + ylab('Sensibilidad') 
+
+```
+
+
+
+2. Para el ejemplo de regresión logística multinomial que
+vimos en clase (clasificación de dígitos 0-9), construye la
+gráfica de coeficientes (sección 4.3.3) para:
+
+- El modelo que vimos en clase donde no habían convergido los
+coeficientes
+- El modelo después de correr hasta convergencia (usa la
+ función *multinom*)
+ 
+ Compara las gráficas. ¿Cuál es más interpretable? ¿Puedes ver
+ el sobreajuste del segundo modelo en estas gráficas?
+ 
+ **Solución**: ve el código de la clase 4. Repite la gráfica
+ de coeficientes con el último modelo que estimamos (usando multinom)
+ 
+ 

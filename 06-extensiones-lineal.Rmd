@@ -68,7 +68,8 @@ es diferente (generalmente expandido).
 
 Veremos las siguientes técnicas:
 
-- Incluir variables cualitativas (categóricas). Transformación de variables.
+- Agregar versiones transformadas de las variables de entrada
+- Incluir variables cualitativas (categóricas). 
 - Interacciones entre variables: incluir términos de la forma $x_1x_2$
 - Regresión polinomial: incluír términos de la forma $x_1^2$, $x_1^3$, etcétera.
 - Splines de regresión.
@@ -77,55 +78,85 @@ Veremos las siguientes técnicas:
 
 Una técnica útil para mejorar el sesgo de modelos de regresión 
 consiste en incluir o sustituir valores transformados de las
-variables de entrada. Una de las más comunes es usar logaritmo
-para variables positivas:
+variables de entrada. 
+
+#### Ejemplo: agregar entradas transformadas {-}
 
 
-#### Ejemplo {-}
+Empezamos por predecir el valor de una casa en función de calidad de terminados.
 
-Consideramos predecir el quilataje de un diamante en función de su precio.
-
+Preparamos los datos:
 
 ```{r, warning=FALSE, message=FALSE}
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-set.seed(231)
-diamonds_muestra <- sample_n(diamonds, 3000)
-ggplot(diamonds_muestra, aes(x=price, y=carat)) + geom_point() +
-  geom_smooth(method = 'lm')
+library(tidyverse)
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+theme_set(theme_minimal())
+datos_casas <- read_csv('./tareas/tarea_6_datos/data_train.csv', na="")
+set.seed(9911)
+indices_entrena <- sample(1:nrow(datos_casas), 1000)
+casas_e <- datos_casas[indices_entrena, ] %>% mutate(log_price = log(SalePrice))
+casas_p <- datos_casas[-indices_entrena, ] %>% mutate(log_price = log(SalePrice))
 ```
 
-Nótese que el modelo lineal está sesgado, y produce sobrestimaciones y subestimaciones
-para distintos valores de $x$. Aunque podríamos utilizar un método más flexible para
-este modelo, una opción es transformar entrada y salida con logaritmo:
+Ajustamos el modelo y lo probamos
+
 
 ```{r}
-diamonds_muestra <- diamonds_muestra %>% 
-  mutate(log_price = log(price), log_carat = log(carat))
-ggplot(diamonds_muestra, aes(x=log_price, y=log_carat)) + geom_point() +
-  geom_smooth(method = 'lm')
+mod_1 <- lm(SalePrice ~ OverallQual , data = casas_e)
+
+calc_error <- function(mod,  datos_p, y_name = "SalePrice"){
+    preds <- predict(mod, newdata = datos_p)
+    error <- sqrt(mean((preds - datos_p[[y_name]])^2))
+    print(qplot(preds, datos_p[[y_name]], alpha=0.5) + geom_abline() +
+        annotate("text", x = 0, y= 300000, label = paste0("rmse ", round(error))))
+    error
+}
+
+calc_error(mod_1, casas_p, "SalePrice")
+
 ```
 
-Nota: si tenemos ceros en los datos podemos usar también $\log(x+1)$. Podemos
-graficar también en unidades originales:
+Y notamos que nuestras predicciones parecen estar sesgadas: tienden a ser  bajas
+cuando el valor de la casa es alto o bajo. Esto es signo de **sesgo**, y
+ usualmente implica que existen relaciones
+no lineales en las variables que estamos considerando, o interacciones que no 
+estamos incluyendo en nuestro modelo.
+
+Una técnica es agregar entradas derivadas de las que tenemos, usando transformaciones
+no lineales. Por ejemplo, podríamos hacer:
 
 ```{r}
-
-ggplot(diamonds_muestra, aes(x=price/1000, y=carat)) + geom_point() +
-  geom_smooth(method = 'lm') + 
-  scale_x_log10(breaks=2^seq(-1,5,1)) + scale_y_log10(breaks=2^seq(-2,5,1))
+mod_2 <- lm(SalePrice ~ OverallQual + I(OverallQual^2) , data = casas_e)
+calc_error(mod_2, casas_p, "SalePrice")
 ```
 
+Y redujimos el error de prueba. Esta reducción claramente proviene de una reducción
+de sesgo, pues usamos un modelo más complejo (una variable adicional).
 
-```{block2, type='comentario'}
-- Cuando una variable  *toma valores positivos y recorre varios órdenes 
-de magnitud*, 
-puede ayudar transformar con logaritmo o 
-raíz cuadrada (esto incluye transformar la variable respuesta).
-- Menos común: variables que son proporciones $p$ pueden transformarse mediante la
-transformación inversa de la logística ($x = \log(\frac{p}{1-p})$.)
+
+Ahora otras variables: el tamaño del área habitable y número 
+de cuartos excluyendo el sótano:
+
+```{r}
+mod_3 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + OverallCond  + 
+                GrLivArea + TotalBsmtSF + GarageArea, 
+            data = casas_e)
+calc_error(mod_3, casas_p, "SalePrice")
 ```
+
+Podemos pensar en expandir el modelo de maneras distintas. Por ejemplo,
+podríamos incluir la relación que hay entre tamaño del sótano y área habitable:
+
+```{r}
+mod_3 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + GrLivArea + TotalBsmtSF +
+                GarageArea + OverallCond +
+                I( TotalBsmtSF / GrLivArea) + I( GarageArea / GrLivArea), 
+            data = casas_e)
+calc_error(mod_3, casas_p, "SalePrice")
+```
+
+Y estos cambios parecen no mejorar nuestro modelo.
+
 
 ## Variables cualitativas
 
@@ -137,13 +168,15 @@ todas las entradas son numéricas. Podemos usar un truco simple para incluir
 variables cualitativas
 
 #### Ejemplo {-}
-Supongamos que queremos incluir la variable *color*:
+Supongamos que queremos incluir la variable *CentralAir*, si tiene aire acondicionado
+central o no. Podemos ver en este análisis simple que, por ejemplo, controlando
+por tamaño de la casa, agrega valor tener aire acondicionado central:
 
 ```{r}
-diamonds_muestra %>% group_by(color) %>% count
-ggplot(diamonds_muestra, 
-       aes(x=price, y=carat, colour=color, group=color)) + 
-  geom_point(alpha=0.5) + 
+casas_e %>% group_by(CentralAir) %>% count
+ggplot(casas_e, 
+       aes(x=GrLivArea, y=SalePrice, colour=CentralAir, group=CentralAir)) + 
+  geom_jitter(alpha=1) + 
   geom_smooth(method='lm', se=FALSE, size=1.5) + 
   scale_y_log10(breaks=c(0.25,0.5,1,2))+
   scale_x_log10(breaks=c(500,1000,2000,4000,8000))
@@ -151,31 +184,28 @@ ggplot(diamonds_muestra,
 
 
 
-Podemos incluir de manera simple esta variable creando variables *dummy* o
-*indicadoras*, que
-son variables que toman valores 0 o 1 dependiendo de cada clase:
+Podemos incluir de manera simple esta variable creando una variable *dummy* o
+*indicadora*,
+que toma el 1 cuando la casa tiene AC y 0 si no:
 
 
 ```{r}
-diamonds_muestra <- diamonds_muestra %>% mutate(color= as.character(color))
-datos <- diamonds_muestra[, c('log_carat', 'log_price', 'color')] 
-head(datos)
-x_e <- model.matrix( ~   color, data = datos)
-head(x_e, 10)
+casas_e <- casas_e %>% mutate(AC_present = as.numeric(CentralAir == "Y"))
+casas_e %>% select(Id, CentralAir, AC_present)
 ```
 
 Y ahora podemos hacer:
 
 ```{r}
-datos_d <- as.data.frame(x_e)
-datos_d$log_carat <- datos$log_carat
-datos_d$log_price <- datos$log_price
-datos_d$`(Intercept)` <- NULL
-mod_1 <- lm(log_carat ~ ., data = datos_d)
-summary(mod_1)
+mod_4 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + GrLivArea + TotalBsmtSF +
+                GarageArea + OverallCond + CentralAir, 
+            data = casas_e)
+calc_error(mod_4, casas_p, "SalePrice")
 ```
 
-Nótese que  si la variable categórica tiene $K$ clases,
+Que no es una gran mejora, pero esperado dado que pocas de estas casas tienen aire acondicionado.
+
+Cuando la variable categórica tiene $K$ clases,
 solo creamos variables indicadores de las primeras $K-1$ clases, pues
 la dummy de la última clase tiene información redundante: es decir, si
 para las primeras $K-1$ clases las variables dummy son cero, entonces
@@ -183,12 +213,47 @@ ya sabemos que se trata de la última clase $K$, y no necesitamos incluir
 una indicadora para la última clase.
 
 
-Más fácilmente, la función lm hace la codificación dummy automáticamente. Por ejemplo,
-para el modelo logarítmico:
+#### Ejemplo {-}
+
+Vamos a incluir la variable BsmtQual, que tiene los niveles:
+
 ```{r}
-lm(log_carat ~ log_price + color, data = diamonds_muestra) 
+casas_e %>% group_by(BsmtQual) %>% count
 ```
 
+Podemos hacer una gráfica exploratoria como la anterior:
+
+```{r}
+ggplot(casas_e, 
+       aes(x=GrLivArea, y=SalePrice, colour=BsmtQual, group=BsmtQual)) + 
+  geom_jitter(alpha=1) + 
+  geom_smooth(method='lm', se=FALSE, size=1.5) + 
+  scale_y_log10(breaks=c(0.25,0.5,1,2))+
+  scale_x_log10(breaks=c(500,1000,2000,4000,8000))
+```
+
+donde vemos que esta variable puede aportar a la predicción. Ajustamos y evaluamos:
+
+```{r}
+mod_5 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + GrLivArea + TotalBsmtSF +
+                GarageArea + OverallCond + CentralAir + BsmtQual, 
+            data = casas_e)
+calc_error(mod_5, casas_p, "SalePrice")
+```
+
+Si examinamos los coeficientes, vemos que *lm* automáticamente convirtió esta variable
+con *dummy coding*:
+
+```{r}
+coef(mod_5)
+bsmt_ind  <- str_detect(names(coef(mod_5)), "BsmtQual")
+coef(mod_5)[bsmt_ind] %>% sort
+```
+
+Nótese que la categoría base (con coeficiente 0 es 'Ex', es decir, no aparece TotalBsmtEx). 
+Esta es la razón por la que todos estos coeficientes son negativos (Ex es el mejor nivel). 
+
+---
 
 **Observaciones**:
 - Nótese también que no hay coeficiente para una de las clases, por lo que discutimos arriba. También podemos pensar que el coeficiente de esta clase es 0, y así comparamos con las otras clases.
@@ -203,6 +268,9 @@ casos conviene usar regularización y quizá (si es razonable) usar categorizaci
 más gruesas.
 ```
 
+En nuestro ejemplo anterior, observamos que el nivel *Fair* queda por debajo de *Typical* y *NA*. Esto
+podría se un signo de sobreajuste (estimación con alta varianza de estos coeficientes).
+
 ## Interacciones
 
 En el modelo lineal, cada variable contribuye de la misma manera independientemente de los valores de las otras variables. Esta es un simplificación o aproximación útil, 
@@ -210,6 +278,7 @@ pero muchas veces puede producir sesgo demasiado grande en el modelo.
 Por ejemplo: consideremos los siguientes datos de la relación de mediciones de temperatura y ozono en la atmósfera:
 
 
+#### Ejemplo {-}
 ```{r}
 head(airquality)
 air <- filter(airquality, !is.na(Ozone) & !is.na(Wind) & !is.na(Temp))
@@ -273,12 +342,59 @@ mod_3 <- lm(Ozone ~ Temp + Wind + Temp:Wind, air[1:50,])
 mod_3
 ```
 
+
+---
+
+
 ```{block2, type='comentario'}
 Podemos incluir interacciones para pares de variables que son importantes en la
 predicción, o que por conocimiento del dominio sabemos que son factibles. Conviene
 usar regularización si necesitamos incluir varias interacciones.
 ```
 
+
+#### Ejemplo {-}
+En nuestro ejemplo de precios de casas ya habíamos intentado utilizar una interacción,
+considerando el cociente de dos variables. Aquí veremos una que es importante:
+la relación entre precio y superficie debe tener interacción con el vecindario,
+pues distintos vecindarios tienen distintos precios por metro cuadrado:
+
+```{r}
+agrupamiento <- casas_e %>% group_by(Neighborhood) %>%
+    summarise(media_ft2 = mean(SalePrice / GrLivArea), n = n()) %>%
+    arrange(desc(media_ft2)) %>%
+    mutate(Neighborhood_grp = ifelse(n < 60, 'Other', Neighborhood))
+agrupamiento
+casas_e <- casas_e %>% left_join(agrupamiento) 
+casas_p <- casas_p %>% left_join(agrupamiento) 
+```
+
+En la siguiente gráfica ordenamos la variable *Neighborhood_grp* de manera
+que aparecen antes vecindarios más baratos:
+
+```{r}
+casas_e$Neighborhood_grp <- reorder(casas_e$Neighborhood_grp, casas_e$media_ft2, mean)
+ggplot(casas_e, 
+       aes(x=GrLivArea, y=SalePrice, colour=Neighborhood_grp, group=Neighborhood_grp)) + 
+  geom_jitter(alpha=0.1) + 
+  geom_smooth(method='lm', se=FALSE, size=1.5) +
+    scale_x_sqrt() + scale_y_sqrt() + 
+    scale_colour_manual(values = cbbPalette)
+```
+
+
+Nótese que no solo las curvas se desplazan verticalmente según el 
+vecindario, sino que también su pendiente cambia con el vecindario. Podemos
+agregar esta interacción a nuestro modelo:
+
+
+```{r}
+mod_6 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + GrLivArea + TotalBsmtSF +
+                GarageArea + OverallCond + CentralAir + BsmtQual + Neighborhood_grp +
+                Neighborhood_grp:GrLivArea, 
+            data = casas_e)
+calc_error(mod_6, casas_p, "SalePrice")
+```
 
 ## Categorización de variables
 
@@ -331,7 +447,7 @@ sea razonable.
 
 Muchas veces los splines son mejores opciones:
 
-## Splines
+## Splines (opcional)
 
 En estos ejemplos, también es posible incluir términos cuadráticos para modelar
 la relación, por ejemplo:
@@ -427,6 +543,100 @@ ggplot(dat_wage) + geom_point(aes(x=age, y=wage)) +
   geom_line(aes(x=age, y=pred_wage), colour = 'red', size=1.1)
 ```
 
+### Modelando en escala logarítmica
+
+En muchos problemas, es natural transformar variables numéricas a logarítmicas. 
+Supongamos por ejemplo que en nuestro problema la variable $y$ es positiva,
+y también las entradas son positivas. En primer lugar podríamos intentar modelar
+$$ y =  b_0 + \sum b_j x_j $$
+pero también podemos transformar las entradas y la salida para construir un 
+modelo multiplicativo:
+$y' = log(y) = b_0 + \sum b_k \log(x_j)$ 
+y ahora queremos predecir el logaritmo de $y$, no $y$ directamente. 
+
+#### Ejemplo {-}
+
+Consideramos predecir el quilataje de 
+
+```{r}
+set.seed(231)
+diamonds_muestra <- sample_n(diamonds, 3000)
+ggplot(diamonds_muestra, aes(x=carat, y=price)) + geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+
+
+---
+Este es un
+modelo multiplicativo, pues tomando exponencial de ambos lados, obtenemos:
+
+$$y = B_0\prod x_j^{b_j}$$
+Por ejemplo, si cambiamos $x_j -> x_j + \Delta x = x_j (1+ \frac{\Delta x}{x_j})$, el cambio porcentual en $y$ es
+$$ \frac{y+\Delta y}{y} = \left (1 + \frac{\Delta x}{x_j}\right )^{b_j}$$
+Y si $\frac{\Delta x}{x_j}$ es chica, entonces aproximadamente
+$$ \frac{\Delta y}{y} \approx b_j \frac{\Delta x}{x_j}$$
+Es decir, el cambio relativo en $y$ es proporcional al cambio relativo en $x_j$ para
+cambios relativamente chicos en $x_j$.
+
+
+```{r}
+set.seed(22)
+diamonds_muestra <- sample_n(diamonds, 1000)
+ggplot(diamonds_muestra, aes(x=carat, y=price)) + geom_point() +
+  geom_smooth(method="lm")
+```
+
+Nótese que el modelo lineal está sesgado, y produce sobrestimaciones y subestimaciones
+para distintos valores de $x$. Aunque podríamos utilizar un método más flexible para
+este modelo, una opción es transformar entrada y salida con logaritmo:
+
+
+```{r}
+diamonds_muestra <- diamonds_muestra %>% 
+  mutate(log_price = log(price), log_carat = log(carat))
+ggplot(diamonds_muestra, aes(x=log_carat, y=log_price)) + geom_point() +
+  geom_smooth(method = "lm")
+```
+
+ Podemos
+graficar también en unidades originales:
+
+```{r}
+ggplot(diamonds_muestra, aes(x=carat, y=price/1000)) + geom_point() +
+  geom_smooth(method = 'lm') + 
+  scale_x_log10(breaks=2^seq(-1,5,1)) + scale_y_log10(breaks=2^seq(-2,5,1))
+```
+
+Y vemos que la relación entre los logaritmos es lineal: redujimos el sesgo
+sin los costos adicionales de varianza que implica agregar más variables 
+e interacciones. En este caso, esta relación es naturalmente multiplicativa
+(un 10\% de incremento relativo en el peso produce un incremento constante
+en el precio).
+
+
+```{block2, type='comentario'}
+- Cuando una variable  *toma valores positivos y recorre varios órdenes 
+de magnitud*, 
+puede ayudar transformar con logaritmo o 
+raíz cuadrada (esto incluye transformar la variable respuesta).
+- Muchas veces es natural modelar en la escala logarítmica, como en el ejemplo
+de los diamantes.
+- También tiene utilidad cuando las variables de respuesta o entrada tienen distribuciones
+muy sesgadas a la derecha (con algunos valores órdenes de magnitud más grandes que la mayoría
+        del grueso de los datos). Tomar logaritmos resulta en mejoras numéricas, y 
+evita que algunos valores atipicos dominen el cálculo del error.
+- Menos común: variables que son proporciones $p$ pueden transformarse mediante la
+transformación inversa de la logística ($x = \log(\frac{p}{1-p})$.)
+```
+
+
+#### Ejercicio {-}
+Puedes repetir el ejercicio de la tarea 6 transformando las variables numéricas
+con logaritmo (o $\log(1+x)$ cuando $x$ tiene ceros). 
+Utiliza el mismo error del concurso de kaggle, que es el error cuadrático medio
+en escala logarítmica (en el concurso, esta es otra razón para usar escala
+logarítmica en la variable respuesta.)
 
 ### ¿Cuándo usar estas técnicas?
 

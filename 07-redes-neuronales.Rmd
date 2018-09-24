@@ -24,7 +24,7 @@ que seleccionaremos más tarde. La idea es hacer **combinaciones lineales** de
 variables **transformadas**. 
 
 
- Modelamos ahora la probabilidad de clase 1 con regresión logística -pero en lugar de usar las entradas originales X usamos las entradas derivadas 
+ Modelamos ahora la probabilidad de clase 1 con regresión logística, pero en lugar de usar las entradas originales X usamos las entradas derivadas 
 $a_1, . . . , a_m$:
 $$p_1(x) = h \left ( \beta_0 + \sum_{j=1}^m \beta_ja_j
 \right)$$ 
@@ -104,7 +104,7 @@ Por ejemplo, podríamos tomar:
 ```{r, out.width=500, echo=FALSE, fig.width=7, fig.asp=1}
  gr <- graph(c(1,2,1,3,2,4,3,4))
  plot(gr, layout = matrix(c(-2,0,0,1,0,-1,2,0), byrow=T, ncol=2),
-      vertex.label=c('X1','a_1','a_2','p1'), 
+      vertex.label=c(expression(X[1]),expression(a[1]),expression(a[2]),expression(p[1])), 
       vertex.size=50, vertex.color='salmon', vertex.label.cex=1.5,
    vertex.label.color='white',vertex.frame.color=NA
    )
@@ -144,6 +144,7 @@ ggplot(dat_2, aes(x=x, y=p2)) + geom_line()+
 geom_line(data=dat_p, aes(x=x,y=p), col='red') +ylim(c(0,1))+
    geom_point(data = datos, aes(x = x_1, y = g_1))
 ```
+
 que da un ajuste razonable. Este es un ejemplo de cómo
 la mezcla de dos funciones logísticas puede 
 replicar esta función con forma de chipote.
@@ -162,7 +163,7 @@ usamos la función *optim* de R para
 minimizar la devianza. En primer lugar, creamos una
 función que para todas las entradas calcula los valores
 de salida. En esta función hacemos **feed-forward** de las entradas
-a través de la red para calcular la salida
+a través de la red para calcular la salida.
 
 ```{r}
 ## esta función calcula los valores de cada nodo en toda la red,
@@ -174,6 +175,7 @@ feed_fow <- function(beta, x){
   p
 }
 ```
+
 Nótese que simplemente seguimos el diagrama mostrado arriba
 para hacer los cálculos, combinando linealmente las entradas en cada
 capa.
@@ -221,6 +223,7 @@ ggplot(dat_2, aes(x = x, y = p_2)) + geom_line()+
 geom_line(data = dat_p, aes(x = x, y = p), col='red') +ylim(c(0,1))+
    geom_point(data = datos, aes(x = x_1, y = g_1))
 ```
+
 Los coeficientes estimados, que en este caso muchas veces se llaman
 *pesos*, son: 
 ```{r}
@@ -319,7 +322,7 @@ ggplot(dat, aes(x=x1, y=x2)) + geom_tile(aes(fill=p))
 ```
 
 Esta función puede entenderse como un o exclusivo: la probabilidad es alta
-sólo cuando x1 y x2 tienen valores opuestos (x1 grande pero x2 chica y viceversa). 
+sólo cuando $x_1$ y $x_2$ tienen valores opuestos ($x_1$ grande pero $x_2$ chica y viceversa). 
 
 No es posible modelar esta función mediante el modelo logístico (sin interacciones).
 Pero podemos incluir la interacción en el modelo logístico o intentar
@@ -343,7 +346,7 @@ table(predict(mod_2) > 0.5, dat_ent$y)
  Observese la gran diferencia de devianza entre los dos modelos (en este caso,
  el sobreajuste no es un problema).
 
-Ahora consideramos qué red neuronal puede ser apropiada
+Ahora consideramos qué red neuronal puede ser apropiada.
 
 ```{r}
 set.seed(11)
@@ -382,7 +385,7 @@ dat <- dat %>% rowwise %>% mutate(p_red = feed_fow(nn$wts, c(x1, x2)))
 ggplot(dat, aes(x=x1, y=x2)) + geom_tile(aes(fill=p_red))
 ```
 
-**Observación**: ¿cómo funciona esta red? Consideremos la capa intermedia
+**Observación**: ¿cómo funciona esta red? Consideremos la capa intermedia.
 
 ```{r}
 dat_entrada <- data_frame(x_1 = c(0,0,1,1), x_2 = c(0,1,0,1))

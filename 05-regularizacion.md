@@ -1230,8 +1230,8 @@ dat_p <- dat_grasa[151:252,]
 x_e <- dat_e %>% select(-grasacorp, -id, -unif) %>% as.matrix
 x_p <- dat_p %>% select(-grasacorp, -id, -unif) %>% as.matrix
 
-mod_bodyfat <- cv.glmnet(x = x_e, y = dat_e$grasacorp, alpha = 1) #alpha=1 para lasso
-plot(mod_bodyfat)
+mod_bodyfat_cv <- cv.glmnet(x = x_e, y = dat_e$grasacorp, alpha = 1) #alpha=1 para lasso
+plot(mod_bodyfat_cv)
 ```
 
 <img src="05-regularizacion_files/figure-html/unnamed-chunk-51-1.png" width="672" />
@@ -1241,7 +1241,7 @@ máxima con error consistente con el mínimo (por validación cruzada):
 
 
 ```r
-coeficientes <- predict(mod_bodyfat, s ='lambda.1se', type='coefficients')
+coeficientes <- predict(mod_bodyfat_cv, s ='lambda.1se', type='coefficients')
 coeficientes
 ```
 
@@ -1270,13 +1270,27 @@ con un modelo considerablemente más simple:
 
 
 ```r
-pred_prueba <- predict(mod_bodyfat, newx = x_p, s ='lambda.1se')
+pred_prueba <- predict(mod_bodyfat_cv, newx = x_p, s ='lambda.1se')
 sqrt(mean((pred_prueba-dat_p$grasacorp)^2))
 ```
 
 ```
 ## [1] 4.374339
 ```
+
+La traza confirma que la regularización lasso, además de encoger 
+coeficientes, saca variables del modelo conforme el valor de regularización
+aumenta:
+
+
+```r
+mod_bodyfat <- glmnet(x = x_e, y = dat_e$grasacorp, alpha = 1) #alpha=1 para lasso
+plot(mod_bodyfat, xvar = "lambda")
+```
+
+<img src="05-regularizacion_files/figure-html/unnamed-chunk-54-1.png" width="672" />
+
+
 Comparado con regresión lineal:
 
 ```r

@@ -101,14 +101,18 @@ casas_p <- datos_casas[-indices_entrena, ] %>% mutate(log_price = log(SalePrice)
 Ajustamos el modelo y lo probamos
 
 
-```{r}
+```{r, fig.width=5, fig.asp=0.7}
 mod_1 <- lm(SalePrice ~ OverallQual , data = casas_e)
 
 calc_error <- function(mod,  datos_p, y_name = "SalePrice"){
     preds <- predict(mod, newdata = datos_p)
+    dat <- data_frame(pred = preds, observado = datos_p[[y_name]])
     error <- sqrt(mean((preds - datos_p[[y_name]])^2))
-    print(qplot(preds, datos_p[[y_name]], alpha=0.5) + geom_abline() +
-        annotate("text", x = 0, y= 300000, label = paste0("rmse ", round(error))))
+    grafica <- ggplot(dat, aes(x = preds, y = observado)) +
+        geom_point(alpha = 0.5) + geom_abline(colour = "red") +
+        annotate("text", x = 1000, y= 300000, label = paste0("rmse ", round(error))) +
+        geom_smooth(method="loess", span = 2, method.args=list(family= "symmetric"))
+    print(grafica)
     error
 }
 
@@ -125,7 +129,7 @@ estamos incluyendo en nuestro modelo.
 Una técnica es agregar entradas derivadas de las que tenemos, usando transformaciones
 no lineales. Por ejemplo, podríamos hacer:
 
-```{r}
+```{r, fig.width=5, fig.asp=0.7}
 mod_2 <- lm(SalePrice ~ OverallQual + I(OverallQual^2) , data = casas_e)
 calc_error(mod_2, casas_p, "SalePrice")
 ```
@@ -134,10 +138,10 @@ Y redujimos el error de prueba. Esta reducción claramente proviene de una reduc
 de sesgo, pues usamos un modelo más complejo (una variable adicional).
 
 
-Ahora otras variables: el tamaño del área habitable y número 
-de cuartos excluyendo el sótano:
+Ahora agregamos otras variables: el tamaño del área habitable, garage y sótano,
+y condición general, 
 
-```{r}
+```{r, fig.width=5, fig.asp=0.7}
 mod_3 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + OverallCond  + 
                 GrLivArea + TotalBsmtSF + GarageArea, 
             data = casas_e)
@@ -147,12 +151,12 @@ calc_error(mod_3, casas_p, "SalePrice")
 Podemos pensar en expandir el modelo de maneras distintas. Por ejemplo,
 podríamos incluir la relación que hay entre tamaño del sótano y área habitable:
 
-```{r}
-mod_3 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + GrLivArea + TotalBsmtSF +
+```{r, fig.width=5, fig.asp=0.7}
+mod_4 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + GrLivArea + TotalBsmtSF +
                 GarageArea + OverallCond +
                 I( TotalBsmtSF / GrLivArea) + I( GarageArea / GrLivArea), 
             data = casas_e)
-calc_error(mod_3, casas_p, "SalePrice")
+calc_error(mod_4, casas_p, "SalePrice")
 ```
 
 Y estos cambios parecen no mejorar nuestro modelo.
@@ -196,11 +200,11 @@ casas_e %>% select(Id, CentralAir, AC_present)
 
 Y ahora podemos hacer:
 
-```{r}
-mod_4 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + GrLivArea + TotalBsmtSF +
+```{r, fig.width=5, fig.asp=0.7}
+mod_5 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + GrLivArea + TotalBsmtSF +
                 GarageArea + OverallCond + CentralAir, 
             data = casas_e)
-calc_error(mod_4, casas_p, "SalePrice")
+calc_error(mod_5, casas_p, "SalePrice")
 ```
 
 Que no es una gran mejora, pero esperado dado que pocas de estas casas tienen aire acondicionado.
@@ -235,19 +239,19 @@ ggplot(casas_e,
 donde vemos que esta variable puede aportar a la predicción. Ajustamos y evaluamos:
 
 ```{r}
-mod_5 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + GrLivArea + TotalBsmtSF +
+mod_6 <- lm(SalePrice ~  OverallQual + I(OverallQual^2) + GrLivArea + TotalBsmtSF +
                 GarageArea + OverallCond + CentralAir + BsmtQual, 
             data = casas_e)
-calc_error(mod_5, casas_p, "SalePrice")
+calc_error(mod_6, casas_p, "SalePrice")
 ```
 
 Si examinamos los coeficientes, vemos que *lm* automáticamente convirtió esta variable
 con *dummy coding*:
 
 ```{r}
-coef(mod_5)
-bsmt_ind  <- str_detect(names(coef(mod_5)), "BsmtQual")
-coef(mod_5)[bsmt_ind] %>% sort
+coef(mod_6)
+bsmt_ind  <- str_detect(names(coef(mod_6)), "BsmtQual")
+coef(mod_6)[bsmt_ind] %>% sort
 ```
 
 Nótese que la categoría base (con coeficiente 0 es 'Ex', es decir, no aparece TotalBsmtEx). 
@@ -543,9 +547,9 @@ ggplot(dat_wage) + geom_point(aes(x=age, y=wage)) +
   geom_line(aes(x=age, y=pred_wage), colour = 'red', size=1.1)
 ```
 
-### Modelando en escala logarítmica
+## Modelando en escala logarítmica
 
-En muchos problemas, es natural transformar variables numéricas a logarítmicas. 
+En muchos problemas, es natural transformar variables numéricas con el logaritmo. 
 Supongamos por ejemplo que en nuestro problema la variable $y$ es positiva,
 y también las entradas son positivas. En primer lugar podríamos intentar modelar
 $$ y =  b_0 + \sum b_j x_j $$
@@ -554,31 +558,21 @@ modelo multiplicativo:
 $y' = log(y) = b_0 + \sum b_k \log(x_j)$ 
 y ahora queremos predecir el logaritmo de $y$, no $y$ directamente. 
 
+Esta tipo de transformación tiene dos efectos:
+
+- Convierte modelos aditivos (regresión lineal) en modelos multiplicativos en
+las variables no transformadas (pero lineales en escala logarítmica). Esta estructura
+tiene más sentido para algunos problemas, y es más razonable que la forma lineal 
+aplique para este tipo de problemas.
+- Comprime la parte superior de la escala en relación a la parte baja, y esto es útil
+para aminorar el efecto de valores atípicos grandes (que puede tener malos efectos
+numéricos y también pueden producir que los atipicos dominen el error o la estimación
+de los coeficientes).
+
+
 #### Ejemplo {-}
 
 Consideramos predecir el quilataje de 
-
-```{r}
-set.seed(231)
-diamonds_muestra <- sample_n(diamonds, 3000)
-ggplot(diamonds_muestra, aes(x=carat, y=price)) + geom_point() +
-  geom_smooth(method = 'lm')
-```
-
-
-
----
-Este es un
-modelo multiplicativo, pues tomando exponencial de ambos lados, obtenemos:
-
-$$y = B_0\prod x_j^{b_j}$$
-Por ejemplo, si cambiamos $x_j -> x_j + \Delta x = x_j (1+ \frac{\Delta x}{x_j})$, el cambio porcentual en $y$ es
-$$ \frac{y+\Delta y}{y} = \left (1 + \frac{\Delta x}{x_j}\right )^{b_j}$$
-Y si $\frac{\Delta x}{x_j}$ es chica, entonces aproximadamente
-$$ \frac{\Delta y}{y} \approx b_j \frac{\Delta x}{x_j}$$
-Es decir, el cambio relativo en $y$ es proporcional al cambio relativo en $x_j$ para
-cambios relativamente chicos en $x_j$.
-
 
 ```{r}
 set.seed(22)
@@ -586,6 +580,9 @@ diamonds_muestra <- sample_n(diamonds, 1000)
 ggplot(diamonds_muestra, aes(x=carat, y=price)) + geom_point() +
   geom_smooth(method="lm")
 ```
+
+
+
 
 Nótese que el modelo lineal está sesgado, y produce sobrestimaciones y subestimaciones
 para distintos valores de $x$. Aunque podríamos utilizar un método más flexible para
@@ -629,6 +626,40 @@ evita que algunos valores atipicos dominen el cálculo del error.
 - Menos común: variables que son proporciones $p$ pueden transformarse mediante la
 transformación inversa de la logística ($x = \log(\frac{p}{1-p})$.)
 ```
+
+
+---
+
+**Discusión**:
+
+En un modelo lineal usual, tenemos que si cambiamos $x_j \to x_j + \Delta x$,
+entonces la predicción $y$ tiene un cambio de
+$$\Delta y = b_j \Delta x.$$
+
+Es decir, mismos cambios absolutos en alguna variable de entrada produce 
+mismos cambios absolutos en las predicciones, independientemente del nivel
+de las entradas.
+
+Sin embargo, el modelo logarítmico es multiplicativo, 
+pues tomando exponencial de ambos lados, obtenemos:
+
+$$y = B_0\prod x_j^{b_j}$$
+Entonces, si cambiamos $x_j \to x_j + \Delta x$, 
+el cambio porcentual en $y$ es
+$$ \frac{y+\Delta y}{y} = \left ( \frac{x_j +\Delta x}{x_j}\right )^{b_j}$$
+
+De modo que mismos cambios porcentuales en $x$ resultan en los mismos cambios
+porcentuales de $y$, independientemente del nivel de las entradas. 
+
+Adicionalmente, es útil notar que si 
+$\frac{\Delta x}{x_j}$ es chica, entonces aproximadamente
+$$ \frac{\Delta y}{y} \approx b_j \frac{\Delta x}{x_j}$$
+Es decir, el cambio relativo en $y$ es proporcional al cambio relativo en $x_j$ para
+cambios relativamente chicos en $x_j$, y el coeficiente es la constante de
+proporcionalidad
+
+---
+
 
 
 #### Ejercicio {-}

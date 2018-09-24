@@ -68,7 +68,7 @@ es diferente (generalmente expandido).
 
 Veremos las siguientes técnicas:
 
-- Agregar versiones transformadas de las variables de entrada
+- Agregar versiones transformadas de las variables de entrada.
 - Incluir variables cualitativas (categóricas). 
 - Interacciones entre variables: incluir términos de la forma $x_1x_2$
 - Regresión polinomial: incluír términos de la forma $x_1^2$, $x_1^3$, etcétera.

@@ -620,13 +620,13 @@ y
 $$p_K(x) = 1/Z$$
 
 En este caso, para que las probabilidades sumen 1, necesitamos que
-$$Z = 1 + \sum_{j=1}^{K-1}\exp(\beta_0^j + \beta_1^jx_2 + \ldots + \beta_p^j x_p)$$
+$$Z = 1 + \sum_{j=1}^{K-1}\exp(\beta_0^j + \beta_1^jx_1 + \ldots + \beta_p^j x_p)$$
 
 Para ajustar coeficientes, usamos el mismo criterio de devianza de entrenamiento.
 Buscamos minimizar:
 $$D(\beta)=−2 \sum_{i=1}^N \log p_{g^{(i)}}(x^{(i)}),$$
 Donde $\beta$ contiene todos los coeficientes organizados en un vector
-de tamaño $(p+1)(K+1)$:
+de tamaño $(p+1)(K-1)$:
 $$\beta = ( \beta_0^1, \beta_1^1, \ldots , \beta_p^1,  \beta_0^2, \beta_1^2, \ldots , \beta_p^2, \ldots \beta_0^{K-1}, \beta_1^{K-1}, \ldots , \beta_p^{K-1} )$$
 
 Y ahora podemos usar algún método númerico para minimizar la devianza (por ejemplo,
@@ -640,12 +640,12 @@ dos métodos dan resultados similares.
 Los coeficientes mostrados en la parametrización de arriba se intrepretan
 más fácilmente como comparaciones de la clase $g$ contra la clase $K$, pues
 
-$$\log\left (\frac{p_g(x)}{p_K(x)}\right ) = \beta_{0,{g}} + \beta_{1,{g}}x_2 + \ldots + \beta_{p,{g}} x_p$$
+$$\log\left (\frac{p_g(x)}{p_K(x)}\right ) = \beta_{0,{g}} + \beta_{1,{g}}x_1 + \ldots + \beta_{p,{g}} x_p$$
 
 Para comparar la clase $j$ con la clase $k$ notamos que
 
 $$\log\left (\frac{p_j(x)}{p_k(x)}\right ) = 
-(\beta_{0,{j}}- \beta_{0,{k}}) + (\beta_{1,{j}}-\beta_{1,{k}} )x_2 + \ldots + (\beta_{p,{j}} -\beta_{p,{k}})  x_p$$
+(\beta_{0,{j}}- \beta_{0,{k}}) + (\beta_{1,{j}}-\beta_{1,{k}} )x_1 + \ldots + (\beta_{p,{j}} -\beta_{p,{k}})  x_p$$
 
 Así que sólo hace falta restar los coeficientes. Nótese adicionalmente
 que en la parametrización, podemos pensar que
@@ -1024,7 +1024,7 @@ dev_ent(beta)
 ```
 
 ```
-## [1] 247608.4
+## [1] 236786.5
 ```
 
 Hacemos algunas revisiones del gradiente:
@@ -1039,7 +1039,7 @@ beta_2[1000] <- beta[1000] + epsilon
 ```
 
 ```
-## [1] -397.8153
+## [1] -446.5749
 ```
 
 
@@ -1048,7 +1048,7 @@ grad(beta)[1000]
 ```
 
 ```
-## [1] -397.817
+## [1] -446.5769
 ```
 
 Ya ahora podemos hacer descenso:

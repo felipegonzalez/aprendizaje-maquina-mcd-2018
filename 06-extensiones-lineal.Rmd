@@ -652,8 +652,8 @@ De modo que mismos cambios porcentuales en $x$ resultan en los mismos cambios
 porcentuales de $y$, independientemente del nivel de las entradas. 
 
 Adicionalmente, es útil notar que si 
-$\frac{\Delta x}{x_j}$ es chica, entonces aproximadamente
-$$ \frac{\Delta y}{y} \approx b_j \frac{\Delta x}{x_j}$$
+$\frac{\Delta x_j}{x_j}$ es chica, entonces aproximadamente
+$$ \frac{\Delta y}{y} \approx b_j \frac{\Delta x_j}{x_j}$$
 Es decir, el cambio relativo en $y$ es proporcional al cambio relativo en $x_j$ para
 cambios relativamente chicos en $x_j$, y el coeficiente es la constante de
 proporcionalidad
@@ -672,7 +672,7 @@ logarítmica en la variable respuesta.)
 ### ¿Cuándo usar estas técnicas?
 
 Estas técnicas pueden mejorar considerablemente nuestros modelos lineales, pero
-a veces puede ser difícil descubrir exactamente que transformaciones pueden ser
+a veces puede ser difícil descubrir exactamente qué transformaciones pueden ser
 útiles, y muchas veces requiere conocimiento experto del problema que 
 enfrentamos. En general, 
 

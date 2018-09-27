@@ -1,0 +1,81 @@
+---
+title: "Tarea 7"
+output: html_notebook
+---
+
+## Parte 1
+
+Resuelve el ejercicio 7.1.0.1 de las notas (sigue el ejemplo anterior a este ejercicio). Puedes utilizar nnet o el código con el que optimizamos en clase.
+
+Este es el código para generar
+los datos:
+
+```{r}
+library(tidyverse)
+h <- function(x){
+    exp(x)/(1 + exp(x))
+}
+x <- seq(-2,2,0.05)
+p <- h(3 + x- 3 * x ^ 2 + 3 * cos(4 * x))
+set.seed(280572)
+x.2 <- runif(300, -2, 2)
+g.2 <- rbinom(300, 1, h(3 + x.2 - 3 * x.2 ^ 2 + 3 * cos(4 * x.2)))
+datos <- data.frame(x.2,g.2)
+dat.p <- data.frame(x,p)
+g <- qplot(x,p, geom='line', col='red')
+g + geom_jitter(data = datos, aes(x=x.2,y=g.2), col ='black',
+  position =position_jitter(height=0.05), alpha=0.4)
+```
+
+- ¿Qué tan bien puedes recuperar la forma verdadera (la función $p$, o la curva roja en la gráfica)? 
+- ¿Cuántas variables derivadas $a_k$ utilizaste? Intenta usar el mínimo posible.
+- A grandes rasgos, ¿`uedes capturar todos los movimientos de la función verdadera $p$ con esta muestra de entrenamiento? Explica por qué si puedes o por qué no.
+
+## Parte 2
+
+1. Instala el paquete keras de R en tu computadora. Sigue [estas instrucciones](https://keras.rstudio.com). 
+
+---
+
+2. **Si no funciona el método de arriba en tu computadora** (generalmente
+por instalaciones de python diferentes, etc), 
+puedes instalar en un contenedor de docker.
+
+Primero instala [docker](https://www.docker.com/get-started) en tu computadora.
+Baja el archivo Dockerfile del repositorio (se tiene que llamar Dockerfile, sin extensión).
+En línea de comandos, en el mismo directorio donde está el Dockerfile,
+corre las siguiente línea:
+
+
+```
+docker build -t aprendizaje-rstudio .
+```
+
+Esto va a tomar varios minutos, pero solo hay que correrlo una vez.
+
+Después, cuando quieras usar el contenedor, corre:
+
+```
+docker run --rm -p 8787:8787 -e PASSWORD=tupassword -v ~/tu/carpeta/local:/home/rstudio/ aprendizaje-rstudio
+```
+
+Nota: en windows la segunda línea debe ser de la forma:
+
+```
+docker run --rm -p 8787:8787 -e PASSWORD=tupassword -v /c/Users/miusuario/micarpeta:/home/rstudio/ aprendizaje-rstudio
+```
+
+Y abre en Chrome o Safari (o el navegador que uses) la dirección:
+
+http://localhost:8787
+
+Y ahora puedes trabajar en rstudio dentro del contenedor de docker (user: rstudio, 
+password: tupassword).  
+
+---
+
+3. Corre algún ejemplo para checar tu instalación, por ejemplo:
+
+https://keras.rstudio.com/articles/tutorial_basic_regression.html
+
+

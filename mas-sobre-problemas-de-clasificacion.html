@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-09-27">
+<meta name="date" content="2018-09-30">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -239,7 +239,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#como-ajustar-los-parametros"><i class="fa fa-check"></i>¿Cómo ajustar los parámetros?</a></li>
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#interacciones-en-redes-neuronales"><i class="fa fa-check"></i><b>7.2</b> Interacciones en redes neuronales</a></li>
-<li class="chapter" data-level="7.3" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#calculo-en-redes-feed-forward."><i class="fa fa-check"></i><b>7.3</b> Cálculo en redes: feed-forward.</a></li>
+<li class="chapter" data-level="7.3" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#calculo-en-redes-feed-forward"><i class="fa fa-check"></i><b>7.3</b> Cálculo en redes: feed-forward</a></li>
 <li class="chapter" data-level="" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#notacion"><i class="fa fa-check"></i>Notación</a></li>
 <li class="chapter" data-level="7.4" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#feed-forward"><i class="fa fa-check"></i><b>7.4</b> Feed forward</a></li>
 <li class="chapter" data-level="7.5" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#backpropagation-calculo-del-gradiente-clasificacion-binaria"><i class="fa fa-check"></i><b>7.5</b> Backpropagation: cálculo del gradiente (clasificación binaria)</a><ul>
@@ -1115,16 +1115,16 @@ beta &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv
 dev_ent &lt;-<span class="st"> </span><span class="kw">devianza_calc</span>(x_ent_s, y_ent)
 grad &lt;-<span class="st"> </span><span class="kw">grad_calc</span>(x_ent_s, y_ent)
 <span class="kw">dev_ent</span>(beta)</code></pre>
-<pre><code>## [1] 244639</code></pre>
+<pre><code>## [1] 260389.8</code></pre>
 <p>Hacemos algunas revisiones del gradiente:</p>
 <pre class="sourceCode r"><code class="sourceCode r">beta_<span class="dv">2</span> &lt;-<span class="st"> </span>beta 
 epsilon &lt;-<span class="st"> </span><span class="fl">0.00001</span>
 beta_<span class="dv">2</span>[<span class="dv">1000</span>] &lt;-<span class="st"> </span>beta[<span class="dv">1000</span>] <span class="op">+</span><span class="st"> </span>epsilon
 
 (<span class="kw">dev_ent</span>(beta_<span class="dv">2</span>) <span class="op">-</span><span class="st"> </span><span class="kw">dev_ent</span>(beta))<span class="op">/</span>epsilon</code></pre>
-<pre><code>## [1] -701.7636</code></pre>
+<pre><code>## [1] -851.836</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grad</span>(beta)[<span class="dv">1000</span>]</code></pre>
-<pre><code>## [1] -701.7655</code></pre>
+<pre><code>## [1] -851.8374</code></pre>
 <p>Ya ahora podemos hacer descenso:</p>
 <pre class="sourceCode r"><code class="sourceCode r">iteraciones &lt;-<span class="st"> </span><span class="kw">descenso</span>(<span class="dv">2000</span>, <span class="kw">rep</span>(<span class="dv">0</span>, <span class="dv">257</span><span class="op">*</span><span class="dv">9</span>), <span class="dt">eta=</span><span class="fl">0.001</span>, 
                         <span class="dt">h_deriv =</span> grad, <span class="dt">dev_fun =</span> dev_ent)</code></pre>

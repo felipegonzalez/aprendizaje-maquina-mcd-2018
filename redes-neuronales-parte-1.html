@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-09-27">
+<meta name="date" content="2018-09-30">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -239,7 +239,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#como-ajustar-los-parametros"><i class="fa fa-check"></i>¿Cómo ajustar los parámetros?</a></li>
 </ul></li>
 <li class="chapter" data-level="7.2" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#interacciones-en-redes-neuronales"><i class="fa fa-check"></i><b>7.2</b> Interacciones en redes neuronales</a></li>
-<li class="chapter" data-level="7.3" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#calculo-en-redes-feed-forward."><i class="fa fa-check"></i><b>7.3</b> Cálculo en redes: feed-forward.</a></li>
+<li class="chapter" data-level="7.3" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#calculo-en-redes-feed-forward"><i class="fa fa-check"></i><b>7.3</b> Cálculo en redes: feed-forward</a></li>
 <li class="chapter" data-level="" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#notacion"><i class="fa fa-check"></i>Notación</a></li>
 <li class="chapter" data-level="7.4" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#feed-forward"><i class="fa fa-check"></i><b>7.4</b> Feed forward</a></li>
 <li class="chapter" data-level="7.5" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#backpropagation-calculo-del-gradiente-clasificacion-binaria"><i class="fa fa-check"></i><b>7.5</b> Backpropagation: cálculo del gradiente (clasificación binaria)</a><ul>
@@ -714,8 +714,8 @@ capa_final</code></pre>
 ## 3     1     0 0.686  0.0960   0.0130  0.98
 ## 4     1     1 0.164  0.998    0.324   0</code></pre>
 </div>
-<div id="calculo-en-redes-feed-forward." class="section level2">
-<h2><span class="header-section-number">7.3</span> Cálculo en redes: feed-forward.</h2>
+<div id="calculo-en-redes-feed-forward" class="section level2">
+<h2><span class="header-section-number">7.3</span> Cálculo en redes: feed-forward</h2>
 <p>Ahora generalizamos lo que vimos arriba para definir la arquitectura
 básica de redes neuronales y cómo se hacen cálculos en las redes.</p>
 
@@ -758,8 +758,8 @@ en la entrada <span class="math inline">\(a_{i}^{(l)}\)</span> de la capa <span 
 <p>En nuestro ejemplo, tenemos que en la capa <span class="math inline">\(l=3\)</span> hay dos unidades. Así que
 podemos calcular los valores <span class="math inline">\(a^{(3)}_1\)</span> y <span class="math inline">\(a^{(3)}_2\)</span>. Están dados
 por</p>
-<p><span class="math display">\[a_1^{(3)} = h(\theta_{1,0}^{(3)} + \theta_{1,1}^{(3)} a_1^{(2)}+ \theta_{1,2}^{(3)}a_2^{(2)}+ \theta_{1,3}^{(3)} a_3^{(2)})\]</span>
-<span class="math display">\[a_2^{(3)} = h(\theta_{2,0}^{(3)} + \theta_{2,1}^{(3)} a_1^{(2)}+ \theta_{2,2}^{(3)}a_2^{(2)}+ \theta_{2,3}^{(3)} a_3^{(2)})\]</span></p>
+<p><span class="math display">\[a_1^{(3)} = h(\theta_{1,0}^{(2)} + \theta_{1,1}^{(2)} a_1^{(2)}+ \theta_{1,2}^{(2)}a_2^{(2)}+ \theta_{1,3}^{(2)} a_3^{(2)})\]</span>
+<span class="math display">\[a_2^{(3)} = h(\theta_{2,0}^{(2)} + \theta_{2,1}^{(2)} a_1^{(2)}+ \theta_{2,2}^{(2)}a_2^{(2)}+ \theta_{2,3}^{(2)} a_3^{(2)})\]</span></p>
 <p>Como se ilustra en la siguiente gráfica:</p>
 <p><img src="07-redes-neuronales_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
 <p>Para visualizar las ordenadas (que también se llaman <strong>sesgos</strong> en este contexto),
@@ -768,28 +768,28 @@ ponemos <span class="math inline">\(a_0^2=1\)</span>.
 </div>
 <div id="ejemplo-34" class="section level4 unnumbered">
 <h4>Ejemplo</h4>
-<p>Consideremos propagar con los siguientes pesos para capa 3 y valores de la
+<p>Consideremos propagar a la capa 3 a partir de la capa 2. Usaremos los siguientes pesos para capa 3 y valores de la
 capa 2 (en gris están los sesgos):
 <img src="07-redes-neuronales_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 <p>Que en nuestra notación escribimos como
-<span class="math display">\[a^{(2)}_0 = 1, a^{(2)}_1 = -2, a^{(2)}_2 = 5\]</span>
+<span class="math display">\[a^{(2)}_0 = 1, a^{(2)}_1 = -2, a^{(2)}_2 = 5, a^{(2)}=3\]</span>
 y los pesos son, para la primera unidad:
-<span class="math display">\[\theta^{(3)}_{1,0} = 3,  \,\,\, \theta^{(3)}_{1,1} = 1,\,\,\,\theta^{(3)}_{1,2} = -1\]</span>
+<span class="math display">\[\theta^{(2)}_{1,0} = 3,  \,\,\, \theta^{(2)}_{1,1} = 1.5,\,\,\,\theta^{(2)}_{1,2} = -1,\,\,\theta^{(2)}_{1,3} = -0.5 \]</span>
 y para la segunda unidad
-<span class="math display">\[\theta^{(3)}_{2,0} = 1,  \,\,\, \theta^{(3)}_{2,1} = 2,\,\,\,\theta^{(3)}_{2,2} = 0.5\]</span>
+<span class="math display">\[\theta^{(2)}_{2,0} = 1,  \,\,\, \theta^{(2)}_{2,1} = 2,\,\,\,\theta^{(2)}_{2,2} = 0.5,\,\, \theta^{(2)}_{2,3} = -0.2\]</span>
 Y ahora queremos calcular los valores que toman las unidades de la capa 3,
 que son <span class="math inline">\(a^{(3)}_1\)</span> y <span class="math inline">\(a^{(3)}_2\)</span>$</p>
 <p>Para hacer feed forward a la siguiente capa, hacemos entonces</p>
-<p><span class="math display">\[a^{(3)}_1 = h(3 + a^{(2)}_1 - a^{(2)}_2),\]</span>
-<span class="math display">\[a^{(3)}_2 = h(1 + 2a^{(2)}_1 + 0.5a^{(2)}_2),\]</span></p>
+<p><span class="math display">\[a^{(3)}_1 = h(3 + a^{(2)}_1 - a^{(2)}_2 -0.5 a_3^{(2)}),\]</span>
+<span class="math display">\[a^{(3)}_2 = h(1 + 2a^{(2)}_1 + 0.5a^{(2)}_2 - 0.2 a_3^{(2)}),\]</span></p>
 <p>Ponemos los pesos y valores de la capa 2 (incluyendo sesgo):</p>
-<pre class="sourceCode r"><code class="sourceCode r">a_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">2</span>,<span class="dv">5</span>) <span class="co"># ponemos un 1 al principio para el sesgo</span>
-theta_<span class="dv">2</span>_<span class="dv">1</span> =<span class="st"> </span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>)
-theta_<span class="dv">2</span>_<span class="dv">2</span> =<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="fl">0.5</span>)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">a_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">-2</span>, <span class="dv">5</span>, <span class="dv">3</span>) <span class="co"># ponemos un 1 al principio para el sesgo</span>
+theta_<span class="dv">2</span>_<span class="dv">1</span> =<span class="st"> </span><span class="kw">c</span>(<span class="dv">3</span>, <span class="fl">1.5</span>, <span class="fl">-1.0</span>, <span class="fl">-0.5</span>)
+theta_<span class="dv">2</span>_<span class="dv">2</span> =<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="fl">0.5</span>, <span class="fl">-0.2</span>)</code></pre>
 <p>y calculamos</p>
 <pre class="sourceCode r"><code class="sourceCode r">a_<span class="dv">3</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="kw">h</span>(<span class="kw">sum</span>(theta_<span class="dv">2</span>_<span class="dv">1</span><span class="op">*</span>a_<span class="dv">2</span>)),<span class="kw">h</span>(<span class="kw">sum</span>(theta_<span class="dv">2</span>_<span class="dv">2</span><span class="op">*</span>a_<span class="dv">2</span>))) <span class="co"># ponemos un 1 al principio</span>
 a_<span class="dv">3</span></code></pre>
-<pre><code>## [1] 1.00000000 0.01798621 0.37754067</code></pre>
+<pre><code>## [1] 1.000000000 0.001501182 0.249739894</code></pre>
 <p><img src="07-redes-neuronales_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 </div>
 </div>
@@ -804,24 +804,24 @@ Para la primera capa,
 escribimos las variables de entrada:
 <span class="math display">\[a^{(1)}_j = x_j, j=1\ldots,n_1\]</span>
 Para la primera capa oculta, o la segunda capa
-<span class="math display">\[a^{(2)}_j = h\left( \theta_{j,0}^{(2)}+ \sum_{k=1}^{n_1}  \theta_{j,k}^{(2)}  a^{(1)}_k    \right), j=1\ldots,n_2\]</span>
+<span class="math display">\[a^{(2)}_j = h\left( \theta_{j,0}^{(1)}+ \sum_{k=1}^{n_1}  \theta_{j,k}^{(1)}  a^{(1)}_k    \right), j=1\ldots,n_2\]</span>
 para la <span class="math inline">\(l\)</span>-ésima capa:
-<span class="math display">\[a^{(l)}_j = h\left( \theta_{j,0}^{(l)}+ \sum_{k=1}^{n_{l-1}}  \theta_{j,k}^{(l)}  a^{(l-1)}_k    \right), j=1\ldots,n_{l}\]</span>
+<span class="math display">\[a^{(l)}_j = h\left( \theta_{j,0}^{(l-1)}+ \sum_{k=1}^{n_{l-1}}  \theta_{j,k}^{(l-1)}  a^{(l-1)}_k    \right), j=1\ldots,n_{l}\]</span>
 y así sucesivamente.
 Para la capa final o capa de salida (para problema binario), suponiendo
 que tenemos <span class="math inline">\(L\)</span> capas (<span class="math inline">\(L-2\)</span> capas ocultas):
-<span class="math display">\[p_1 = h\left(    \theta_{1,0}^{(L)}+ \sum_{k=1}^{n_{L-1}}  \theta_{1,k}^{(L)}  a^{(L-1)}_k     \right).\]</span>
+<span class="math display">\[p_1 = h\left(    \theta_{1,0}^{(L-1)}+ \sum_{k=1}^{n_{L-1}}  \theta_{1,k}^{(L-1)}  a^{(L-1)}_k     \right).\]</span>
 </div>
 
 <p>Nótese que entonces:</p>
 
 <div class="comentario">
 <p>Cada capa se caracteriza por el conjunto de parámetros <span class="math inline">\(\Theta^{(l)}\)</span>, que es una matriz
-de <span class="math inline">\(n_l\times n_{l-1}\)</span>.
-La red completa entonces se caracteriza por:</p>
+de <span class="math inline">\(n_l\times n_{l-1}\)</span>.</p>
+<p>La red completa entonces se caracteriza por:</p>
 <ul>
 <li>La estructura elegida (número de capas ocultas y número de nodos en cada capa oculta).</li>
-<li>Las matrices de pesos en cada capa <span class="math inline">\(\Theta^{(1)},\Theta^{(2)},\ldots, \Theta^{(L)}\)</span>
+<li>Las matrices de pesos en cada capa <span class="math inline">\(\Theta^{(1)},\Theta^{(2)},\ldots, \Theta^{(L-1)}\)</span>
 </div></li>
 </ul>
 <p>Adicionalmente, escribimos en forma vectorial:
@@ -840,17 +840,17 @@ las ordenadas al origen (o sesgos) podemos escribir:</p>
 <li>Capa 2
 <span class="math display">\[ a^{(2)} = h(\Theta^{(1)}a^{(1)})\]</span></li>
 <li>Capa <span class="math inline">\(l\)</span> (oculta)
-<span class="math display">\[ a^{(l)} = h(\Theta^{(l)}a^{(l-1)})\]</span></li>
+<span class="math display">\[ a^{(l)} = h(\Theta^{(l-1)}a^{(l-1)})\]</span></li>
 <li>Capa de salida:</li>
 </ul>
 <p>En un problema de clasificación binaria, la capa de salida se calcula como
 en regresión logística:
-<span class="math display">\[a^{(L)}= p = h(\Theta^{(L)}a^{(L-1)})\]</span>
+<span class="math display">\[a^{(L)}= p = h(\Theta^{(L-1)}a^{(L-1)})\]</span>
 donde <span class="math inline">\(h\)</span> se aplica componente a componente sobre los vectores correspondientes. Nótese
 que feed-foward consiste principalmente de multiplicaciones de matrices con
 algunas aplicaciones de <span class="math inline">\(h\)</span></p>
 <p>Para un problema de regresión, la última capa se calcula como en regresión lineal:</p>
-<span class="math display">\[a^{(L)} = p = \Theta^{(L)}a^{(L-1)}\]</span>
+<span class="math display">\[a^{(L)} = p = \Theta^{(L-1)}a^{(L-1)}\]</span>
 </div>
 
 </div>
@@ -887,47 +887,47 @@ las parciales <em>para un solo caso de entrenamiento</em> <span class="math inli
 calcular
 <span class="math display">\[\frac{\partial D}{\partial \theta_{j,k}^{(l)}}\]</span></p>
 <p>Y escribiremos, con la notación de arriba,
-<span class="math display">\[a^{(l)}_j = h(z^{(l)}_j)\]</span>
+<span class="math display">\[a^{(l+1)}_j = h(z^{(l+1)}_j)\]</span>
 donde
-<span class="math display">\[z^{(l)} = \Theta^{l} a^{(l-1)},\]</span>
+<span class="math display">\[z^{(l+1)} = \Theta^{(l)} a^{(l)},\]</span>
 que coordenada a coordenada se escribe como
-<span class="math display">\[z^{(l)}_j =  \sum_{k=0}^{n_{l-1}}  \theta_{j,k}^{(l)}  a^{(l-1)}_k\]</span></p>
-<div id="paso-1-derivar-respecto-a-capa-l" class="section level4 unnumbered">
-<h4>Paso 1: Derivar respecto a capa <span class="math inline">\(l\)</span></h4>
+<span class="math display">\[z^{(l+1)}_j =  \sum_{k=0}^{n_{l-1}}  \theta_{j,k}^{(l)}  a^{(l)}_k\]</span></p>
+<div id="paso-1-derivar-respecto-a-capa-l1" class="section level4 unnumbered">
+<h4>Paso 1: Derivar respecto a capa <span class="math inline">\(l+1\)</span></h4>
 <p>Como los valores de cada capa determinan los valores de salida y la devianza,
 podemos escribir (recordemos que <span class="math inline">\(a_0^{(l)}=1\)</span> es constante):
-<span class="math display">\[D=D(a_0^{(l)},a_1^{(l)},a_2^{(l)},\ldots, a_{n_{l}}^{(l)})=D(a_1^{(l)},a_2^{(l)},\ldots, a_{n_{l}}^{(l)})\]</span></p>
+<span class="math display">\[D=D(a_0^{(l+1)},a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})=D(a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l}}^{(l+1)})\]</span></p>
 <p>Así que por la regla de la cadena para varias variables:
 <span class="math display">\[\frac{\partial D}{\partial \theta_{j,k}^{(l)}} =
-\sum_{t=1}^{n_{l}} \frac{\partial D}{\partial a_t^{l}}\frac{\partial a_t^{(l)}}
+\sum_{t=1}^{n_{l}} \frac{\partial D}{\partial a_t^{(l+1)}}\frac{\partial a_t^{(l+1)}}
 {\partial \theta_{j,k}^{(l)} }\]</span></p>
 <p>Pero si vemos dónde aparece <span class="math inline">\(\theta_{j,k}^{(l)}\)</span> en la gráfica de la red:</p>
-<p><span class="math display">\[ \cdots a^{(l-1)}_k \xrightarrow{\theta_{j,k}^{(l)}} a^{(l)}_j  \cdots \rightarrow  D\]</span>
+<p><span class="math display">\[ \cdots a^{(l)}_k \xrightarrow{\theta_{j,k}^{(l)}} a^{(l+1)}_j  \cdots \rightarrow  D\]</span>
 Entonces podemos concluir que
-<span class="math inline">\(\frac{\partial a_t^{(l)}}{\partial \theta_{j,k}^{(l)}} =0\)</span> cuando <span class="math inline">\(t\neq j\)</span> (pues no
+<span class="math inline">\(\frac{\partial a_t^{(l+1)}}{\partial \theta_{j,k}^{(l)}} =0\)</span> cuando <span class="math inline">\(t\neq j\)</span> (pues no
 dependen de <span class="math inline">\(\theta_{j,k}^{(l)}\)</span>),</p>
-<p>de lo que se concluye que, para toda <span class="math inline">\(j=1,2,\ldots, n_{l+1}, k=0,1,\ldots, n_{l}\)</span>
+<p>y entonces, para toda <span class="math inline">\(j=1,2,\ldots, n_{l+1}, k=0,1,\ldots, n_{l}\)</span>
 <span class="math display" id="eq:parcial">\[\begin{equation}
 \frac{\partial D}{\partial \theta_{j,k}^{(l)}} =
-\frac{\partial D}{\partial a_j^{(l)}}\frac{\partial a_j^{(l)}}{\partial \theta_{j,k}^{(l)} }
-,
+\frac{\partial D}{\partial a_j^{(l+1)}}\frac{\partial a_j^{(l+1)}}{\partial \theta_{j,k}^{(l)} }
+.
   \tag{7.1}
 \end{equation}\]</span></p>
-<p>y como
-<span class="math display">\[a_j^{(l)} = h(z_j^{(l)}) = h\left (\sum_{k=0}^{n_{l-1}}  \theta_{j,k}^{(l)}  a^{(l-1)}_k \right )\]</span>
-Tenemos por la regla de la cadena que
+<p>Adicionalmente, como
+<span class="math display">\[a_j^{(l+1)} = h(z_j^{(l+1)}) = h\left (\sum_{k=0}^{n_{l}}  \theta_{j,k}^{(l)}  a^{(l)}_k \right )\]</span>
+y las <span class="math inline">\(a_k^{(l)}\)</span> no dependen de <span class="math inline">\(\theta_{j,k}^{(l)}\)</span>, tenemos por la regla de la cadena que
 <span class="math display">\[\begin{equation}
-\frac{\partial a_j^{(l)}}{\partial \theta_{j,k}^{(l)} } = h&#39;(z_j^{(l)})a_k^{(l-1)}.
+\frac{\partial a_j^{(l)}}{\partial \theta_{j,k}^{(l)} } = h&#39;(z_j^{(l+1)})a_k^{(l)}.
 \end{equation}\]</span></p>
 <p>Esta última expresión podemos calcularla pues sólo requiere la derivada de <span class="math inline">\(h\)</span> y
-los valores de los nodos obtenidos en la pasada de feed-forward.</p>
+los valores otenidos en el paso de feed-forward.</p>
 </div>
-<div id="paso-2-derivar-con-respecto-a-capa-l1" class="section level4 unnumbered">
-<h4>Paso 2: Derivar con respecto a capa <span class="math inline">\(l+1\)</span></h4>
+<div id="paso-2-obtener-formula-recursiva" class="section level4 unnumbered">
+<h4>Paso 2: Obtener fórmula recursiva</h4>
 <p>Así que sólo nos queda calcular las parciales (<span class="math inline">\(j = 1,\ldots, n_l\)</span>)
 <span class="math display">\[\frac{\partial D}{\partial a_j^{(l)}}\]</span></p>
 <p>Para obtener una fórmula recursiva para esta cantidad (hacia atrás),
-aplicamos otra vez regla de la cadena, pero con respecto a la capa <span class="math inline">\(l+1\)</span> (ojo: queremos obtener
+aplicamos otra vez regla de la cadena, pero con respecto a la capa <span class="math inline">\(l\)</span> (ojo: queremos obtener
 una fórmula recursiva!):</p>
 <p><span class="math display">\[\frac{\partial D}{\partial a_j^{(l)}}= \sum_{s=1}^{n_l}
 \frac{\partial D}{\partial a_s^{(l+1)}}\frac{\partial  a_s^{(l+1)}}{\partial a_j^{(l)}},\]</span></p>
@@ -937,39 +937,40 @@ una fórmula recursiva!):</p>
 de <span class="math inline">\(a_k^{(l)}\)</span>.</p>
 <p>En este caso los elementos de la suma no se anulan necesariamente. Primero
 consideramos la derivada de:</p>
-<p><span class="math display">\[\frac{\partial  a_s^{(l+1)}}{\partial a_j^{(l)}}=h&#39;(z_s^{(l+1)})\theta_{s,j}^{(l+1)},\]</span></p>
+<p><span class="math display">\[\frac{\partial  a_s^{(l+1)}}{\partial a_j^{(l)}}=h&#39;(z_s^{(l+1)})\theta_{s,j}^{(l)},\]</span></p>
 <p>de modo que</p>
 <p><span class="math display">\[\frac{\partial D}{\partial a_j^{(l)}}= \sum_{s=1}^{n_l}
-\frac{\partial D}{\partial a_s^{(l+1)}} h&#39;(z_s^{(l+1)})\theta_{s,j}^{(l+1)}.\]</span></p>
+\frac{\partial D}{\partial a_s^{(l+1)}} h&#39;(z_s^{(l+1)})\theta_{s,j}^{(l)}.\]</span></p>
+<p>Nótese que esto nos da una fórmula recursiva para las parciales que nos
+falta calcular (de <span class="math inline">\(D\)</span> con respecto a <span class="math inline">\(a\)</span>), pues las otras cantidades las
+conocemos por backpropagation.</p>
+</div>
+<div id="paso-3-simplificacion-de-la-recursion" class="section level4 unnumbered">
+<h4>Paso 3: Simplificación de la recursión</h4>
 <p>Denotaremos
 <span class="math display">\[\delta_s^{ (l+1)}=\frac{\partial D}{\partial a_s^{(l+1)}} h&#39;(z_s^{(l+1)})\]</span></p>
-<p>de manera que la ecuación anterior es
+<p>de manera que la ecuación recursiva es
 <span class="math display" id="eq:delta-def">\[\begin{equation}
 \frac{\partial D}{\partial a_j^{(l)}} = \sum_{s=1}^{n_{l+1}}
-\delta_s^{(l+1)}\theta_{s,j}^{(l+1)}.
+\delta_s^{(l+1)}\theta_{s,j}^{(l)}.
   \tag{7.2}
 \end{equation}\]</span></p>
-<p><strong>Observación</strong>
-Nótese que <span class="math inline">\(\delta_s^{(l)} =\frac{\partial D}{\partial z_s^{(l+1)}}\)</span>, que nos
-dice <em>a dónde tenemos que mover la entrada derivada</em>
-<span class="math inline">\(z_s^{(l+1)}\)</span> <em>para reducir el error</em> <span class="math inline">\(D\)</span>.
-Como <span class="math inline">\(z_s^{(l+1)}\)</span> es una entrada derivada que depende de parámetros <span class="math inline">\(\theta\)</span>,
-esta cantidad también nos ayudará a entender cómo debemos cambiar los
-parámetros <span class="math inline">\(\theta\)</span> para disminuir el error.</p>
-</div>
-<div id="paso-3-construir-formula-recursiva-para-delta" class="section level4 unnumbered">
-<h4>Paso 3: Construir fórmula recursiva para <span class="math inline">\(\delta\)</span></h4>
-<p>Lo único que nos falta calcular entonces son las <span class="math inline">\(\delta_s^{(l)}\)</span>.</p>
 <p>Tenemos que si <span class="math inline">\(l=2,\ldots,L-1\)</span>, entonces podemos escribir (usando <a href="redes-neuronales-parte-1.html#eq:delta-def">(7.2)</a>)
 como fórmula recursiva:</p>
 <span class="math display" id="eq:delta-recursion">\[\begin{equation}
-\delta_j^{(l)} = \frac{\partial D}{\partial a_j^{l}} h&#39;(z_j^{(l)})
-= \left (\sum_{s=1}^{n_l} \delta_s^{(l+1)} \theta_{s,j}^{(l+1)}\right ) h&#39;(z_j^{(l)}),
+\delta_j^{(l)} 
+= \left (\sum_{s=1}^{n_l} \delta_s^{(l+1)} \theta_{s,j}^{(l)}\right ) h&#39;(z_j^{(l)}),
   \tag{7.3}
 \end{equation}\]</span>
 <p>para <span class="math inline">\(j=1,2,\ldots, n_{l}\)</span>.</p>
-<p>y para la última capa, tenemos que (demostrar!)</p>
+</div>
+<div id="paso-4-condiciones-inciales" class="section level4 unnumbered">
+<h4>Paso 4: Condiciones inciales</h4>
+<p>Para la última capa, tenemos que (demostrar!)</p>
 <p><span class="math display">\[\delta_1^{(L)}=p - y.\]</span></p>
+</div>
+<div id="paso-5-calculo-de-parciales" class="section level4 unnumbered">
+<h4>Paso 5: Cálculo de parciales</h4>
 <p>Finalmente, usando <a href="redes-neuronales-parte-1.html#eq:parcial">(7.1)</a>, obtenemos
 <span class="math display">\[\frac{\partial D}{\partial \theta_{j,k}^{(l)}} = \delta_j^{(l)}a_k^{(l-1)},\]</span></p>
 <p>y con esto ya podemos hacer backpropagation para calcular el gradiente
@@ -977,14 +978,14 @@ sobre cada caso de entrenamiento, y solo resta acumular para obtener el gradient
 sobre la muestra de entrenamiento.</p>
 <p>Muchas veces es útil escribir una versión vectorizada (importante para implementar):</p>
 </div>
-<div id="paso-4-version-matricial" class="section level4 unnumbered">
-<h4>Paso 4: Versión matricial</h4>
+<div id="paso-6-version-matricial" class="section level4 unnumbered">
+<h4>Paso 6: Versión matricial</h4>
 <p>Ahora podemos escribir estas ecuaciones en forma vectorial. En primer lugar,
 <span class="math display">\[\delta^{(L)}=p-y.\]</span>
 Y además se puede ver de la ecuación <a href="redes-neuronales-parte-1.html#eq:delta-recursion">(7.3)</a> que
 (<span class="math inline">\(\Theta_{*}^{(l+1)}\)</span> denota la matriz de pesos <em>sin</em> la columna correspondiente al sesgo):</p>
 <span class="math display" id="eq:delta-recursion-mat">\[\begin{equation}
-\delta^{(l)}=\left( \Theta_{*}^{(l+1)}    \right)^t\delta^{(l+1)} \circ h&#39;(z^{(l)})
+\delta^{(l)}=\left( \Theta_{*}^{(l)}    \right)^t\delta^{(l+1)} \circ h&#39;(z^{(l)})
 \tag{7.4}
 \end{equation}\]</span>
 <p>donde <span class="math inline">\(\circ\)</span> denota el producto componente a componente.</p>
@@ -1095,12 +1096,12 @@ para afinar estos parámetros según validación cruzada o una muestra de valida
 <p>Escalamos y preparamos los datos:</p>
 <pre class="sourceCode r"><code class="sourceCode r">diabetes_ent &lt;-<span class="st"> </span>MASS<span class="op">::</span>Pima.tr
 diabetes_pr &lt;-<span class="st"> </span>MASS<span class="op">::</span>Pima.te
-<span class="kw">set.seed</span>(<span class="dv">293</span>)
 x_ent &lt;-<span class="st"> </span>diabetes_ent <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>type) <span class="op">%&gt;%</span><span class="st"> </span>as.matrix
 x_ent_s &lt;-<span class="st"> </span><span class="kw">scale</span>(x_ent)
 x_valid &lt;-<span class="st"> </span>diabetes_pr <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>type) <span class="op">%&gt;%</span><span class="st"> </span>as.matrix 
 x_valid_s &lt;-<span class="st"> </span>x_valid <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">scale</span>(<span class="dt">center =</span> <span class="kw">attr</span>(x_ent_s, <span class="st">&#39;scaled:center&#39;</span>), <span class="dt">scale =</span> <span class="kw">attr</span>(x_ent_s,  <span class="st">&#39;scaled:scale&#39;</span>))
+<span class="st">  </span><span class="kw">scale</span>(<span class="dt">center =</span> <span class="kw">attr</span>(x_ent_s, <span class="st">&#39;scaled:center&#39;</span>), 
+        <span class="dt">scale =</span> <span class="kw">attr</span>(x_ent_s,  <span class="st">&#39;scaled:scale&#39;</span>))
 y_ent &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(diabetes_ent<span class="op">$</span>type <span class="op">==</span><span class="st"> &#39;Yes&#39;</span>)
 y_valid &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(diabetes_pr<span class="op">$</span>type <span class="op">==</span><span class="st"> &#39;Yes&#39;</span>)</code></pre>
 <p>Para definir la arquitectura de dos capas con:</p>
@@ -1110,16 +1111,16 @@ y_valid &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(diabete
 <li>regularización L2 (ridge),</li>
 <li>salida logística (<span class="math inline">\(p_1\)</span>), escribimos:</li>
 </ul>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">9232</span>)
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">923</span>)
 modelo_tc &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>() 
 <span class="co"># no es necesario asignar a nuevo objeto, modelo_tc es modificado al agregar capas</span>
 modelo_tc <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">10</span>, <span class="dt">activation =</span> <span class="st">&#39;sigmoid&#39;</span>, 
-              <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(<span class="dt">l =</span> <span class="fl">1e-4</span>), 
+              <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(<span class="dt">l =</span> <span class="fl">1e-3</span>), 
               <span class="dt">kernel_initializer =</span> <span class="kw">initializer_random_uniform</span>(<span class="dt">minval =</span> <span class="fl">-0.5</span>, <span class="dt">maxval =</span> <span class="fl">0.5</span>),
               <span class="dt">input_shape=</span><span class="dv">7</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">10</span>, <span class="dt">activation =</span> <span class="st">&#39;sigmoid&#39;</span>, 
-              <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(<span class="dt">l =</span> <span class="fl">1e-4</span>), 
+              <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(<span class="dt">l =</span> <span class="fl">1e-3</span>), 
               <span class="dt">kernel_initializer =</span> <span class="kw">initializer_random_uniform</span>(<span class="dt">minval =</span> <span class="fl">-0.5</span>, <span class="dt">maxval =</span> <span class="fl">0.5</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">1</span>, <span class="dt">activation =</span> <span class="st">&#39;sigmoid&#39;</span>,
               <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(<span class="dt">l =</span> <span class="fl">1e-4</span>),
@@ -1130,44 +1131,58 @@ cruzada binaria), y pedimos registrar porcentaje de correctos (accuracy) y compi
 en tensorflow:</p>
 <pre class="sourceCode r"><code class="sourceCode r">modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(
   <span class="dt">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,
-  <span class="dt">optimizer =</span> <span class="kw">optimizer_sgd</span>(<span class="dt">lr =</span> <span class="fl">0.5</span>),
+  <span class="dt">optimizer =</span> <span class="kw">optimizer_sgd</span>(<span class="dt">lr =</span> <span class="fl">0.8</span>),
   <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>,<span class="st">&#39;binary_crossentropy&#39;</span>))</code></pre>
 <p>Iteramos con descenso en gradiente y monitoreamos el error de validación. Hacemos
 100 iteraciones de descenso en gradiente (épocas=100)</p>
 <pre class="sourceCode r"><code class="sourceCode r">iteraciones &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(
   x_ent_s, y_ent, 
   <span class="co">#batch size mismo que nrow(x_ent_s) es descenso en grad.</span>
-  <span class="dt">epochs =</span> <span class="dv">500</span>, <span class="dt">batch_size =</span> <span class="kw">nrow</span>(x_ent_s), 
+  <span class="dt">epochs =</span> <span class="dv">1000</span>, <span class="dt">batch_size =</span> <span class="kw">nrow</span>(x_ent_s), 
   <span class="dt">verbose =</span> <span class="dv">0</span>,
   <span class="dt">validation_data =</span> <span class="kw">list</span>(x_valid_s, y_valid)
 )</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_valid_s, y_valid)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.4346585
+## [1] 0.4681075
 ## 
 ## $acc
-## [1] 0.7921687
+## [1] 0.7831325
 ## 
 ## $binary_crossentropy
-## [1] 0.4302271</code></pre>
+## [1] 0.4413433</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">predict_classes</span>(x_valid_s),y_valid) 
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 195  41
-##   1  28  68</code></pre>
+##   0 192  41
+##   1  31  68</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##             0         1
-##   0 0.8744395 0.3761468
-##   1 0.1255605 0.6238532</code></pre>
+##   0 0.8609865 0.3761468
+##   1 0.1390135 0.6238532</code></pre>
 <p>Es importante monitorear las curvas de aprendizaje (entrenamiento y
 validación) para diagnosticar mejoras:</p>
 <pre class="sourceCode r"><code class="sourceCode r">df_iteraciones &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(iteraciones)
 <span class="kw">ggplot</span>(df_iteraciones, <span class="kw">aes</span>(<span class="dt">x=</span>epoch, <span class="dt">y=</span>value, <span class="dt">colour=</span>data, <span class="dt">group=</span>data)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">facet_wrap</span>(<span class="op">~</span>metric, <span class="dt">ncol=</span><span class="dv">1</span>, <span class="dt">scales =</span> <span class="st">&#39;free&#39;</span>)</code></pre>
-<p><img src="07-redes-neuronales_files/figure-html/unnamed-chunk-48-1.png" width="480" /></p>
+<p><img src="07-redes-neuronales_files/figure-html/unnamed-chunk-48-1.png" width="768" /></p>
+<p><strong>Observación</strong>: puedes utilizar <em>Tensorboard</em>, una herramienta
+para visualizar resultados del entrenamiento de modelos incluída
+en <em>Tensorflow</em> (que es lo que usa keras para hacer los cálculos):</p>
+<pre class="sourceCode r"><code class="sourceCode r">iteraciones &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(
+  x_ent_s, y_ent, 
+  <span class="co">#batch size mismo que nrow(x_ent_s) es descenso en grad.</span>
+  <span class="dt">epochs =</span> <span class="dv">500</span>, <span class="dt">batch_size =</span> <span class="kw">nrow</span>(x_ent_s), 
+  <span class="dt">verbose =</span> <span class="dv">0</span>,
+  <span class="dt">callbacks =</span> <span class="kw">callback_tensorboard</span>(<span class="st">&quot;logs/diabetes/run_1&quot;</span>),
+  <span class="dt">validation_data =</span> <span class="kw">list</span>(x_valid_s, y_valid)
+)</code></pre>
+<p>y después puedes hacer:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tensorboard</span>(<span class="st">&quot;logs/diabetes/&quot;</span>)</code></pre>
+<pre><code>## Started TensorBoard at http://127.0.0.1:4490</code></pre>
 <div id="ejercicio-6" class="section level4 unnumbered">
 <h4>Ejercicio</h4>
 <p>Corre el ejemplo anterior con distintos parámetros de tasa de aprendizaje,

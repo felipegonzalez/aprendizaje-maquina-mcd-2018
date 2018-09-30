@@ -413,7 +413,7 @@ capa_final
 
 
 
-## Cálculo en redes: feed-forward.
+## Cálculo en redes: feed-forward
 
 Ahora generalizamos lo que vimos arriba para definir la arquitectura
 básica de redes neuronales y cómo se hacen cálculos en las redes.
@@ -472,8 +472,8 @@ En nuestro ejemplo, tenemos que en la capa $l=3$ hay dos unidades. Así que
 podemos calcular los valores $a^{(3)}_1$ y $a^{(3)}_2$. Están dados
 por
 
-$$a_1^{(3)} = h(\theta_{1,0}^{(3)} + \theta_{1,1}^{(3)} a_1^{(2)}+ \theta_{1,2}^{(3)}a_2^{(2)}+ \theta_{1,3}^{(3)} a_3^{(2)})$$
-$$a_2^{(3)} = h(\theta_{2,0}^{(3)} + \theta_{2,1}^{(3)} a_1^{(2)}+ \theta_{2,2}^{(3)}a_2^{(2)}+ \theta_{2,3}^{(3)} a_3^{(2)})$$
+$$a_1^{(3)} = h(\theta_{1,0}^{(2)} + \theta_{1,1}^{(2)} a_1^{(2)}+ \theta_{1,2}^{(2)}a_2^{(2)}+ \theta_{1,3}^{(2)} a_3^{(2)})$$
+$$a_2^{(3)} = h(\theta_{2,0}^{(2)} + \theta_{2,1}^{(2)} a_1^{(2)}+ \theta_{2,2}^{(2)}a_2^{(2)}+ \theta_{2,3}^{(2)} a_3^{(2)})$$
 
 Como se ilustra en la siguiente gráfica:
 
@@ -486,9 +486,9 @@ Como se ilustra en la siguiente gráfica:
         expression(a[1]^3), expression(a[2]^3)), 
       vertex.size=50, vertex.color=c('salmon','salmon','salmon','red','red'), vertex.label.cex=1.5,
       vertex.label.color='white',vertex.frame.color=NA,
-   edge.label=c(expression(theta[11]^3),expression(theta[21]^3),
-     expression(theta[12]^3),  expression(theta[22]^3),
-      expression(theta[13]^3), expression(theta[23]^3)))
+   edge.label=c(expression(theta[11]^3),expression(theta[21]^2),
+     expression(theta[12]^2),  expression(theta[22]^2),
+      expression(theta[13]^2), expression(theta[23]^2)))
 ```
 
 Para visualizar las ordenadas (que también se llaman  **sesgos** en este contexto),
@@ -503,46 +503,46 @@ ponemos $a_0^2=1$.
       vertex.size=50, 
    vertex.color=c('gray','salmon','salmon','salmon','red','red'), vertex.label.cex=1.5,
       vertex.label.color='white',vertex.frame.color=NA,
-   edge.label=c(expression(theta[10]^3),expression(theta[20]^3),
-     expression(theta[11]^3),expression(theta[21]^3), expression(theta[12]^3),  expression(theta[22]^3), expression(theta[13]^3), expression(theta[23]^3)))
+   edge.label=c(expression(theta[10]^2),expression(theta[20]^2),
+     expression(theta[11]^2),expression(theta[21]^2), expression(theta[12]^2),  expression(theta[22]^2), expression(theta[13]^2), expression(theta[23]^2)))
 ```
 
 
 #### Ejemplo {-}
 
-Consideremos propagar con los siguientes pesos para capa 3 y valores de la
+Consideremos propagar a la capa 3 a partir de la capa 2. Usaremos los siguientes pesos para capa 3 y valores de la
 capa 2 (en gris están los sesgos):
 ```{r, echo =FALSE, fig.width=7}
  gr <- graph(
-   c(c(1,4,1,5,2,4,2,5,3,4,3,5)))
- plot(gr, layout = matrix(c(-4,1,-4,0,-4,-1,0,1,0,-1), byrow=T, ncol=2),
-      vertex.label=c('-2','5','1','a_1 ?','a_2 ?'), vertex.label.cex=1.5,
-      vertex.size=50, vertex.color=c('salmon','salmon','gray','red','red'), vertex.label.cex=3,
+   c(c(1,4,1,5,2,4,2,5,3,4,3,5, 6, 4, 6, 5)))
+ plot(gr, layout = matrix(c(-4,1,-4,0,-4,-2,0,1,0,-1, -4, -1), byrow=T, ncol=2),
+      vertex.label=c('-2','5','1','a_1 ?','a_2 ?','3'), vertex.label.cex=1.5,
+      vertex.size=50, vertex.color=c('salmon','salmon','gray','red','red'), vertex.label.cex=2,
       vertex.label.color='white',vertex.frame.color=NA,
-   edge.label=c(1,2,-1,0.5,3,1))
+   edge.label=c(1.5,2,-1,0.5,3,1,-0.5,-0.2))
 ```
 
 
 Que en nuestra notación escribimos como
-$$a^{(2)}_0 = 1, a^{(2)}_1 = -2, a^{(2)}_2 = 5$$
+$$a^{(2)}_0 = 1, a^{(2)}_1 = -2, a^{(2)}_2 = 5, a^{(2)}=3$$
 y los pesos son, para la primera unidad:
-$$\theta^{(3)}_{1,0} = 3,  \,\,\, \theta^{(3)}_{1,1} = 1,\,\,\,\theta^{(3)}_{1,2} = -1$$
+$$\theta^{(2)}_{1,0} = 3,  \,\,\, \theta^{(2)}_{1,1} = 1.5,\,\,\,\theta^{(2)}_{1,2} = -1,\,\,\theta^{(2)}_{1,3} = -0.5 $$
 y para la segunda unidad
-$$\theta^{(3)}_{2,0} = 1,  \,\,\, \theta^{(3)}_{2,1} = 2,\,\,\,\theta^{(3)}_{2,2} = 0.5$$
+$$\theta^{(2)}_{2,0} = 1,  \,\,\, \theta^{(2)}_{2,1} = 2,\,\,\,\theta^{(2)}_{2,2} = 0.5,\,\, \theta^{(2)}_{2,3} = -0.2$$
 Y ahora queremos calcular los valores que toman las unidades de la capa 3, 
 que son $a^{(3)}_1$ y  $a^{(3)}_2$$
 
 Para hacer feed forward a la siguiente capa, hacemos entonces
 
-$$a^{(3)}_1 = h(3 + a^{(2)}_1 - a^{(2)}_2),$$
-$$a^{(3)}_2 = h(1 + 2a^{(2)}_1 + 0.5a^{(2)}_2),$$
+$$a^{(3)}_1 = h(3 + a^{(2)}_1 - a^{(2)}_2 -0.5 a_3^{(2)}),$$
+$$a^{(3)}_2 = h(1 + 2a^{(2)}_1 + 0.5a^{(2)}_2 - 0.2 a_3^{(2)}),$$
 
 Ponemos los pesos y valores de la capa 2 (incluyendo sesgo):
 
 ```{r}
-a_2 <- c(1,-2,5) # ponemos un 1 al principio para el sesgo
-theta_2_1 = c(3,1,-1)
-theta_2_2 = c(1,2,0.5)
+a_2 <- c(1, -2, 5, 3) # ponemos un 1 al principio para el sesgo
+theta_2_1 = c(3, 1.5, -1.0, -0.5)
+theta_2_2 = c(1, 2, 0.5, -0.2)
 ```
 
 y calculamos
@@ -553,14 +553,14 @@ a_3
 ```
 
 
-```{r, echo=FALSE, fig.width=7}
-gr <- graph(
-   c(c(1,4,1,5,2,4,2,5,3,4,3,5)))
- plot(gr, layout = matrix(c(-4,1,-4,0,-4,-1,0,1,0,-1), byrow=T, ncol=2),
-      vertex.label=c('-2','5','1','a_1=0.02','a_2=0.37'), 
-      vertex.size=50, vertex.color=c('salmon','salmon','gray','red','red'), vertex.label.cex=1, edge.label.cex=1.5,
+```{r, echo =FALSE, fig.width=7}
+ gr <- graph(
+   c(c(1,4,1,5,2,4,2,5,3,4,3,5, 6, 4, 6, 5)))
+ plot(gr, layout = matrix(c(-4,1,-4,0,-4,-2,0,1,0,-1, -4, -1), byrow=T, ncol=2),
+      vertex.label=c('-2','5','1','a_1= 0.002','a_2=0.250','3'), vertex.label.cex=1.5,
+      vertex.size=50, vertex.color=c('salmon','salmon','gray','red','red'), vertex.label.cex=2,
       vertex.label.color='white',vertex.frame.color=NA,
-   edge.label=c(1,2,-1,0.5,3,1))
+   edge.label=c(1.5,2,-1,0.5,3,1,-0.5,-0.2))
 ```
 
 
@@ -577,13 +577,13 @@ Para la primera capa,
 escribimos las variables de entrada:
 $$a^{(1)}_j = x_j, j=1\ldots,n_1$$
 Para la primera capa oculta, o la segunda capa
-$$a^{(2)}_j = h\left( \theta_{j,0}^{(2)}+ \sum_{k=1}^{n_1}  \theta_{j,k}^{(2)}  a^{(1)}_k    \right), j=1\ldots,n_2$$
+$$a^{(2)}_j = h\left( \theta_{j,0}^{(1)}+ \sum_{k=1}^{n_1}  \theta_{j,k}^{(1)}  a^{(1)}_k    \right), j=1\ldots,n_2$$
 para la $l$-ésima capa:
-$$a^{(l)}_j = h\left( \theta_{j,0}^{(l)}+ \sum_{k=1}^{n_{l-1}}  \theta_{j,k}^{(l)}  a^{(l-1)}_k    \right), j=1\ldots,n_{l}$$
+$$a^{(l)}_j = h\left( \theta_{j,0}^{(l-1)}+ \sum_{k=1}^{n_{l-1}}  \theta_{j,k}^{(l-1)}  a^{(l-1)}_k    \right), j=1\ldots,n_{l}$$
 y así sucesivamente. 
 Para la capa final o capa de salida (para problema binario), suponiendo
 que tenemos $L$ capas ($L-2$ capas ocultas):
-$$p_1 = h\left(    \theta_{1,0}^{(L)}+ \sum_{k=1}^{n_{L-1}}  \theta_{1,k}^{(L)}  a^{(L-1)}_k     \right).$$
+$$p_1 = h\left(    \theta_{1,0}^{(L-1)}+ \sum_{k=1}^{n_{L-1}}  \theta_{1,k}^{(L-1)}  a^{(L-1)}_k     \right).$$
 ```
 
 Nótese que entonces:
@@ -591,10 +591,11 @@ Nótese que entonces:
 ```{block2, type='comentario'}
 Cada capa se caracteriza por el conjunto de parámetros $\Theta^{(l)}$, que es una matriz
 de $n_l\times n_{l-1}$.
+
 La red completa entonces se caracteriza por:
 
 - La estructura elegida (número de capas ocultas y número de nodos en cada capa oculta).
-- Las matrices de pesos en cada capa $\Theta^{(1)},\Theta^{(2)},\ldots, \Theta^{(L)}$
+- Las matrices de pesos en cada capa $\Theta^{(1)},\Theta^{(2)},\ldots, \Theta^{(L-1)}$
 ```
 
 Adicionalmente, escribimos en forma vectorial:
@@ -615,19 +616,19 @@ $$ a^{(1)} = x$$
 - Capa 2
 $$ a^{(2)} = h(\Theta^{(1)}a^{(1)})$$
 - Capa $l$ (oculta)
-$$ a^{(l)} = h(\Theta^{(l)}a^{(l-1)})$$
+$$ a^{(l)} = h(\Theta^{(l-1)}a^{(l-1)})$$
 - Capa de salida:
     
 En un problema de clasificación binaria, la capa de salida se calcula como
 en regresión logística:
-$$a^{(L)}= p = h(\Theta^{(L)}a^{(L-1)})$$
+$$a^{(L)}= p = h(\Theta^{(L-1)}a^{(L-1)})$$
 donde $h$ se aplica componente a componente sobre los vectores correspondientes. Nótese
 que feed-foward consiste principalmente de multiplicaciones de matrices con
 algunas aplicaciones de $h$
     
 Para un problema de regresión, la última capa se calcula como en regresión lineal:
     
-$$a^{(L)} = p = \Theta^{(L)}a^{(L-1)}$$
+$$a^{(L)} = p = \Theta^{(L-1)}a^{(L-1)}$$
 ```
 
 
@@ -676,55 +677,55 @@ calcular
 $$\frac{\partial D}{\partial \theta_{j,k}^{(l)}}$$
 
 Y escribiremos, con la notación de arriba, 
-$$a^{(l)}_j = h(z^{(l)}_j)$$
+$$a^{(l+1)}_j = h(z^{(l+1)}_j)$$
 donde 
-$$z^{(l)} = \Theta^{l} a^{(l-1)},$$
+$$z^{(l+1)} = \Theta^{(l)} a^{(l)},$$
 que coordenada a coordenada se escribe como
-$$z^{(l)}_j =  \sum_{k=0}^{n_{l-1}}  \theta_{j,k}^{(l)}  a^{(l-1)}_k$$
+$$z^{(l+1)}_j =  \sum_{k=0}^{n_{l-1}}  \theta_{j,k}^{(l)}  a^{(l)}_k$$
 
-#### Paso 1: Derivar respecto a capa $l$ {-}
+#### Paso 1: Derivar respecto a capa $l+1$ {-}
 
 Como los valores de cada capa determinan los valores de salida y la devianza,
 podemos escribir (recordemos que $a_0^{(l)}=1$ es constante):
-$$D=D(a_0^{(l)},a_1^{(l)},a_2^{(l)},\ldots, a_{n_{l}}^{(l)})=D(a_1^{(l)},a_2^{(l)},\ldots, a_{n_{l}}^{(l)})$$
+$$D=D(a_0^{(l+1)},a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})=D(a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l}}^{(l+1)})$$
 
 Así que por la regla de la cadena para varias variables:
 $$\frac{\partial D}{\partial \theta_{j,k}^{(l)}} =
-\sum_{t=1}^{n_{l}} \frac{\partial D}{\partial a_t^{l}}\frac{\partial a_t^{(l)}}
+\sum_{t=1}^{n_{l}} \frac{\partial D}{\partial a_t^{(l+1)}}\frac{\partial a_t^{(l+1)}}
 {\partial \theta_{j,k}^{(l)} }$$
 
 Pero si vemos dónde aparece $\theta_{j,k}^{(l)}$ en la gráfica de la red:
 
-$$ \cdots a^{(l-1)}_k \xrightarrow{\theta_{j,k}^{(l)}} a^{(l)}_j  \cdots \rightarrow  D$$
+$$ \cdots a^{(l)}_k \xrightarrow{\theta_{j,k}^{(l)}} a^{(l+1)}_j  \cdots \rightarrow  D$$
 Entonces podemos concluir  que 
-$\frac{\partial a_t^{(l)}}{\partial \theta_{j,k}^{(l)}} =0$ cuando  $t\neq j$ (pues no
+$\frac{\partial a_t^{(l+1)}}{\partial \theta_{j,k}^{(l)}} =0$ cuando  $t\neq j$ (pues no
  dependen de $\theta_{j,k}^{(l)}$),
 
-de lo que se concluye que, para toda $j=1,2,\ldots, n_{l+1}, k=0,1,\ldots, n_{l}$
+y entonces, para toda $j=1,2,\ldots, n_{l+1}, k=0,1,\ldots, n_{l}$
 \begin{equation}
 \frac{\partial D}{\partial \theta_{j,k}^{(l)}} =
-\frac{\partial D}{\partial a_j^{(l)}}\frac{\partial a_j^{(l)}}{\partial \theta_{j,k}^{(l)} }
-,
+\frac{\partial D}{\partial a_j^{(l+1)}}\frac{\partial a_j^{(l+1)}}{\partial \theta_{j,k}^{(l)} }
+.
   (\#eq:parcial)
 \end{equation}
 
-y como 
-$$a_j^{(l)} = h(z_j^{(l)}) = h\left (\sum_{k=0}^{n_{l-1}}  \theta_{j,k}^{(l)}  a^{(l-1)}_k \right )$$
-Tenemos por la regla de la cadena que
+Adicionalmente, como
+$$a_j^{(l+1)} = h(z_j^{(l+1)}) = h\left (\sum_{k=0}^{n_{l}}  \theta_{j,k}^{(l)}  a^{(l)}_k \right )$$
+y las $a_k^{(l)}$ no dependen de $\theta_{j,k}^{(l)}$, tenemos por la regla de la cadena que
 \begin{equation}
-\frac{\partial a_j^{(l)}}{\partial \theta_{j,k}^{(l)} } = h'(z_j^{(l)})a_k^{(l-1)}.
+\frac{\partial a_j^{(l)}}{\partial \theta_{j,k}^{(l)} } = h'(z_j^{(l+1)})a_k^{(l)}.
 \end{equation}
 
-Esta última expresión podemos calcularla pues sólo requiere la derivada de $h$ y
-los valores de los nodos obtenidos en la pasada de feed-forward.
+Esta última expresión podemos calcularla pues sólo requiere la derivada de $h$ y 
+los valores otenidos en el paso de feed-forward.
 
-#### Paso 2: Derivar con respecto a capa $l+1$ {-}
+#### Paso 2: Obtener fórmula recursiva  {-}
 
 Así que sólo nos queda calcular las parciales ($j = 1,\ldots, n_l$)
 $$\frac{\partial D}{\partial a_j^{(l)}}$$ 
 
 Para obtener una fórmula recursiva para esta cantidad (hacia atrás), 
-aplicamos otra vez regla de la cadena, pero con respecto a la capa $l+1$ (ojo: queremos obtener
+aplicamos otra vez regla de la cadena, pero con respecto a la capa $l$ (ojo: queremos obtener
 una fórmula recursiva!):  
 
 $$\frac{\partial D}{\partial a_j^{(l)}}= \sum_{s=1}^{n_l}
@@ -750,50 +751,51 @@ de $a_k^{(l)}$.
 En este caso los elementos de la suma no se anulan necesariamente. Primero
 consideramos la derivada de:
 
-$$\frac{\partial  a_s^{(l+1)}}{\partial a_j^{(l)}}=h'(z_s^{(l+1)})\theta_{s,j}^{(l+1)},$$
+$$\frac{\partial  a_s^{(l+1)}}{\partial a_j^{(l)}}=h'(z_s^{(l+1)})\theta_{s,j}^{(l)},$$
 
 de modo que
 
 $$\frac{\partial D}{\partial a_j^{(l)}}= \sum_{s=1}^{n_l}
-\frac{\partial D}{\partial a_s^{(l+1)}} h'(z_s^{(l+1)})\theta_{s,j}^{(l+1)}.$$
+\frac{\partial D}{\partial a_s^{(l+1)}} h'(z_s^{(l+1)})\theta_{s,j}^{(l)}.$$
+
+
+Nótese que esto nos da una fórmula recursiva para las parciales que nos
+falta calcular (de $D$ con respecto a $a$), pues las otras cantidades las
+conocemos por backpropagation.
+
+#### Paso 3: Simplificación de la recursión {-}
+
 
 Denotaremos
 $$\delta_s^{ (l+1)}=\frac{\partial D}{\partial a_s^{(l+1)}} h'(z_s^{(l+1)})$$
 
-de manera que la ecuación anterior es
+de manera que la ecuación recursiva es
 \begin{equation}
 \frac{\partial D}{\partial a_j^{(l)}} = \sum_{s=1}^{n_{l+1}}
-\delta_s^{(l+1)}\theta_{s,j}^{(l+1)}.
+\delta_s^{(l+1)}\theta_{s,j}^{(l)}.
   (\#eq:delta-def)
 \end{equation}
 
-**Observación**
-Nótese que $\delta_s^{(l)} =\frac{\partial D}{\partial z_s^{(l+1)}}$, que nos 
-dice *a dónde tenemos que mover la entrada derivada*
-$z_s^{(l+1)}$ *para reducir el error* $D$.
-Como $z_s^{(l+1)}$ es una entrada derivada que depende de parámetros $\theta$,
-esta cantidad también nos ayudará a entender cómo debemos cambiar los
-parámetros $\theta$ para disminuir el error.
-
-
-#### Paso 3: Construir fórmula recursiva para $\delta$ {-}
-
-Lo único que nos falta calcular entonces son las $\delta_s^{(l)}$. 
 
 Tenemos que si $l=2,\ldots,L-1$, entonces podemos escribir (usando \@ref(eq:delta-def))
 como fórmula recursiva:
 
 \begin{equation}
-\delta_j^{(l)} = \frac{\partial D}{\partial a_j^{l}} h'(z_j^{(l)})
-= \left (\sum_{s=1}^{n_l} \delta_s^{(l+1)} \theta_{s,j}^{(l+1)}\right ) h'(z_j^{(l)}),
+\delta_j^{(l)} 
+= \left (\sum_{s=1}^{n_l} \delta_s^{(l+1)} \theta_{s,j}^{(l)}\right ) h'(z_j^{(l)}),
   (\#eq:delta-recursion)
 \end{equation}
 para $j=1,2,\ldots, n_{l}$.
 
-y para la última capa, tenemos que (demostrar!)
+
+#### Paso 4: Condiciones inciales {-}
+
+
+Para la última capa, tenemos que (demostrar!)
 
 $$\delta_1^{(L)}=p - y.$$
 
+#### Paso 5: Cálculo de parciales {-}
 
 Finalmente, usando \@ref(eq:parcial), obtenemos
 $$\frac{\partial D}{\partial \theta_{j,k}^{(l)}} = \delta_j^{(l)}a_k^{(l-1)},$$
@@ -804,7 +806,7 @@ sobre la muestra de entrenamiento.
 
 Muchas veces es útil escribir una versión vectorizada (importante para implementar):
 
-#### Paso 4: Versión matricial {-}
+#### Paso 6: Versión matricial {-}
 
 Ahora podemos escribir estas ecuaciones en forma vectorial. En primer lugar,
 $$\delta^{(L)}=p-y.$$
@@ -812,7 +814,7 @@ Y además se puede ver de la ecuación \@ref(eq:delta-recursion) que
 ($\Theta_{*}^{(l+1)}$ denota la matriz de pesos *sin* la columna correspondiente al sesgo):
 
 \begin{equation}
-\delta^{(l)}=\left( \Theta_{*}^{(l+1)}    \right)^t\delta^{(l+1)} \circ h'(z^{(l)})
+\delta^{(l)}=\left( \Theta_{*}^{(l)}    \right)^t\delta^{(l+1)} \circ h'(z^{(l)})
 (\#eq:delta-recursion-mat)
 \end{equation}
 
@@ -939,12 +941,12 @@ Escalamos y preparamos los datos:
 ```{r, message=FALSE, warning=FALSE}
 diabetes_ent <- MASS::Pima.tr
 diabetes_pr <- MASS::Pima.te
-set.seed(293)
 x_ent <- diabetes_ent %>% select(-type) %>% as.matrix
 x_ent_s <- scale(x_ent)
 x_valid <- diabetes_pr %>% select(-type) %>% as.matrix 
 x_valid_s <- x_valid %>%
-  scale(center = attr(x_ent_s, 'scaled:center'), scale = attr(x_ent_s,  'scaled:scale'))
+  scale(center = attr(x_ent_s, 'scaled:center'), 
+        scale = attr(x_ent_s,  'scaled:scale'))
 y_ent <- as.numeric(diabetes_ent$type == 'Yes')
 y_valid <- as.numeric(diabetes_pr$type == 'Yes')
 ```
@@ -959,16 +961,16 @@ Para definir la arquitectura de dos capas con:
 
 
 ```{r}
-set.seed(9232)
+set.seed(923)
 modelo_tc <- keras_model_sequential() 
 # no es necesario asignar a nuevo objeto, modelo_tc es modificado al agregar capas
 modelo_tc %>% 
   layer_dense(units = 10, activation = 'sigmoid', 
-              kernel_regularizer = regularizer_l2(l = 1e-4), 
+              kernel_regularizer = regularizer_l2(l = 1e-3), 
               kernel_initializer = initializer_random_uniform(minval = -0.5, maxval = 0.5),
               input_shape=7) %>%
   layer_dense(units = 10, activation = 'sigmoid', 
-              kernel_regularizer = regularizer_l2(l = 1e-4), 
+              kernel_regularizer = regularizer_l2(l = 1e-3), 
               kernel_initializer = initializer_random_uniform(minval = -0.5, maxval = 0.5)) %>%
   layer_dense(units = 1, activation = 'sigmoid',
               kernel_regularizer = regularizer_l2(l = 1e-4),
@@ -983,7 +985,7 @@ en tensorflow:
 ```{r}
 modelo_tc %>% compile(
   loss = 'binary_crossentropy',
-  optimizer = optimizer_sgd(lr = 0.5),
+  optimizer = optimizer_sgd(lr = 0.8),
   metrics = c('accuracy','binary_crossentropy'))
 ```
 
@@ -994,7 +996,7 @@ Iteramos con descenso en gradiente y monitoreamos el error de validación. Hacem
 iteraciones <- modelo_tc %>% fit(
   x_ent_s, y_ent, 
   #batch size mismo que nrow(x_ent_s) es descenso en grad.
-  epochs = 500, batch_size = nrow(x_ent_s), 
+  epochs = 1000, batch_size = nrow(x_ent_s), 
   verbose = 0,
   validation_data = list(x_valid_s, y_valid)
 )
@@ -1011,11 +1013,34 @@ prop.table(tab_confusion, 2)
 Es importante monitorear las curvas de aprendizaje (entrenamiento y
 validación) para diagnosticar mejoras:
 
-```{r}
+```{r, fig.width=8, fig.height=8}
 df_iteraciones <- as.data.frame(iteraciones)
 ggplot(df_iteraciones, aes(x=epoch, y=value, colour=data, group=data)) + 
   geom_line() + geom_point() + facet_wrap(~metric, ncol=1, scales = 'free')
 ```
+
+
+**Observación**: puedes utilizar *Tensorboard*, una herramienta
+para visualizar resultados del entrenamiento de modelos incluída
+en *Tensorflow* (que es lo que usa keras para hacer los cálculos):
+
+```{r, eval = FALSE}
+iteraciones <- modelo_tc %>% fit(
+  x_ent_s, y_ent, 
+  #batch size mismo que nrow(x_ent_s) es descenso en grad.
+  epochs = 500, batch_size = nrow(x_ent_s), 
+  verbose = 0,
+  callbacks = callback_tensorboard("logs/diabetes/run_1"),
+  validation_data = list(x_valid_s, y_valid)
+)
+```
+
+y después puedes hacer:
+
+```{r}
+tensorboard("logs/diabetes/")
+```
+
 
 #### Ejercicio {-}
 Corre el ejemplo anterior con distintos parámetros de tasa de aprendizaje,

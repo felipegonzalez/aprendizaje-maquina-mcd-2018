@@ -319,7 +319,7 @@ ggplot(dat, aes(x=x1, y=x2)) + geom_tile(aes(fill=p))
 ```
 
 Esta función puede entenderse como un o exclusivo: la probabilidad es alta
-sólo cuando x1 y x2 tienen valores opuestos (x1 grande pero x2 chica y viceversa). 
+sólo cuando $x_1$ y $x_2$ tienen valores opuestos ($x_1$ grande pero $x_2$ chica y viceversa). 
 
 No es posible modelar esta función mediante el modelo logístico (sin interacciones).
 Pero podemos incluir la interacción en el modelo logístico o intentar

@@ -910,7 +910,7 @@ del gradiente.
 
 - Generalmente los pesos se inicializan al azar con variables independientes
 gaussianas o uniformes centradas en cero, y con varianza chica
-(por ejemplo $U(-0.5,0.5)$). Una recomendación es usar $U(-1/\sqrt(m), 1/\sqrt(m))$
+(por ejemplo $U(-0.5,0.5)$). Una recomendación es usar $U(-1/\sqrt{(m)}, 1/\sqrt{(m)})$
 donde $m$ es el número de entradas. En general, hay que experimentar con este 
 parámetro.
 

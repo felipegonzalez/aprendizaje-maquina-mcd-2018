@@ -446,7 +446,7 @@ la siguiente de la misma forma: combinaciones lineales y aplicación de $h$. Y a
 sucesivamente hasta que llegamos a la capa final.
 
 ## Notación {-}
-
+MEJORAR GRAFICAS
 Sea $L$ el número total de capas. En primer lugar, para un cierto caso de entrada $x = (x_1,x_2,\ldots, x_p)$, 
 denotamos por:
 

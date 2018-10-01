@@ -713,7 +713,7 @@ Adicionalmente, como
 $$a_j^{(l+1)} = h(z_j^{(l+1)}) = h\left (\sum_{k=0}^{n_{l}}  \theta_{j,k}^{(l)}  a^{(l)}_k \right )$$
 y las $a_k^{(l)}$ no dependen de $\theta_{j,k}^{(l)}$, tenemos por la regla de la cadena que
 \begin{equation}
-\frac{\partial a_j^{(l)}}{\partial \theta_{j,k}^{(l)} } = h'(z_j^{(l+1)})a_k^{(l)}.
+\frac{\partial a_j^{(l+1)}}{\partial \theta_{j,k}^{(l+1)} } = h'(z_j^{(l+1)})a_k^{(l)}.
 \end{equation}
 
 Esta última expresión podemos calcularla pues sólo requiere la derivada de $h$ y 

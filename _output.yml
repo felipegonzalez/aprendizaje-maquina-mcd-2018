@@ -1,6 +1,5 @@
 bookdown::gitbook:
   css: [css/style.css, css/toc.css, css/font-awesome.min.css]
-  mathjax: "lib/mathjax-local/Mathjax.js"
   config:
     toc:
       before: |

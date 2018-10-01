@@ -784,7 +784,7 @@ set.seed(29123)
 entrena_3 <- digitos_entrena %>% sample_n(nrow(digitos_entrena)) %>%
   sample_n(3000)
 x_train_3 <- entrena_3 %>% select(-digito) %>% as.matrix + 1
-y_train_3 <- (entrena_3$digito %in% c(3,5)) %>% as.numeric
+y_train_3 <- (entrena_3$digito %in% c(3,8)) %>% as.numeric
 set.seed(12)
 modelo_sin_reg <- keras_model_sequential() 
 modelo_sin_reg  %>% 

@@ -612,23 +612,23 @@ las ordenadas al origen (o sesgos) podemos escribir:
 
 
 - Capa 1 (vector de entradas)
-$$ a^{(1)} = x$$
+$$ a^{(1)} = x$$.
 - Capa 2
-$$ a^{(2)} = h(\Theta^{(1)}a^{(1)})$$
+$$ a^{(2)} = h(\Theta^{(1)}a^{(1)})$$.
 - Capa $l$ (oculta)
-$$ a^{(l)} = h(\Theta^{(l-1)}a^{(l-1)})$$
+$$ a^{(l)} = h(\Theta^{(l-1)}a^{(l-1)})$$.
 - Capa de salida:
     
 En un problema de clasificación binaria, la capa de salida se calcula como
 en regresión logística:
-$$a^{(L)}= p = h(\Theta^{(L-1)}a^{(L-1)})$$
+$$a^{(L)}= p = h(\Theta^{(L-1)}a^{(L-1)})$$,
 donde $h$ se aplica componente a componente sobre los vectores correspondientes. Nótese
 que feed-foward consiste principalmente de multiplicaciones de matrices con
-algunas aplicaciones de $h$
+algunas aplicaciones de $h$.
     
 Para un problema de regresión, la última capa se calcula como en regresión lineal:
     
-$$a^{(L)} = p = \Theta^{(L-1)}a^{(L-1)}$$
+$$a^{(L)} = p = \Theta^{(L-1)}a^{(L-1)}$$.
 ```
 
 
@@ -663,7 +663,7 @@ Recordamos también nuestra notación para la función logística (o sigmoide):
 
 $$h(z)=\frac{1}{1+e^{-z}}.$$
 Necesitaremos su derivada, que está dada por (cálculala):
-$$h'(z) = h(z)(1-h(z))$$
+$$h'(z) = h(z)(1-h(z))$$.
 
 ### Cálculo para un caso de entrenamiento
 
@@ -674,25 +674,25 @@ $$ D=  -\left ( y\log (p_1(x)) + (1-y)\log (1-p_1(x))\right) . $$
 
 Después sumaremos sobre toda la muestra de entrenamiento. Entonces queremos
 calcular 
-$$\frac{\partial D}{\partial \theta_{j,k}^{(l)}}$$
+$$\frac{\partial D}{\partial \theta_{j,k}^{(l)}} . $$
 
 Y escribiremos, con la notación de arriba, 
-$$a^{(l+1)}_j = h(z^{(l+1)}_j)$$
+$$a^{(l+1)}_j = h(z^{(l+1)}_j), $$
 donde 
 $$z^{(l+1)} = \Theta^{(l)} a^{(l)},$$
 que coordenada a coordenada se escribe como
-$$z^{(l+1)}_j =  \sum_{k=0}^{n_{l}}  \theta_{j,k}^{(l)}  a^{(l)}_k$$
+$$z^{(l+1)}_j =  \sum_{k=0}^{n_{l}}  \theta_{j,k}^{(l)}  a^{(l)}_k .$$
 
 #### Paso 1: Derivar respecto a capa $l+1$ {-}
 
 Como los valores de cada capa determinan los valores de salida y la devianza,
 podemos escribir (recordemos que $a_0^{(l)}=1$ es constante):
-$$D=D(a_0^{(l+1)},a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})=D(a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})$$
+$$D=D(a_0^{(l+1)},a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})=D(a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)}).$$
 
 Así que por la regla de la cadena para varias variables:
 $$\frac{\partial D}{\partial \theta_{j,k}^{(l)}} =
 \sum_{t=1}^{n_{l}} \frac{\partial D}{\partial a_t^{(l+1)}}\frac{\partial a_t^{(l+1)}}
-{\partial \theta_{j,k}^{(l)} }$$
+{\partial \theta_{j,k}^{(l)} }.$$
 
 Pero si vemos dónde aparece $\theta_{j,k}^{(l)}$ en la gráfica de la red:
 
@@ -722,7 +722,7 @@ los valores otenidos en el paso de feed-forward.
 #### Paso 2: Obtener fórmula recursiva  {-}
 
 Así que sólo nos queda calcular las parciales ($j = 1,\ldots, n_l$)
-$$\frac{\partial D}{\partial a_j^{(l)}}$$ 
+$$\frac{\partial D}{\partial a_j^{(l)}}.$$ 
 
 Para obtener una fórmula recursiva para esta cantidad (hacia atrás), 
 aplicamos otra vez regla de la cadena, pero con respecto a la capa $l$ (ojo: queremos obtener

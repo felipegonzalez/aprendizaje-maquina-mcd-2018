@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-09-30">
+<meta name="date" content="2018-10-01">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="extensiones-para-regresion-lineal-y-logistica.html">
-
+<link rel="next" href="redes-neuronales-parte-2.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -52,7 +52,7 @@
 <style type="text/css">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; position: absolute; }
+a.sourceLine:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -65,13 +65,11 @@ code.sourceCode { white-space: pre-wrap; }
 a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
 pre.numberSource a.sourceLine
-  { position: relative; }
-pre.numberSource a.sourceLine:empty
-  { position: absolute; }
+  { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
   { content: attr(data-line-number);
-    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all;
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -250,6 +248,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="7.6.1" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#ejemplo-35"><i class="fa fa-check"></i><b>7.6.1</b> Ejemplo</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="8" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html"><i class="fa fa-check"></i><b>8</b> Redes neuronales (parte 2)</a><ul>
+<li class="chapter" data-level="8.1" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#descenso-estocastico"><i class="fa fa-check"></i><b>8.1</b> Descenso estocástico</a></li>
+<li class="chapter" data-level="8.2" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#algoritmo-de-descenso-estocastico"><i class="fa fa-check"></i><b>8.2</b> Algoritmo de descenso estocástico</a></li>
+<li class="chapter" data-level="8.3" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#por-que-usar-descenso-estocastico-por-minilotes"><i class="fa fa-check"></i><b>8.3</b> ¿Por qué usar descenso estocástico por minilotes?</a></li>
+<li class="chapter" data-level="8.4" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#escogiendo-la-tasa-de-aprendizaje"><i class="fa fa-check"></i><b>8.4</b> Escogiendo la tasa de aprendizaje</a></li>
+<li class="chapter" data-level="8.5" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#mejoras-al-algoritmo-de-descenso-estocastico."><i class="fa fa-check"></i><b>8.5</b> Mejoras al algoritmo de descenso estocástico.</a><ul>
+<li class="chapter" data-level="8.5.1" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#decaimiento-de-tasa-de-aprendizaje"><i class="fa fa-check"></i><b>8.5.1</b> Decaimiento de tasa de aprendizaje</a></li>
+<li class="chapter" data-level="8.5.2" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#momento"><i class="fa fa-check"></i><b>8.5.2</b> Momento</a></li>
+<li class="chapter" data-level="8.5.3" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#otras-variaciones"><i class="fa fa-check"></i><b>8.5.3</b> Otras variaciones</a></li>
+</ul></li>
+<li class="chapter" data-level="8.6" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#ajuste-de-redes-con-descenso-estocastico"><i class="fa fa-check"></i><b>8.6</b> Ajuste de redes con descenso estocástico</a></li>
+<li class="chapter" data-level="8.7" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#activaciones-relu"><i class="fa fa-check"></i><b>8.7</b> Activaciones relu</a></li>
+<li class="chapter" data-level="8.8" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#dropout-para-regularizacion"><i class="fa fa-check"></i><b>8.8</b> Dropout para regularización</a><ul>
+<li class="chapter" data-level="" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#ejemplo-39"><i class="fa fa-check"></i>Ejemplo</a></li>
+</ul></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>
 
@@ -385,8 +399,8 @@ minimizar la devianza. En primer lugar, creamos una
 función que para todas las entradas calcula los valores
 de salida. En esta función hacemos <strong>feed-forward</strong> de las entradas
 a través de la red para calcular la salida</p>
-<pre class="sourceCode r"><code class="sourceCode r">## esta función calcula los valores de cada nodo en toda la red,
-## para cada entrada
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co">## esta función calcula los valores de cada nodo en toda la red,</span>
+<span class="co">## para cada entrada</span>
 feed_fow &lt;-<span class="st"> </span><span class="cf">function</span>(beta, x){
   a_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">h</span>(beta[<span class="dv">1</span>] <span class="op">+</span><span class="st"> </span>beta[<span class="dv">2</span>] <span class="op">*</span><span class="st"> </span>x) <span class="co"># calcula variable 1 de capa oculta</span>
   a_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">h</span>(beta[<span class="dv">3</span>] <span class="op">+</span><span class="st"> </span>beta[<span class="dv">4</span>] <span class="op">*</span><span class="st"> </span>x) <span class="co"># calcula variable 2 de capa oculta</span>
@@ -410,7 +424,7 @@ de datos de entrenamiento fijos:</p>
 }</code></pre>
 <p>Por ejemplo:</p>
 <pre class="sourceCode r"><code class="sourceCode r">dev &lt;-<span class="st"> </span><span class="kw">devianza_fun</span>(x_<span class="dv">1</span>, g_<span class="dv">1</span>) <span class="co"># crea función dev</span>
-## ahora dev toma solamente los 7 parámetros beta:
+<span class="co">## ahora dev toma solamente los 7 parámetros beta:</span>
 <span class="kw">dev</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))</code></pre>
 <pre><code>## [1] 1.386294</code></pre>
 <p>Finalmente, optimizamos la devianza. Para esto usaremos
@@ -436,7 +450,7 @@ salida</code></pre>
 ## NULL</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">beta &lt;-<span class="st"> </span>salida<span class="op">$</span>par</code></pre>
 <p>Y ahora podemos graficar con el vector <span class="math inline">\(\beta\)</span> encontrado:</p>
-<pre class="sourceCode r"><code class="sourceCode r">## hacer feed forward con beta encontrados
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co">## hacer feed forward con beta encontrados</span>
 p_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">feed_fow</span>(beta, x)
 dat_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">data.frame</span>(x, <span class="dt">p_2 =</span> p_<span class="dv">2</span>)
 <span class="kw">ggplot</span>(dat_<span class="dv">2</span>, <span class="kw">aes</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> p_<span class="dv">2</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>()<span class="op">+</span>
@@ -891,12 +905,12 @@ calcular
 donde
 <span class="math display">\[z^{(l+1)} = \Theta^{(l)} a^{(l)},\]</span>
 que coordenada a coordenada se escribe como
-<span class="math display">\[z^{(l+1)}_j =  \sum_{k=0}^{n_{l-1}}  \theta_{j,k}^{(l)}  a^{(l)}_k\]</span></p>
+<span class="math display">\[z^{(l+1)}_j =  \sum_{k=0}^{n_{l}}  \theta_{j,k}^{(l)}  a^{(l)}_k\]</span></p>
 <div id="paso-1-derivar-respecto-a-capa-l1" class="section level4 unnumbered">
 <h4>Paso 1: Derivar respecto a capa <span class="math inline">\(l+1\)</span></h4>
 <p>Como los valores de cada capa determinan los valores de salida y la devianza,
 podemos escribir (recordemos que <span class="math inline">\(a_0^{(l)}=1\)</span> es constante):
-<span class="math display">\[D=D(a_0^{(l+1)},a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})=D(a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l}}^{(l+1)})\]</span></p>
+<span class="math display">\[D=D(a_0^{(l+1)},a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})=D(a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})\]</span></p>
 <p>Así que por la regla de la cadena para varias variables:
 <span class="math display">\[\frac{\partial D}{\partial \theta_{j,k}^{(l)}} =
 \sum_{t=1}^{n_{l}} \frac{\partial D}{\partial a_t^{(l+1)}}\frac{\partial a_t^{(l+1)}}
@@ -929,7 +943,7 @@ los valores otenidos en el paso de feed-forward.</p>
 <p>Para obtener una fórmula recursiva para esta cantidad (hacia atrás),
 aplicamos otra vez regla de la cadena, pero con respecto a la capa <span class="math inline">\(l\)</span> (ojo: queremos obtener
 una fórmula recursiva!):</p>
-<p><span class="math display">\[\frac{\partial D}{\partial a_j^{(l)}}= \sum_{s=1}^{n_l}
+<p><span class="math display">\[\frac{\partial D}{\partial a_j^{(l)}}= \sum_{s=1}^{n_{l+1}}
 \frac{\partial D}{\partial a_s^{(l+1)}}\frac{\partial  a_s^{(l+1)}}{\partial a_j^{(l)}},\]</span></p>
 <p>que se puede entender a partir de este diagrama:
 <img src="07-redes-neuronales_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
@@ -957,12 +971,12 @@ conocemos por backpropagation.</p>
 \end{equation}\]</span></p>
 <p>Tenemos que si <span class="math inline">\(l=2,\ldots,L-1\)</span>, entonces podemos escribir (usando <a href="redes-neuronales-parte-1.html#eq:delta-def">(7.2)</a>)
 como fórmula recursiva:</p>
-<span class="math display" id="eq:delta-recursion">\[\begin{equation}
+<p><span class="math display" id="eq:delta-recursion">\[\begin{equation}
 \delta_j^{(l)} 
 = \left (\sum_{s=1}^{n_l} \delta_s^{(l+1)} \theta_{s,j}^{(l)}\right ) h&#39;(z_j^{(l)}),
   \tag{7.3}
 \end{equation}\]</span>
-<p>para <span class="math inline">\(j=1,2,\ldots, n_{l}\)</span>.</p>
+para <span class="math inline">\(j=1,2,\ldots, n_{l}\)</span>.</p>
 </div>
 <div id="paso-4-condiciones-inciales" class="section level4 unnumbered">
 <h4>Paso 4: Condiciones inciales</h4>
@@ -972,7 +986,7 @@ como fórmula recursiva:</p>
 <div id="paso-5-calculo-de-parciales" class="section level4 unnumbered">
 <h4>Paso 5: Cálculo de parciales</h4>
 <p>Finalmente, usando <a href="redes-neuronales-parte-1.html#eq:parcial">(7.1)</a>, obtenemos
-<span class="math display">\[\frac{\partial D}{\partial \theta_{j,k}^{(l)}} = \delta_j^{(l)}a_k^{(l-1)},\]</span></p>
+<span class="math display">\[\frac{\partial D}{\partial \theta_{j,k}^{(l+1)}} = \delta_j^{(l+1)}a_k^{(l)},\]</span></p>
 <p>y con esto ya podemos hacer backpropagation para calcular el gradiente
 sobre cada caso de entrenamiento, y solo resta acumular para obtener el gradiente
 sobre la muestra de entrenamiento.</p>
@@ -984,10 +998,10 @@ sobre la muestra de entrenamiento.</p>
 <span class="math display">\[\delta^{(L)}=p-y.\]</span>
 Y además se puede ver de la ecuación <a href="redes-neuronales-parte-1.html#eq:delta-recursion">(7.3)</a> que
 (<span class="math inline">\(\Theta_{*}^{(l+1)}\)</span> denota la matriz de pesos <em>sin</em> la columna correspondiente al sesgo):</p>
-<span class="math display" id="eq:delta-recursion-mat">\[\begin{equation}
+<p><span class="math display" id="eq:delta-recursion-mat">\[\begin{equation}
 \delta^{(l)}=\left( \Theta_{*}^{(l)}    \right)^t\delta^{(l+1)} \circ h&#39;(z^{(l)})
 \tag{7.4}
-\end{equation}\]</span>
+\end{equation}\]</span></p>
 <p>donde <span class="math inline">\(\circ\)</span> denota el producto componente a componente.</p>
 <p>Ahora todo ya está calculado. Lo interesante es que las <span class="math inline">\(\delta^{(l)}\)</span> se calculan
 de manera recursiva.</p>
@@ -1005,7 +1019,7 @@ Para <span class="math inline">\(i=1,\ldots, N\)</span>, tomamos el dato de entr
 <li>Calculamos <span class="math inline">\(\delta^{(L)}=a^{ (L)}-y^{(i)}\)</span>, y luego
 <span class="math inline">\(\delta^{(L-1)},\ldots, \delta^{(2)}\)</span> según la recursión <a href="redes-neuronales-parte-1.html#eq:delta-recursion">(7.3)</a>.</li>
 <li>Acumulamos
-<span class="math inline">\(\Delta_{j,k}^{(l)}=\Delta_{j,k}^{(l)} + \delta_j^{(l)}a_k^{(l-1)}\)</span>.</li>
+<span class="math inline">\(\Delta_{j,k}^{(l)}=\Delta_{j,k}^{(l)} + \delta_j^{(l+1)}a_k^{(l)}\)</span>.</li>
 <li>Finalmente, ponemos, si <span class="math inline">\(k\neq 0\)</span>,
 <span class="math display">\[D_{j,k}^{(l)} = \frac{2}{N}\Delta_{j,k}^{(l)} + 2\lambda\theta_{j,k}^{(l)}\]</span>
 y si <span class="math inline">\(k=0\)</span>,
@@ -1044,8 +1058,9 @@ derivadas de descenso en gradiente. Más
 específicamente, una variación, que es <em>descenso estocástico</em>.</p></li>
 <li><p>Que el algoritmo depende principalmente de multiplicaciones de matrices y
 acumulaciones implica que puede escalarse de diversas maneras. Una es paralelizando
-sobre la muestra de entrenamiento (y acumular acumulados al final), pero quizá la
-más importante actualmente es la de multiplicaciones de matrices.</p></li>
+sobre la muestra de entrenamiento (y acumular acumulados al final), pero también
+se puede paralelizar la de multiplicaciones de matrices (para lo cual los GPUs
+se prestan muy bien).</p></li>
 <li><p>Para redes neuronales, el gradiente se calcula con un algoritmo que se llama
 <em>back-propagation</em>, que es una aplicación de la regla de la cadena para propagar
 errores desde la capa de salida a lo largo de todas las capas para ajustar los pesos y sesgos.</p></li>
@@ -1060,7 +1075,7 @@ pesos entre neuronas y las conexiones correspondientes. Esto implica que necesar
 hay varios mínimos.</p></li>
 <li><p>Para este problema, no tiene sentido comenzar las iteraciones con todos los pesos
 igual a cero, pues las unidades de la red son simétricas: no hay nada que
-diferencie una de otra si todos los pesos son iguales. Esto quiere decir que si iteramos,
+distinga una de otra si todos los pesos son iguales. Esto quiere decir que si iteramos,
 ¡todas las neuronas van a aprender lo mismo!</p></li>
 <li><p>Es importante
 no comenzar valores de los pesos grandes, pues las funciones logísticas pueden
@@ -1145,24 +1160,24 @@ en tensorflow:</p>
 <pre class="sourceCode r"><code class="sourceCode r">score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_valid_s, y_valid)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.4681075
+## [1] 0.4893344
 ## 
 ## $acc
-## [1] 0.7831325
+## [1] 0.7891566
 ## 
 ## $binary_crossentropy
-## [1] 0.4413433</code></pre>
+## [1] 0.452496</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">predict_classes</span>(x_valid_s),y_valid) 
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 192  41
-##   1  31  68</code></pre>
+##   0 194  41
+##   1  29  68</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##             0         1
-##   0 0.8609865 0.3761468
-##   1 0.1390135 0.6238532</code></pre>
+##   0 0.8699552 0.3761468
+##   1 0.1300448 0.6238532</code></pre>
 <p>Es importante monitorear las curvas de aprendizaje (entrenamiento y
 validación) para diagnosticar mejoras:</p>
 <pre class="sourceCode r"><code class="sourceCode r">df_iteraciones &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(iteraciones)
@@ -1182,30 +1197,12 @@ en <em>Tensorflow</em> (que es lo que usa keras para hacer los cálculos):</p>
 )</code></pre>
 <p>y después puedes hacer:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tensorboard</span>(<span class="st">&quot;logs/diabetes/&quot;</span>)</code></pre>
-<pre><code>## Started TensorBoard at http://127.0.0.1:4490</code></pre>
 <div id="ejercicio-6" class="section level4 unnumbered">
 <h4>Ejercicio</h4>
 <p>Corre el ejemplo anterior con distintos parámetros de tasa de aprendizaje,
 número de unidades en las capas de intermedia y regularización (cambia
 arriba verbose=1 para monitorear al correr).</p>
 
-<div id="refs" class="references">
-<div>
-<p>Bishop, Christopher M. 2006. <em>Pattern Recognition and Machine Learning (Information Science and Statistics)</em>. Secaucus, NJ, USA: Springer-Verlag New York, Inc.</p>
-</div>
-<div>
-<p>Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep Learning</em>. MIT Press.</p>
-</div>
-<div>
-<p>Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2017. <em>The Elements of Statistical Learning</em>. Springer Series in Statistics. Springer New York Inc. <a href="http://web.stanford.edu/~hastie/ElemStatLearn/" class="uri">http://web.stanford.edu/~hastie/ElemStatLearn/</a>.</p>
-</div>
-<div>
-<p>James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. <em>An Introduction to Statistical Learning: With Applications in R</em>. Springer Publishing Company, Incorporated. <a href="http://www-bcf.usc.edu/~gareth/ISL/" class="uri">http://www-bcf.usc.edu/~gareth/ISL/</a>.</p>
-</div>
-<div>
-<p>Ng, Andrew. 2017. “Machine Learning.” <a href="https://www.coursera.org/learn/machine-learning" class="uri">https://www.coursera.org/learn/machine-learning</a>.</p>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -1215,8 +1212,8 @@ arriba verbose=1 para monitorear al correr).</p>
           </div>
         </div>
       </div>
-<a href="extensiones-para-regresion-lineal-y-logistica.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="extensiones-para-regresion-lineal-y-logistica.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="redes-neuronales-parte-2.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

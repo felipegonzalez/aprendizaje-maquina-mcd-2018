@@ -944,13 +944,13 @@ $$a^{(l+1)}_j = h(z^{(l+1)}_j)$$
 donde 
 $$z^{(l+1)} = \Theta^{(l)} a^{(l)},$$
 que coordenada a coordenada se escribe como
-$$z^{(l+1)}_j =  \sum_{k=0}^{n_{l-1}}  \theta_{j,k}^{(l)}  a^{(l)}_k$$
+$$z^{(l+1)}_j =  \sum_{k=0}^{n_{l}}  \theta_{j,k}^{(l)}  a^{(l)}_k$$
 
 #### Paso 1: Derivar respecto a capa $l+1$ {-}
 
 Como los valores de cada capa determinan los valores de salida y la devianza,
 podemos escribir (recordemos que $a_0^{(l)}=1$ es constante):
-$$D=D(a_0^{(l+1)},a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})=D(a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l}}^{(l+1)})$$
+$$D=D(a_0^{(l+1)},a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})=D(a_1^{(l+1)},a_2^{(l+1)},\ldots, a_{n_{l+1}}^{(l+1)})$$
 
 Así que por la regla de la cadena para varias variables:
 $$\frac{\partial D}{\partial \theta_{j,k}^{(l)}} =
@@ -991,7 +991,7 @@ Para obtener una fórmula recursiva para esta cantidad (hacia atrás),
 aplicamos otra vez regla de la cadena, pero con respecto a la capa $l$ (ojo: queremos obtener
 una fórmula recursiva!):  
 
-$$\frac{\partial D}{\partial a_j^{(l)}}= \sum_{s=1}^{n_l}
+$$\frac{\partial D}{\partial a_j^{(l)}}= \sum_{s=1}^{n_{l+1}}
 \frac{\partial D}{\partial a_s^{(l+1)}}\frac{\partial  a_s^{(l+1)}}{\partial a_j^{(l)}},$$
 
 que se puede entender a partir de este diagrama:
@@ -1050,7 +1050,7 @@ $$\delta_1^{(L)}=p - y.$$
 #### Paso 5: Cálculo de parciales {-}
 
 Finalmente, usando \@ref(eq:parcial), obtenemos
-$$\frac{\partial D}{\partial \theta_{j,k}^{(l)}} = \delta_j^{(l)}a_k^{(l-1)},$$
+$$\frac{\partial D}{\partial \theta_{j,k}^{(l+1)}} = \delta_j^{(l+1)}a_k^{(l)},$$
 
 y con esto ya podemos hacer backpropagation para calcular el gradiente
 sobre cada caso de entrenamiento, y solo resta acumular para obtener el gradiente
@@ -1085,7 +1085,7 @@ Para $i=1,\ldots, N$, tomamos el dato de entrenamiento  $(x^{(i)}, y^{(i)})$ y h
 3. Calculamos $\delta^{(L)}=a^{ (L)}-y^{(i)}$, y luego
 $\delta^{(L-1)},\ldots, \delta^{(2)}$ según la recursión \@ref(eq:delta-recursion).
 4. Acumulamos
-$\Delta_{j,k}^{(l)}=\Delta_{j,k}^{(l)} + \delta_j^{(l)}a_k^{(l-1)}$.
+$\Delta_{j,k}^{(l)}=\Delta_{j,k}^{(l)} + \delta_j^{(l+1)}a_k^{(l)}$.
 5. Finalmente, ponemos, si $k\neq 0$,
 $$D_{j,k}^{(l)} = \frac{2}{N}\Delta_{j,k}^{(l)} + 2\lambda\theta_{j,k}^{(l)}$$
 y si $k=0$,
@@ -1126,8 +1126,9 @@ específicamente, una variación, que es *descenso estocástico*.
 
 - Que el algoritmo depende principalmente de multiplicaciones de matrices y
 acumulaciones implica que puede escalarse de diversas maneras. Una es paralelizando
-sobre la muestra de entrenamiento (y acumular acumulados al final), pero quizá la
-más importante actualmente es la de multiplicaciones de matrices.
+sobre la muestra de entrenamiento (y acumular acumulados al final), pero también
+se puede paralelizar la de multiplicaciones de matrices (para lo cual los GPUs
+se prestan muy bien).
 
 - Para redes neuronales, el gradiente se calcula con un algoritmo que se llama
 *back-propagation*, que es una aplicación de la regla de la cadena para propagar
@@ -1146,7 +1147,7 @@ hay varios mínimos.
 
 - Para este problema, no tiene sentido comenzar las iteraciones con todos los pesos
 igual a cero, pues las unidades de la red son simétricas: no hay nada que
-diferencie una de otra si todos los pesos son iguales. Esto quiere decir que si iteramos,
+distinga una de otra si todos los pesos son iguales. Esto quiere decir que si iteramos,
 ¡todas las neuronas van a aprender lo mismo!
 
 - Es importante
@@ -1274,13 +1275,13 @@ score
 
 ```
 ## $loss
-## [1] 0.4681075
+## [1] 0.4893344
 ## 
 ## $acc
-## [1] 0.7831325
+## [1] 0.7891566
 ## 
 ## $binary_crossentropy
-## [1] 0.4413433
+## [1] 0.452496
 ```
 
 ```r
@@ -1291,8 +1292,8 @@ tab_confusion
 ```
 ##    y_valid
 ##       0   1
-##   0 192  41
-##   1  31  68
+##   0 194  41
+##   1  29  68
 ```
 
 ```r
@@ -1302,8 +1303,8 @@ prop.table(tab_confusion, 2)
 ```
 ##    y_valid
 ##             0         1
-##   0 0.8609865 0.3761468
-##   1 0.1390135 0.6238532
+##   0 0.8699552 0.3761468
+##   1 0.1300448 0.6238532
 ```
 
 Es importante monitorear las curvas de aprendizaje (entrenamiento y
@@ -1340,10 +1341,6 @@ y después puedes hacer:
 
 ```r
 tensorboard("logs/diabetes/")
-```
-
-```
-## Started TensorBoard at http://127.0.0.1:4490
 ```
 
 

@@ -6,9 +6,7 @@ En esta parte veremos aspectos más modernos de redes neuronales
  activaciones.
 
 ```{r, echo=FALSE, message=FALSE}
-library(tidyverse)
-knitr::opts_chunk$set(fig.width=7, fig.asp=0.7) 
-theme_set(theme_minimal())
+knitr::opts_chunk$set(fig.width=5, fig.asp=0.7) 
 ```
 
 ## Descenso estocástico
@@ -35,6 +33,9 @@ Antes de escribir el algoritmo mostramos una implementación para regresión log
 Usamos las mismas funciones para calcular devianza y gradiente.
 
 ```{r, message=FALSE, warning = FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 h <- function(x){1/(1+exp(-x))}
 # la devianza es la misma
 devianza_calc <- function(x, y){
@@ -772,7 +773,7 @@ ser que un pixel separe bien los casos que nos interesa clasificar).
 
 
 #### Ejemplo: dropout y regularización {-}
-Consideremos el problema de separar 8 y 3 del resto de dígitos zip.
+Consideremos el problema de separar 9 y 3 del resto de dígitos zip.
 Queremos comparar el desempeño de una red sin y con dropout (tanto de entradas
 como de capa oculta) y entender parcialmente cómo se comportan los pesos
 aprendidos:
@@ -782,9 +783,8 @@ aprendidos:
 set.seed(29123)
 entrena_3 <- digitos_entrena %>% sample_n(nrow(digitos_entrena)) %>%
   sample_n(3000)
-# escalamos entre 0 y 1
-x_train_3 <- ( entrena_3 %>% select(-digito) %>% as.matrix + 1 ) / 2
-y_train_3 <- (entrena_3$digito %in% c(3,8)) %>% as.numeric
+x_train_3 <- entrena_3 %>% select(-digito) %>% as.matrix + 1
+y_train_3 <- (entrena_3$digito %in% c(3,5)) %>% as.numeric
 set.seed(12)
 modelo_sin_reg <- keras_model_sequential() 
 modelo_sin_reg  %>% 
@@ -811,7 +811,7 @@ modelo_sin_reg %>% compile(loss = 'binary_crossentropy',
   optimizer = optimizer_sgd(lr = 0.5),
   metrics = c('accuracy')
 )
-history_1 <- modelo_sin_reg %>% fit(x_train_3, y_train_3, verbose=0,
+history_1 <- modelo_sin_reg %>% fit(x_train_3/2, y_train_3, verbose=0,
   epochs = 800, batch_size = 256, validation_split = 0.2
 )
 hist_1 <- as.data.frame(history_1)
@@ -819,11 +819,10 @@ ggplot(hist_1, aes(x=epoch, y=value, colour=data)) + geom_line() +
   facet_wrap(~metric, scales = 'free', ncol=1)
 ```
 
- En la siguiente imagen,
+Y parecen ruidosas las unidades que aprendió en la capa oculta (algunas no
+aprendieron o aprendieron cosas irrelevantes). En la siguiente imagen,
 cada pixel es un peso. Cada imagen agrupa los pesos de una unidad, y ordenamos
 los pesos según la variable de entrada (pixel) al que se multiplican.
-Los pesos aprendidos en la capa oculta parecen ruidosos, e incluso parece
-que hay unidades que no tienen mucho propósito:
 
 ```{r}
 graf_pesos <- function(pesos, mostrar_facets=FALSE){
@@ -861,16 +860,18 @@ modelo_dropout %>% compile(loss = 'binary_crossentropy',
                            optimizer = optimizer_sgd(lr = 0.5),
                            metrics = c('accuracy')
 )
-history_2 <- modelo_dropout %>% fit(x_train_3, y_train_3, verbose = 0,
-  epochs = 800, batch_size = 256, validation_split = 0.2)
+history_2 <- modelo_dropout %>% fit(x_train_3/2, y_train_3, verbose = 0,
+  epochs = 800, batch_size = 256, validation_split = 0.2,
+  callbacks = callback_tensorboard("logs/digits/run_2", write_images=TRUE),
+)
 
 hist_2 <- as.data.frame(history_2)
 ggplot(hist_2, aes(x=epoch, y=value, colour=data)) + geom_line() + 
   facet_wrap(~metric, scales = 'free')
 ```
 
-El desempeño es mejor, y  los patrones que aprendió
-en el capa oculta parecen ser más útiles:
+El desempeño es mejor, y parecen ser más útiles los patrones que aprendió
+el capa oculta:
 
 ```{r}
 pesos <- get_weights(modelo_dropout)[[1]]
@@ -887,13 +888,10 @@ graf_pesos(pesos[, pesos_capa_f > 0], mostrar_facets = TRUE)
 graf_pesos(pesos[, pesos_capa_f < -0], mostrar_facets = TRUE)
 ```
 
-
-Ahora veamos cómo se activan distintas unidades con diferentes entradas.
-En este caso, calculamos las activaciones de las 30 unidades ocultas para
-5 dígitos del conjunto de entrenamiento (una matriz de 30 por 5):
+Veamos cómo se activan distintas unidades con diferentes entradas:
 
 ```{r}
-indices <- c(2, 10, 16, 29, 30)
+indices <- c(10, 28, 3, 29, 16)
 entrena_3$digito[indices]
 dense_layer <- keras_model(inputs = modelo_dropout$input,
     outputs = get_layer(modelo_dropout, 'dense_1')$output)
@@ -902,17 +900,14 @@ dense_t <- t(dense_output)
 dense_t
 ```
 
-Y podemos graficar sólo aquellas unidades que están activas
-en cada caso:
 
 ```{r, warning = FALSE, message = FALSE}
 graf_pesos(pesos[, dense_t[ ,1] > 0], mostrar_facets = TRUE)
 graf_pesos(pesos[, dense_t[ ,2] > 0], mostrar_facets = TRUE)
 graf_pesos(pesos[, dense_t[ ,3] > 0], mostrar_facets = TRUE)
 graf_pesos(pesos[, dense_t[ ,4] > 0], mostrar_facets = TRUE)
-graf_pesos(pesos[, dense_t[ ,5] > 0], mostrar_facets = TRUE)
-
 ```
+
 
 #### Comentarios adicionales {-}
 Algunas maneras en que podemos pensar en la regularización de dropout:

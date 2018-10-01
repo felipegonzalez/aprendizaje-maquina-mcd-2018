@@ -826,12 +826,12 @@ de manera recursiva.
 ### Algoritmo de backpropagation
 
 ```{block2, type='comentario'}
-**Backpropagation** Para problema de clasificación con regularización $\lambda\geq 0 $.
-Para $i=1,\ldots, N$, tomamos el dato de entrenamiento  $(x^{(i)}, y^{(i)})$ y hacemos:
+**Backpropagation** Para problema de clasificación con regularización $ \lambda \geq 0 $.
+Para $i=1,\ldots, N,$ tomamos el dato de entrenamiento  $(x^{(i)}, y^{(i)})$ y hacemos:
 
 1. Ponemos $a^{(1)}=x^{(i)}$ (vector de entradas, incluyendo 1).
-2. Calculamos $a^{(2)},a^{(3)},\ldots, a^{(L)}$ usando feed forward para la entrada $x^{(i)}$
-3. Calculamos $\delta^{(L)}=a^{ (L)}-y^{(i)}$, y luego
+2. Calculamos $a^{(2)},a^{(3)},\ldots, a^{(L)}$ usando feed forward para la entrada $x^{(i)}.$
+3. Calculamos $\delta^{(L)}=a^{(L)}-y^{(i)}$, y luego
 $\delta^{(L-1)},\ldots, \delta^{(2)}$ según la recursión \@ref(eq:delta-recursion).
 4. Acumulamos
 $\Delta_{j,k}^{(l)}=\Delta_{j,k}^{(l)} + \delta_j^{(l+1)}a_k^{(l)}$.

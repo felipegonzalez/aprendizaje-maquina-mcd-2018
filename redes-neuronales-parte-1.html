@@ -931,7 +931,7 @@ dependen de <span class="math inline">\(\theta_{j,k}^{(l)}\)</span>),</p>
 <span class="math display">\[a_j^{(l+1)} = h(z_j^{(l+1)}) = h\left (\sum_{k=0}^{n_{l}}  \theta_{j,k}^{(l)}  a^{(l)}_k \right )\]</span>
 y las <span class="math inline">\(a_k^{(l)}\)</span> no dependen de <span class="math inline">\(\theta_{j,k}^{(l)}\)</span>, tenemos por la regla de la cadena que
 <span class="math display">\[\begin{equation}
-\frac{\partial a_j^{(l)}}{\partial \theta_{j,k}^{(l)} } = h&#39;(z_j^{(l+1)})a_k^{(l)}.
+\frac{\partial a_j^{(l+1)}}{\partial \theta_{j,k}^{(l)} } = h&#39;(z_j^{(l+1)})a_k^{(l)}.
 \end{equation}\]</span></p>
 <p>Esta última expresión podemos calcularla pues sólo requiere la derivada de <span class="math inline">\(h\)</span> y
 los valores otenidos en el paso de feed-forward.</p>
@@ -986,7 +986,7 @@ para <span class="math inline">\(j=1,2,\ldots, n_{l}\)</span>.</p>
 <div id="paso-5-calculo-de-parciales" class="section level4 unnumbered">
 <h4>Paso 5: Cálculo de parciales</h4>
 <p>Finalmente, usando <a href="redes-neuronales-parte-1.html#eq:parcial">(7.1)</a>, obtenemos
-<span class="math display">\[\frac{\partial D}{\partial \theta_{j,k}^{(l+1)}} = \delta_j^{(l+1)}a_k^{(l)},\]</span></p>
+<span class="math display">\[\frac{\partial D}{\partial \theta_{j,k}^{(l)}} = \delta_j^{(l+1)}a_k^{(l)},\]</span></p>
 <p>y con esto ya podemos hacer backpropagation para calcular el gradiente
 sobre cada caso de entrenamiento, y solo resta acumular para obtener el gradiente
 sobre la muestra de entrenamiento.</p>
@@ -1138,7 +1138,7 @@ modelo_tc <span class="op">%&gt;%</span><span class="st"> </span>
               <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(<span class="dt">l =</span> <span class="fl">1e-3</span>), 
               <span class="dt">kernel_initializer =</span> <span class="kw">initializer_random_uniform</span>(<span class="dt">minval =</span> <span class="fl">-0.5</span>, <span class="dt">maxval =</span> <span class="fl">0.5</span>)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">1</span>, <span class="dt">activation =</span> <span class="st">&#39;sigmoid&#39;</span>,
-              <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(<span class="dt">l =</span> <span class="fl">1e-4</span>),
+              <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(<span class="dt">l =</span> <span class="fl">1e-3</span>),
               <span class="dt">kernel_initializer =</span> <span class="kw">initializer_random_uniform</span>(<span class="dt">minval =</span> <span class="fl">-0.5</span>, <span class="dt">maxval =</span> <span class="fl">0.5</span>)
 )</code></pre>
 <p>Ahora difinimos la función de pérdida (devianza es equivalente a entropía
@@ -1154,30 +1154,30 @@ en tensorflow:</p>
   x_ent_s, y_ent, 
   <span class="co">#batch size mismo que nrow(x_ent_s) es descenso en grad.</span>
   <span class="dt">epochs =</span> <span class="dv">1000</span>, <span class="dt">batch_size =</span> <span class="kw">nrow</span>(x_ent_s), 
-  <span class="dt">verbose =</span> <span class="dv">0</span>,
+  <span class="dt">verbose =</span> <span class="dv">1</span>,
   <span class="dt">validation_data =</span> <span class="kw">list</span>(x_valid_s, y_valid)
 )</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_valid_s, y_valid)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.4661414
+## [1] 0.4780706
 ## 
 ## $acc
-## [1] 0.7861446
+## [1] 0.7891566
 ## 
 ## $binary_crossentropy
-## [1] 0.4411527</code></pre>
+## [1] 0.4359964</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">predict_classes</span>(x_valid_s),y_valid) 
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 192  40
-##   1  31  69</code></pre>
+##   0 195  42
+##   1  28  67</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##             0         1
-##   0 0.8609865 0.3669725
-##   1 0.1390135 0.6330275</code></pre>
+##   0 0.8744395 0.3853211
+##   1 0.1255605 0.6146789</code></pre>
 <p>Es importante monitorear las curvas de aprendizaje (entrenamiento y
 validación) para diagnosticar mejoras:</p>
 <pre class="sourceCode r"><code class="sourceCode r">df_iteraciones &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(iteraciones)
@@ -1260,7 +1260,7 @@ gitbook.start({
     var script = document.createElement("script");
     script.type = "text/javascript";
     var src = "true";
-    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
     if (location.protocol !== "file:" && /^https?:/.test(src))
       src = src.replace(/^https?:/, '');
     script.src = src;

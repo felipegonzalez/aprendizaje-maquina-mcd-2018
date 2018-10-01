@@ -976,7 +976,7 @@ Adicionalmente, como
 $$a_j^{(l+1)} = h(z_j^{(l+1)}) = h\left (\sum_{k=0}^{n_{l}}  \theta_{j,k}^{(l)}  a^{(l)}_k \right )$$
 y las $a_k^{(l)}$ no dependen de $\theta_{j,k}^{(l)}$, tenemos por la regla de la cadena que
 \begin{equation}
-\frac{\partial a_j^{(l)}}{\partial \theta_{j,k}^{(l)} } = h'(z_j^{(l+1)})a_k^{(l)}.
+\frac{\partial a_j^{(l+1)}}{\partial \theta_{j,k}^{(l)} } = h'(z_j^{(l+1)})a_k^{(l)}.
 \end{equation}
 
 Esta última expresión podemos calcularla pues sólo requiere la derivada de $h$ y 
@@ -1050,7 +1050,7 @@ $$\delta_1^{(L)}=p - y.$$
 #### Paso 5: Cálculo de parciales {-}
 
 Finalmente, usando \@ref(eq:parcial), obtenemos
-$$\frac{\partial D}{\partial \theta_{j,k}^{(l+1)}} = \delta_j^{(l+1)}a_k^{(l)},$$
+$$\frac{\partial D}{\partial \theta_{j,k}^{(l)}} = \delta_j^{(l+1)}a_k^{(l)},$$
 
 y con esto ya podemos hacer backpropagation para calcular el gradiente
 sobre cada caso de entrenamiento, y solo resta acumular para obtener el gradiente
@@ -1236,7 +1236,7 @@ modelo_tc %>%
               kernel_regularizer = regularizer_l2(l = 1e-3), 
               kernel_initializer = initializer_random_uniform(minval = -0.5, maxval = 0.5)) %>%
   layer_dense(units = 1, activation = 'sigmoid',
-              kernel_regularizer = regularizer_l2(l = 1e-4),
+              kernel_regularizer = regularizer_l2(l = 1e-3),
               kernel_initializer = initializer_random_uniform(minval = -0.5, maxval = 0.5)
 )
 ```
@@ -1262,7 +1262,7 @@ iteraciones <- modelo_tc %>% fit(
   x_ent_s, y_ent, 
   #batch size mismo que nrow(x_ent_s) es descenso en grad.
   epochs = 1000, batch_size = nrow(x_ent_s), 
-  verbose = 0,
+  verbose = 1,
   validation_data = list(x_valid_s, y_valid)
 )
 ```
@@ -1275,13 +1275,13 @@ score
 
 ```
 ## $loss
-## [1] 0.4661414
+## [1] 0.4780706
 ## 
 ## $acc
-## [1] 0.7861446
+## [1] 0.7891566
 ## 
 ## $binary_crossentropy
-## [1] 0.4411527
+## [1] 0.4359964
 ```
 
 ```r
@@ -1292,8 +1292,8 @@ tab_confusion
 ```
 ##    y_valid
 ##       0   1
-##   0 192  40
-##   1  31  69
+##   0 195  42
+##   1  28  67
 ```
 
 ```r
@@ -1303,8 +1303,8 @@ prop.table(tab_confusion, 2)
 ```
 ##    y_valid
 ##             0         1
-##   0 0.8609865 0.3669725
-##   1 0.1390135 0.6330275
+##   0 0.8744395 0.3853211
+##   1 0.1255605 0.6146789
 ```
 
 Es importante monitorear las curvas de aprendizaje (entrenamiento y

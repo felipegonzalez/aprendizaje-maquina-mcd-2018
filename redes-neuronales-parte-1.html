@@ -961,20 +961,22 @@ conocemos por backpropagation.</p>
 </div>
 <div id="paso-3-simplificacion-de-la-recursion" class="section level4 unnumbered">
 <h4>Paso 3: Simplificación de la recursión</h4>
-<p>Denotaremos
-<span class="math display">\[\delta_s^{ (l+1)}=\frac{\partial D}{\partial a_s^{(l+1)}} h&#39;(z_s^{(l+1)})\]</span></p>
-<p>de manera que la ecuación recursiva es
-<span class="math display" id="eq:delta-def">\[\begin{equation}
-\frac{\partial D}{\partial a_j^{(l)}} = \sum_{s=1}^{n_{l+1}}
-\delta_s^{(l+1)}\theta_{s,j}^{(l)}.
+<p><span class="math display" id="eq:delta-def-a">\[\begin{equation}
+\delta_s^{ (l+1)}=\frac{\partial D}{\partial a_s^{(l+1)}} h&#39;(z_s^{(l+1)})
   \tag{7.2}
 \end{equation}\]</span></p>
-<p>Tenemos que si <span class="math inline">\(l=2,\ldots,L-1\)</span>, entonces podemos escribir (usando <a href="redes-neuronales-parte-1.html#eq:delta-def">(7.2)</a>)
+<p>de manera que la ecuación recursiva es</p>
+<p><span class="math display" id="eq:delta-def">\[\begin{equation}
+\frac{\partial D}{\partial a_j^{(l)}} = \sum_{s=1}^{n_{l+1}}
+\delta_s^{(l+1)}\theta_{s,j}^{(l)}.
+  \tag{7.3}
+\end{equation}\]</span></p>
+<p>Tenemos que si <span class="math inline">\(l=2,\ldots,L-1\)</span>, entonces podemos escribir (usando <a href="redes-neuronales-parte-1.html#eq:delta-def">(7.3)</a>)
 como fórmula recursiva:</p>
 <p><span class="math display" id="eq:delta-recursion">\[\begin{equation}
 \delta_j^{(l)} 
 = \left (\sum_{s=1}^{n_l} \delta_s^{(l+1)} \theta_{s,j}^{(l)}\right ) h&#39;(z_j^{(l)}),
-  \tag{7.3}
+  \tag{7.4}
 \end{equation}\]</span>
 para <span class="math inline">\(j=1,2,\ldots, n_{l}\)</span>.</p>
 </div>
@@ -985,7 +987,7 @@ para <span class="math inline">\(j=1,2,\ldots, n_{l}\)</span>.</p>
 </div>
 <div id="paso-5-calculo-de-parciales" class="section level4 unnumbered">
 <h4>Paso 5: Cálculo de parciales</h4>
-<p>Finalmente, usando <a href="redes-neuronales-parte-1.html#eq:parcial">(7.1)</a>, obtenemos
+<p>Finalmente, usando <a href="redes-neuronales-parte-1.html#eq:parcial">(7.1)</a> y <a href="redes-neuronales-parte-1.html#eq:delta-def-a">(7.2)</a> , obtenemos
 <span class="math display">\[\frac{\partial D}{\partial \theta_{j,k}^{(l)}} = \delta_j^{(l+1)}a_k^{(l)},\]</span></p>
 <p>y con esto ya podemos hacer backpropagation para calcular el gradiente
 sobre cada caso de entrenamiento, y solo resta acumular para obtener el gradiente
@@ -996,11 +998,11 @@ sobre la muestra de entrenamiento.</p>
 <h4>Paso 6: Versión matricial</h4>
 <p>Ahora podemos escribir estas ecuaciones en forma vectorial. En primer lugar,
 <span class="math display">\[\delta^{(L)}=p-y.\]</span>
-Y además se puede ver de la ecuación <a href="redes-neuronales-parte-1.html#eq:delta-recursion">(7.3)</a> que
+Y además se puede ver de la ecuación <a href="redes-neuronales-parte-1.html#eq:delta-recursion">(7.4)</a> que
 (<span class="math inline">\(\Theta_{*}^{(l+1)}\)</span> denota la matriz de pesos <em>sin</em> la columna correspondiente al sesgo):</p>
 <p><span class="math display" id="eq:delta-recursion-mat">\[\begin{equation}
 \delta^{(l)}=\left( \Theta_{*}^{(l)}    \right)^t\delta^{(l+1)} \circ h&#39;(z^{(l)})
-\tag{7.4}
+\tag{7.5}
 \end{equation}\]</span></p>
 <p>donde <span class="math inline">\(\circ\)</span> denota el producto componente a componente.</p>
 <p>Ahora todo ya está calculado. Lo interesante es que las <span class="math inline">\(\delta^{(l)}\)</span> se calculan
@@ -1017,7 +1019,7 @@ Para <span class="math inline">\(i=1,\ldots, N\)</span>, tomamos el dato de entr
 <li>Ponemos <span class="math inline">\(a^{(1)}=x^{(i)}\)</span> (vector de entradas, incluyendo 1).</li>
 <li>Calculamos <span class="math inline">\(a^{(2)},a^{(3)},\ldots, a^{(L)}\)</span> usando feed forward para la entrada <span class="math inline">\(x^{(i)}\)</span></li>
 <li>Calculamos <span class="math inline">\(\delta^{(L)}=a^{ (L)}-y^{(i)}\)</span>, y luego
-<span class="math inline">\(\delta^{(L-1)},\ldots, \delta^{(2)}\)</span> según la recursión <a href="redes-neuronales-parte-1.html#eq:delta-recursion">(7.3)</a>.</li>
+<span class="math inline">\(\delta^{(L-1)},\ldots, \delta^{(2)}\)</span> según la recursión <a href="redes-neuronales-parte-1.html#eq:delta-recursion">(7.4)</a>.</li>
 <li>Acumulamos
 <span class="math inline">\(\Delta_{j,k}^{(l)}=\Delta_{j,k}^{(l)} + \delta_j^{(l+1)}a_k^{(l)}\)</span>.</li>
 <li>Finalmente, ponemos, si <span class="math inline">\(k\neq 0\)</span>,
@@ -1160,24 +1162,24 @@ en tensorflow:</p>
 <pre class="sourceCode r"><code class="sourceCode r">score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_valid_s, y_valid)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.4780706
+## [1] 0.4752598
 ## 
 ## $acc
-## [1] 0.7891566
+## [1] 0.7771084
 ## 
 ## $binary_crossentropy
-## [1] 0.4359964</code></pre>
+## [1] 0.4362988</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">predict_classes</span>(x_valid_s),y_valid) 
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 195  42
-##   1  28  67</code></pre>
+##   0 191  42
+##   1  32  67</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##             0         1
-##   0 0.8744395 0.3853211
-##   1 0.1255605 0.6146789</code></pre>
+##   0 0.8565022 0.3853211
+##   1 0.1434978 0.6146789</code></pre>
 <p>Es importante monitorear las curvas de aprendizaje (entrenamiento y
 validación) para diagnosticar mejoras:</p>
 <pre class="sourceCode r"><code class="sourceCode r">df_iteraciones &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(iteraciones)

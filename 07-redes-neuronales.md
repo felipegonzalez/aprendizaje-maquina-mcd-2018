@@ -1018,10 +1018,13 @@ conocemos por backpropagation.
 #### Paso 3: Simplificación de la recursión {-}
 
 
-Denotaremos
-$$\delta_s^{ (l+1)}=\frac{\partial D}{\partial a_s^{(l+1)}} h'(z_s^{(l+1)})$$
+\begin{equation}
+\delta_s^{ (l+1)}=\frac{\partial D}{\partial a_s^{(l+1)}} h'(z_s^{(l+1)})
+  (\#eq:delta-def-a)
+\end{equation}
 
 de manera que la ecuación recursiva es
+
 \begin{equation}
 \frac{\partial D}{\partial a_j^{(l)}} = \sum_{s=1}^{n_{l+1}}
 \delta_s^{(l+1)}\theta_{s,j}^{(l)}.
@@ -1049,7 +1052,7 @@ $$\delta_1^{(L)}=p - y.$$
 
 #### Paso 5: Cálculo de parciales {-}
 
-Finalmente, usando \@ref(eq:parcial), obtenemos
+Finalmente, usando \@ref(eq:parcial) y \@ref(eq:delta-def-a) , obtenemos
 $$\frac{\partial D}{\partial \theta_{j,k}^{(l)}} = \delta_j^{(l+1)}a_k^{(l)},$$
 
 y con esto ya podemos hacer backpropagation para calcular el gradiente
@@ -1275,13 +1278,13 @@ score
 
 ```
 ## $loss
-## [1] 0.4780706
+## [1] 0.4752598
 ## 
 ## $acc
-## [1] 0.7891566
+## [1] 0.7771084
 ## 
 ## $binary_crossentropy
-## [1] 0.4359964
+## [1] 0.4362988
 ```
 
 ```r
@@ -1292,8 +1295,8 @@ tab_confusion
 ```
 ##    y_valid
 ##       0   1
-##   0 195  42
-##   1  28  67
+##   0 191  42
+##   1  32  67
 ```
 
 ```r
@@ -1303,8 +1306,8 @@ prop.table(tab_confusion, 2)
 ```
 ##    y_valid
 ##             0         1
-##   0 0.8744395 0.3853211
-##   1 0.1255605 0.6146789
+##   0 0.8565022 0.3853211
+##   1 0.1434978 0.6146789
 ```
 
 Es importante monitorear las curvas de aprendizaje (entrenamiento y

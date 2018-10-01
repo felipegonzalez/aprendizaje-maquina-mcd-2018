@@ -524,13 +524,13 @@ capa 2 (en gris están los sesgos):
 
 
 Que en nuestra notación escribimos como
-$$a^{(2)}_0 = 1, a^{(2)}_1 = -2, a^{(2)}_2 = 5, a^{(2)}=3$$
+$$a^{(2)}_0 = 1, a^{(2)}_1 = -2, a^{(2)}_2 = 5, a^{(2)}_3=3$$
 y los pesos son, para la primera unidad:
 $$\theta^{(2)}_{1,0} = 3,  \,\,\, \theta^{(2)}_{1,1} = 1.5,\,\,\,\theta^{(2)}_{1,2} = -1,\,\,\theta^{(2)}_{1,3} = -0.5 $$
 y para la segunda unidad
 $$\theta^{(2)}_{2,0} = 1,  \,\,\, \theta^{(2)}_{2,1} = 2,\,\,\,\theta^{(2)}_{2,2} = 0.5,\,\, \theta^{(2)}_{2,3} = -0.2$$
 Y ahora queremos calcular los valores que toman las unidades de la capa 3, 
-que son $a^{(3)}_1$ y  $a^{(3)}_2$$
+que son $a^{(3)}_1$ y  $a^{(3)}_2$
 
 Para hacer feed forward a la siguiente capa, hacemos entonces
 
@@ -557,7 +557,7 @@ a_3
  gr <- graph(
    c(c(1,4,1,5,2,4,2,5,3,4,3,5, 6, 4, 6, 5)))
  plot(gr, layout = matrix(c(-4,1,-4,0,-4,-2,0,1,0,-1, -4, -1), byrow=T, ncol=2),
-      vertex.label=c('-2','5','1','a_1= 0.002','a_2=0.250','3'), vertex.label.cex=1.5,
+      vertex.label=c('-2','5','1',expression(a[1]=0.002),expression(a[2]=0.250),'3'), vertex.label.cex=1.5,
       vertex.size=50, vertex.color=c('salmon','salmon','gray','red','red'), vertex.label.cex=2,
       vertex.label.color='white',vertex.frame.color=NA,
    edge.label=c(1.5,2,-1,0.5,3,1,-0.5,-0.2))

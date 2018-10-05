@@ -24,7 +24,7 @@ library(igraph)
 1. Escribe cada $\theta_{i,j}^{(l)}$ según la notación de clase e identifica su valor. Por ejemplo, tenemos que $\theta^{(1)}_{1,0} = 0$ (tienes que escribir 7 valores como este). Escribe las matrices $\Theta^{(1)}$ y $\Theta^{(2)}$
 
 2. Supón que tenemos un caso (observación) con $(x, p)=(1, 0)$. ¿Qué es $a_1^{(1)}$? Haz forward feed para calcular los valores de $a_1^{(2)}$, $a_2^{(2)}$ y $p=a_1^{(3)}$.
-3. Calcula la devianza para el caso $(x, p)=(1, 0)$
+3. Calcula la devianza para el caso $(x, y)=(1, 0)$
 4. Según el cálculo que hiciste en 2 y 3, intuitivamente, ¿qué conviene hacer con los dos últimos pesos de la última capa para reducir la devianza? ¿Incrementarlos o disminuirlos? 
 5. Según tu cálculo de 2, y 3, ¿qué conviene hacer con
 las unidades

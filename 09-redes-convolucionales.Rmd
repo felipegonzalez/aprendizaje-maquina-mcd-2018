@@ -220,19 +220,22 @@ de la siguiente capa.
 
 Entonces, supongamos que un filtro de 3x3 está dado por ciertos pesos
 
-$$ f = \left[ {\begin{array}{ccccc}
+$$ 
+f = \left[ {\begin{array}{ccccc}
 \theta_{1,1} & \theta_{1,2} & \theta_{1,3} \\
 \theta_{2,1} & \theta_{2,2} & \theta_{2,3} \\
 \theta_{3,1} & \theta_{3,2} & \theta_{3,3} \\
 \end{array} } \right]
 $$
 
+
+
 Este filtro lo aplicaremos a cada parche de la imagen de entrada. Empezamos
 aplicando el filtro sobre la parte superior izquierda de la imagen para
 calcular la primera unidad de salida $a_1$
 
 ```{r}
-knitr::include_graphics('./imagenes/conv_1.png')
+knitr::include_graphics('./figuras/conv_1.png')
 ```
 
 Ahora nos movemos un pixel a la derecha y aplicamos el filtro para
@@ -240,21 +243,21 @@ obtener la unidad $a_2$. Podemos poner las unidades en el orden de la imagen
 para entender mejor las unidades:
 
 ```{r}
-knitr::include_graphics('./imagenes/conv_2.png')
+knitr::include_graphics('./figuras/conv_2.png')
 ```
 
 Al aplicar el filtro a lo  largo de toda la imagen, obtenemos 9 unidades
 de salida:
 
 ```{r}
-knitr::include_graphics('./imagenes/conv_3.png')
+knitr::include_graphics('./figuras/conv_3.png')
 ```
 
 
 Finalmente, podemos agregar más parámetros para otros filtros:
 
 ```{r}
-knitr::include_graphics('./imagenes/conv_4.png')
+knitr::include_graphics('./figuras/conv_4.png')
 ```
 
 
@@ -267,7 +270,7 @@ de las más populares es el max pooling, donde en cada parche de la imagen
 tomamos el máximo.
 
 ```{r}
-knitr::include_graphics('./imagenes/pooling_1.png')
+knitr::include_graphics('./figuras/pooling_1.png')
 ```
 
 
@@ -289,7 +292,7 @@ que detectan patrones simples, para obtener unidades que se encargan de
 detectar patrones más complejos.
 
 ```{r}
-knitr::include_graphics('./imagenes/lenet_1.png')
+knitr::include_graphics('./figuras/lenet_1.png')
 ```
 
 

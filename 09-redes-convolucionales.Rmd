@@ -326,28 +326,38 @@ y_test <- to_categorical(digitos_prueba$digito, 10)
 ```
 
 Para fines de interpretación, agregaremos regularización ridge además
-de dropout (puedes obtener buen desempeño usando solamente dropout):
+de dropout (puedes obtener buen desempeño usando solamente dropout), 
+y usaremos una arquitectura un poco más simple:
 
 ```{r}
-usar_cache <- TRUE
+# reproducibilidad en keras es más difícil, pues hay varias capas de software
+# set.seed no funciona. Podemos usar use_session_with_seed https://keras.rstudio.com/articles/faq.html#how-can-i-obtain-reproducible-results-using-keras-during-development
+#
+use_session_with_seed(7288)
+usar_cache <- FALSE
 if(!usar_cache){
     # correr modelo y guardarlo serializado
     set.seed(213)
     model_2 <- keras_model_sequential() 
     model_2 %>%
-      layer_conv_2d(filters = 8, kernel_size = c(5,5), activation = 'relu',
-                  input_shape = c(16,16,1), padding ='same',
-                  kernel_regularizer = regularizer_l2(0.01) ) %>%
-      layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
+      layer_conv_2d(filters = 8, kernel_size = c(5,5), 
+                    activation = 'relu',
+                    input_shape = c(16,16,1), 
+                    padding ='same',
+                    kernel_regularizer = regularizer_l2(0.01)) %>%
+      layer_max_pooling_2d(pool_size = c(2, 2), name = 'conv_1') %>% 
       layer_dropout(rate = 0.25) %>% 
-      layer_conv_2d(filters = 12, kernel_size = c(3,3), activation = 'relu',
+      layer_conv_2d(filters = 4, kernel_size = c(3,3), 
+                    activation = 'relu',
+                    padding = 'same',
                     kernel_regularizer = regularizer_l2(0.01)) %>% 
-      layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
+      layer_max_pooling_2d(pool_size = c(2, 2), name = 'conv_2') %>% 
       layer_dropout(rate = 0.25) %>% 
       layer_flatten() %>% 
-      layer_dense(units = 100, activation = 'relu') %>%
+      layer_dense(units = 20, activation = 'relu') %>%
       layer_dropout(rate = 0.5) %>%
-      layer_dense(units = 10, activation = 'softmax')
+      layer_dense(units = 10, activation = 'softmax', 
+                  kernel_regularizer = regularizer_l2(0.01))
     
     model_2 %>% compile(
       loss = 'categorical_crossentropy',
@@ -356,7 +366,8 @@ if(!usar_cache){
     )
     history <- model_2 %>% fit(
       x_train, y_train, 
-      epochs = 200, batch_size = 256, 
+      epochs = 400, batch_size = 256, 
+      verbose = 0,
       validation_data = list(x_test, y_test)
     )
     model_serialized <- serialize_model(model_2)
@@ -373,68 +384,112 @@ score_entrena <- model_2 %>% evaluate(x_train, y_train)
 score_entrena
 ```
 
+### Conteo de parámetros {-}
+
+En pimer lugar, contemos el número de parámetros. Podemos ver los
+matrices donde están guardados los pesos:
+```{r}
+wts <- get_weights(model_2)
+lapply(wts, dim)
+```
+
+1. La primera capa convolucional está construida con `r dim(wts[[1]])[4]` filtros, cada uno  de tamaño `r dim(wts[[1]])[1:2]`. Adicionalmente, tenemos los
+`r dim(wts[[2]])` sesgos.
+2. La segunda capa convolucional está construida con `r dim(wts[[3]])[4]` filtros, cada uno de tamaño `r dim(wts[[3]])[1:2]`, para cada una 
+de las `r dim(wts[[3]])[4]` imágenes filtradas de la capa anterior.
+Adicionalmente, tenemos los
+`r dim(wts[[4]])` sesgos.
+
+```{r}
+num_params <- sapply(wts, function(x){ length(as.numeric(x))})
+num_params
+```
+
+1. En la primera capa convolucional
+tenemos `r num_params[1]` pesos más
+`r num_params[2]` sesgos, para un total de `r sum(num_params[1:2])` parámetros. Esto es porque tenemos 
+2. En la segunda capa convolucional tenemos `r num_params[3]` pesos más
+`r num_params[4]` sesgos, para un total de `r sum(num_params[3:4])` parámetros.
+3. En la primera capa densa tenemos `r num_params[5]` pesos más
+`r num_params[6]` sesgos, para un total de `r sum(num_params[5:6])` parámetros.
+4. En la segunda capa densa tenemos `r num_params[7]` pesos más
+`r num_params[8]` sesgos, para un total de `r sum(num_params[7:8])` parámetros.
+
+El total de parámetros es `r sum(num_params)`. Recalcula para confirmar
+este conteo de número de parámetros.
+
+**Observación**: la segunda capa convolucional trata cada una de las
+8 "imágenes" filtradas como una nueva imagen. Cada una de ella tendrá
+12 filtros asociados, y estos 12 filtros se suman para producir
+las activaciones de la capa de salida de esta segunda convolución.
+
+### Pesos y activaciones {-}
+
 Y ahora graficamos los filtros aprendidos en la primera capa:
 
-```{r, fig.width=4}
+```{r, fig.width=4, message=FALSE, warning=FALSE}
 library(scales)
-wts <- get_weights(model_2)
+
 capa_1 <- wts[[1]] 
 capa_list <- lapply(1:8, function(i){
     data_frame(val = as.numeric(t(capa_1[,,1,i])), pixel = 1:25, unidad=i)
 }) %>% 
     bind_rows %>% 
     mutate(y = (pixel-1) %% 5, x = (pixel-1) %/% 5) %>%
-     group_by(unidad) %>% mutate(val = (val-mean(val))/sd(val))
+     group_by(unidad)
 capa_list
-ggplot(capa_list, aes(x=x, y=-y)) + geom_raster(aes(fill=val), interpolate=FALSE) + 
-  facet_wrap(~unidad, ncol=4) + coord_equal()+scale_fill_gradient2(low = "black", mid='gray50',high = "white")    
-
+graficar_pesos <- function(capa_list){
+    ggplot(capa_list, aes(x=x, y=-y)) + 
+        geom_raster(aes(fill=val), interpolate=FALSE) + 
+        facet_wrap(~unidad, ncol=4) + 
+        coord_equal() + 
+        scale_fill_gradient2(low = "red", mid='gray80',high = "black")   
+}
+graficar_pesos(capa_list)
 ```
 
-
-Podemos ver las activaciones de la primera capa para algunos dígitos (después de 
-pooling):
+Nota que estos son detectores de formas geométricas simples (diagonales, rectas). Podemos ver las activaciones de la primera capa para algunos dígitos:
 
 ```{r}
-capa <- keras_model_sequential()
-capa %>%
-  layer_conv_2d(filters = 8, kernel_size = c(5,5), activation = 'relu',
-              input_shape = c(16,16,1), padding='same',weights = wts[1:2]) %>%
-  layer_max_pooling_2d()
-probas <- predict_proba(capa, x_train[1:50,,,,drop=FALSE])
+red_conv_1 <- keras_model(inputs = model_2$input,
+    outputs = get_layer(model_2, 'conv_1')$output)
+activaciones_1 <- predict(red_conv_1, x_train[1:50,,,,drop=FALSE])
 
-graf_activaciones <- function(probas, ind){
-  probas_ind <- probas[ind,,,] # drop primera dimensión
+graf_activaciones <- function(activaciones, ind){
+  probas_ind <- activaciones[ind,,,] # drop primera dimensión
   x_tamaño <- dim(probas_ind)[1]
   y_tamaño <- dim(probas_ind)[2]
   num_filtros <- dim(probas_ind)[3]
   unidades_df <- lapply(1:dim(probas_ind)[3], function(i){
     mat <- t(probas_ind[,,i])
-    data_frame(val = as.numeric(mat), pixel = 1:(8*8), unidad = i) %>%
-      mutate(y = (pixel-1) %% 8, x = (pixel-1) %/% 8)  %>%
-      group_by(unidad) %>% mutate(val=(val-mean(val))/sd(val))
+    data_frame(val = as.numeric(mat), pixel = 1:(x_tamaño*y_tamaño), 
+               unidad = i) %>%
+      mutate(y = (pixel-1) %% x_tamaño, x = (pixel-1) %/% y_tamaño)  %>%
+      group_by(unidad) 
   })
   dat <- bind_rows(unidades_df)
   ggplot(dat, aes(x=x, y=-y, fill=val)) + geom_tile() + facet_wrap(~unidad) +
-    scale_fill_gradient2(low = "black", mid='gray20',high = "white") + coord_equal()
+    scale_fill_gradient(low = "white", high = "blue") + 
+    coord_equal()
 }
-graf_activaciones(probas, 4)
-graf_activaciones(probas, 5)
-graf_activaciones(probas, 15)
-graf_activaciones(probas, 8)
-graf_activaciones(probas, 33)
-
-#image((x_train[4,1:16,16:1,1]))
+graf_activaciones(activaciones_1, 4)
+graf_activaciones(activaciones_1, 5)
+graf_activaciones(activaciones_1, 15)
+graf_activaciones(activaciones_1, 8)
+graf_activaciones(activaciones_1, 33)
 ```
 
+La segunda es capa de convolución es más difícil de interpretar. En esta
+capa, cada unidad de salida es combinación del filtrado de las
+8 "imágenes" de la capa anterior.
 
-Y los filtros aprendidos en la segunda capa son:
+Los filtros aprendidos en la segunda capa son:
 ```{r}
 capa_2 <- wts[[3]] 
 out <- list()
 for(j in 1:8){
   out_temp <- list()
-  for(i in 1:12){
+  for(i in 1:4){
   dat_lay <- data_frame(val = as.numeric(capa_2[,,j,i]), 
     pixel = 1:9, unidad=i, origen = j) %>% 
     mutate(y = (pixel-1) %% 3, x = (pixel-1) %/% 3) 
@@ -443,38 +498,58 @@ for(j in 1:8){
   out[[j]] <- bind_rows(out_temp)
 }
 capa_out <- bind_rows(out)
-ggplot(capa_out, aes(x = x, y = -y)) + geom_tile(aes(fill = (val))) + 
-  facet_grid(origen ~ unidad) + coord_equal()+scale_fill_gradient2(low = "black", mid='gray70',high = "white") + theme(strip.background = element_blank(), strip.text = element_blank())    
+ggplot(capa_out, aes(x = x, y = -y)) + 
+  geom_tile(aes(fill = (val))) + 
+  facet_grid(origen ~ unidad) + 
+  coord_equal() +
+  scale_fill_gradient2(low = "red", mid='gray80',high = "black") +
+  theme(strip.background = element_blank(), strip.text = element_blank())   
 ```
 
-Por ejemplo, consideremos los filtros que se aplican a la
-unidad 2 de capa anterior:
+Por ejemplo, consideremos los filtros de
+la primera y la cuarta unidad de salida:
 ```{r}
-ggplot(capa_out %>% filter(origen == 7), 
+ggplot(capa_out %>% filter(unidad %in% c(1,4)), 
     aes(x = x, y = -y)) + geom_tile(aes(fill = (val))) + 
   facet_grid(origen ~ unidad) + coord_equal()+
-  scale_fill_gradient2(low = "black", mid='gray70',high = "white") + 
+  scale_fill_gradient2(low = "red", mid='gray70',high = "black") + 
   theme(strip.background = element_blank(), strip.text = element_blank())    
 ```
 
-Y veamos las activaciones de las siguiente capa:
+El primer filtro produce valores altos de activación cuando, en
+la salida de la primera capa de convolución:
 
+- Las unidades 5 y 7 están apagadas (no detecta recta horizontal).
+- La unidad 2, 4, 6 y 8 están encendidas (detecta rectas verticales).
+- La unidad 1 tiene un gradiente creciente de arriba a abajo.
+
+Considerando los pesos de la capa anterior, esta capa produce
+valores altos de activación cuando:
+
+- La imagen no tiene rectas horizontales.
+- La imagen tiene rectas verticales.
+
+El filtro 4 es similar, excepto que no penaliza rectas verticales.
+
+Veamos las activaciones de las siguiente capa convolucional:
 
 ```{r}
-capa <- keras_model_sequential()
-capa %>%
-  layer_conv_2d(filters = 8, kernel_size = c(5,5), activation = 'relu',
-              input_shape = c(16,16,1), padding='same',weights = wts[1:2]) %>%
-  layer_max_pooling_2d(pool_size = c(2,2)) %>%
-  layer_conv_2d(filters = 12, kernel_size = c(3,3), activation = 'relu',
-              padding='same',weights = wts[3:4]) %>%
-  layer_max_pooling_2d() 
-probas <- predict_proba(capa, x_train[1:50,,,,drop=FALSE])
-dim(probas)
+red_conv_2 <- keras_model(inputs = model_2$input,
+    outputs = get_layer(model_2, 'conv_2')$output)
+activaciones_2 <- predict(red_conv_2, x_train[1:50,,,,drop=FALSE])
+dim(activaciones_2)
 ```
 
 ```{r}
-graf_activaciones(probas)
+require(gridExtra)
+grid.arrange(graf_activaciones(activaciones_1, 4), 
+             graf_activaciones(activaciones_2, 4), ncol=2)
+grid.arrange(graf_activaciones(activaciones_1, 5), 
+             graf_activaciones(activaciones_2, 5), ncol=2)
+grid.arrange(graf_activaciones(activaciones_1, 15), 
+             graf_activaciones(activaciones_2, 15), ncol=2)
+grid.arrange(graf_activaciones(activaciones_1, 33), 
+             graf_activaciones(activaciones_2, 33), ncol=2)
 ```
 
 

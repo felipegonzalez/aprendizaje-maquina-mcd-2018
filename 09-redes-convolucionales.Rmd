@@ -73,31 +73,26 @@ $$f =\frac{1}{5} (\ldots, 0,0,1,1,1,1,1,0,0,\ldots)$$
 donde $f_s=1/5$ para $s=-2,-1,0,1,2$ y cero en otro caso.
 
 Entonces
-$$y_t = \cdots + x_{t-2}f_{2} +    x_{t-1}f_{1} +    x_{t}f_{0}   +x_{t+1}f_{-1} +x_{t+2}f_{-2}$$
+$$y_t = \cdots + x_{t-2}f_{-2} +    x_{t-1}f_{-1} +    x_{t}f_{0}   +x_{t+1}f_{1} +x_{t+2}f_{2}$$
 Que también se puede escribir como
 \begin{equation}
-y_t = \sum_{s=-\infty}^{\infty} x_s f_{t-s}
+y_t = \sum_{s=-\infty}^{\infty} x_s f_{s-t}
 \end{equation}
 Nótese que estamos moviendo el filtro $f$ a lo largo de la serie (tiempo) y aplicándolo
 cada vez.
 
-**Observación**:
-Aunque parece estar "volteado" el filtro con
-respecto a la señal, la interpretación correcta es como sigue: 
-
-- Al tiempo 0, la contribución a $y_0$ de $x_0$ es $x_0f_0$.
-- Al tiempo 1, la contribución a $y_1$ de $x_0$ es 
-$x_0f_1$ 
-- Al tiempo 2, la contribución a $y_2$ de $x_0$ es 
-$x_0f_2$ 
-
-De modo que las $f_0$, $f_1$, $f_2$ etc. nos dice cuál es la
-contribución de la señal en el momento actual, hace una
-unidad de tiempo, hace dos unidades de tiempo, etc.
+**Observación**: en matemáticas y procesamiento de señales,
+la *convolución* es más comunmente
+\begin{equation}
+y_t = \sum_{s=-\infty}^{\infty} x_s f_{t-s},
+\end{equation}
+mientras que la fórmula que nosotros usamos se llama *correlación cruzada*.
+En redes neuronales se dice *filtro convolucional*, aunque estrictamente
+usa la correlación cruzada (por ejemplo en Tensorflow).
 
 
-
-Este es un ejemplo de **filtro convolucional**: es una vector $f$ que se aplica a la
+Este es un ejemplo de **filtro convolucional** del tipo
+que se usa en redes neuronales: es una vector $f$ que se aplica a la
 serie $x$ como
 en la ecuación anterior para obtener una serie transformada (filtrada) $y$. El vector se desplaza a lo largo de la serie par obtener los distintos valores filtrados.
 
@@ -119,7 +114,7 @@ posible pixel,
 para obtener la matriz (imagen) filtrada $y_{i,j}$ dada por
 
 \begin{equation}
-y_{a,b} = \sum_{s,t=-\infty}^{\infty} x_{s,t} f_{a-s,b-t}
+y_{a,b} = \sum_{s,t=-\infty}^{\infty} x_{s,t} f_{s-a,t-b}
 \end{equation}
 
 A la matriz $f$ se le llama matriz convolucional, kernel o  máscara del filtro
@@ -439,12 +434,17 @@ capa_list <- lapply(1:8, function(i){
     mutate(y = (pixel-1) %% 5, x = (pixel-1) %/% 5) %>%
      group_by(unidad)
 capa_list
-graficar_pesos <- function(capa_list){
-    ggplot(capa_list, aes(x=x, y=-y)) + 
+graficar_pesos <- function(capa_list, ncol = 4, blank = FALSE){
+    g_salida <- ggplot(capa_list, aes(x=x, y=-y)) + 
         geom_raster(aes(fill=val), interpolate=FALSE) + 
-        facet_wrap(~unidad, ncol=4) + 
+        facet_wrap(~unidad, ncol = ncol) + 
         coord_equal() + 
         scale_fill_gradient2(low = "red", mid='gray80',high = "black")   
+    if(blank){
+        g_salida <- g_salida + 
+        theme(strip.background = element_blank(), strip.text = element_blank()) 
+    }
+    g_salida
 }
 graficar_pesos(capa_list)
 ```
@@ -462,7 +462,7 @@ red_conv_1 <- keras_model(inputs = model_2$input,
     outputs = get_layer(model_2, 'conv_1')$output)
 activaciones_1 <- predict(red_conv_1, x_train[1:50,,,,drop=FALSE])
 
-graf_activaciones <- function(activaciones, ind){
+graficar_activaciones <- function(activaciones, ind){
   probas_ind <- activaciones[ind,,,] # drop primera dimensión
   x_tamaño <- dim(probas_ind)[1]
   y_tamaño <- dim(probas_ind)[2]
@@ -477,14 +477,14 @@ graf_activaciones <- function(activaciones, ind){
   dat <- bind_rows(unidades_df)
   ggplot(dat, aes(x=x, y=-y, fill=val)) + geom_tile() + 
     facet_wrap(~unidad, ncol = 4) +
-    scale_fill_gradient(low = "white", high = "salmon") + 
+    scale_fill_gradient2(low = "gray60", mid = "white", high = "blue", midpoint = 0.5) + 
     coord_equal()
 }
-graf_activaciones(activaciones_1, 4)
-graf_activaciones(activaciones_1, 5)
-graf_activaciones(activaciones_1, 15)
-graf_activaciones(activaciones_1, 8)
-graf_activaciones(activaciones_1, 33)
+graficar_activaciones(activaciones_1, 4)
+graficar_activaciones(activaciones_1, 5)
+graficar_activaciones(activaciones_1, 15)
+graficar_activaciones(activaciones_1, 8)
+graficar_activaciones(activaciones_1, 33)
 ```
 
 La segunda es capa de convolución es más difícil de interpretar. En esta
@@ -506,15 +506,20 @@ for(j in 1:8){
   out[[j]] <- bind_rows(out_temp)
 }
 capa_out <- bind_rows(out)
-ggplot(capa_out, aes(x = x, y = -y)) + 
+library(gridExtra)
+g_1 <- graficar_pesos(capa_list, ncol = 1, blank = TRUE)
+g_2 <- ggplot(capa_out, aes(x = x, y = -y)) + 
   geom_tile(aes(fill = (val))) + 
   facet_grid(origen ~ unidad) + 
   coord_equal() +
   scale_fill_gradient2(low = "red", mid='gray90',high = "black") +
-  theme(strip.background = element_blank(), strip.text = element_blank())   
+  theme(strip.background = element_blank(), strip.text = element_blank())
+g_1
+g_2
 ```
 
-Nótese que en esta gráfica 
+Nótese que en esta gráfica los filtros claramente tienen una
+estructura espacial (en general no se ven ruidosos). En esta gráfica:
 
 - los renglones son las unidades de la capa origen (después de la primera convolución),
 - las columnas son las unidades de salida de la segunda capa de convolución.
@@ -522,7 +527,7 @@ Nótese que en esta gráfica
 Por ejemplo, consideremos los filtros de
 la primera y la segunda unidad de salida:
 ```{r}
-ggplot(capa_out %>% filter(unidad %in% c(1,2)), 
+ggplot(capa_out %>% filter(unidad %in% c(1, 2, 3)), 
     aes(x = x, y = -y)) + geom_tile(aes(fill = (val))) + 
   facet_grid(origen ~ unidad) + coord_equal()+
   scale_fill_gradient2(low = "red", mid='gray90',high = "black") + 
@@ -553,10 +558,12 @@ grid.arrange(graf_activaciones(activaciones_1, 4),
              graf_activaciones(activaciones_2, 4), ncol=2)
 grid.arrange(graf_activaciones(activaciones_1, 5), 
              graf_activaciones(activaciones_2, 5), ncol=2)
+grid.arrange(graf_activaciones(activaciones_1, 6), 
+             graf_activaciones(activaciones_2, 6), ncol=2)
 grid.arrange(graf_activaciones(activaciones_1, 15), 
              graf_activaciones(activaciones_2, 15), ncol=2)
-grid.arrange(graf_activaciones(activaciones_1, 33), 
-             graf_activaciones(activaciones_2, 33), ncol=2)
+grid.arrange(graf_activaciones(activaciones_1, 50), 
+             graf_activaciones(activaciones_2, 50), ncol=2)
 ```
 
 

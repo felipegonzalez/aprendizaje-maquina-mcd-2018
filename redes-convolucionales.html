@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Aprendizaje de máquina</title>
+  <meta name="description" content="Notas y material para el curso de aprendizaje de máquina (ITAM)">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Aprendizaje de máquina" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Notas y material para el curso de aprendizaje de máquina (ITAM)" />
+  <meta name="github-repo" content="felipegonzalez/aprendizaje-maquina-mcd" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Aprendizaje de máquina" />
+  
+  <meta name="twitter:description" content="Notas y material para el curso de aprendizaje de máquina (ITAM)" />
+  
+
+<meta name="author" content="Felipe González">
+
+
+<meta name="date" content="2018-10-07">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="redes-neuronales-parte-2.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+<link rel="stylesheet" href="css/toc.css" type="text/css" />
+<link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Aprendizaje Máquina</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Temario y referencias</a><ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#evaluacion"><i class="fa fa-check"></i>Evaluación</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-r-y-rstudio"><i class="fa fa-check"></i>Software: R y Rstudio</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#referencias-principales"><i class="fa fa-check"></i>Referencias principales</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#otras-referencias"><i class="fa fa-check"></i>Otras referencias</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="introduccion.html"><a href="introduccion.html"><i class="fa fa-check"></i><b>1</b> Introducción</a><ul>
+<li class="chapter" data-level="1.1" data-path="introduccion.html"><a href="introduccion.html#que-es-aprendizaje-de-maquina-machine-learning"><i class="fa fa-check"></i><b>1.1</b> ¿Qué es aprendizaje de máquina (machine learning)?</a></li>
+<li class="chapter" data-level="1.2" data-path="introduccion.html"><a href="introduccion.html#aprendizaje-supervisado-1"><i class="fa fa-check"></i><b>1.2</b> Aprendizaje Supervisado</a><ul>
+<li class="chapter" data-level="" data-path="introduccion.html"><a href="introduccion.html#proceso-generador-de-datos-modelo-teorico"><i class="fa fa-check"></i>Proceso generador de datos (modelo teórico)</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="introduccion.html"><a href="introduccion.html#predicciones"><i class="fa fa-check"></i><b>1.3</b> Predicciones</a></li>
+<li class="chapter" data-level="1.4" data-path="introduccion.html"><a href="introduccion.html#aprendizaje"><i class="fa fa-check"></i><b>1.4</b> Tarea de aprendizaje supervisado</a></li>
+<li class="chapter" data-level="1.5" data-path="introduccion.html"><a href="introduccion.html#error"><i class="fa fa-check"></i><b>1.5</b> Balance de complejidad y rigidez</a></li>
+<li class="chapter" data-level="1.6" data-path="introduccion.html"><a href="introduccion.html#como-estimar-f"><i class="fa fa-check"></i><b>1.6</b> ¿Cómo estimar f?</a></li>
+<li class="chapter" data-level="1.7" data-path="introduccion.html"><a href="introduccion.html#resumen"><i class="fa fa-check"></i><b>1.7</b> Resumen</a></li>
+<li class="chapter" data-level="1.8" data-path="introduccion.html"><a href="introduccion.html#tarea"><i class="fa fa-check"></i><b>1.8</b> Tarea</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="regresion.html"><a href="regresion.html"><i class="fa fa-check"></i><b>2</b> Regresión lineal</a><ul>
+<li class="chapter" data-level="2.1" data-path="introduccion.html"><a href="introduccion.html#introduccion"><i class="fa fa-check"></i><b>2.1</b> Introducción</a></li>
+<li class="chapter" data-level="2.2" data-path="regresion.html"><a href="regresion.html#aprendizaje-de-coeficientes-ajuste"><i class="fa fa-check"></i><b>2.2</b> Aprendizaje de coeficientes (ajuste)</a></li>
+<li class="chapter" data-level="2.3" data-path="regresion.html"><a href="regresion.html#descenso-en-gradiente"><i class="fa fa-check"></i><b>2.3</b> Descenso en gradiente</a><ul>
+<li class="chapter" data-level="2.3.1" data-path="regresion.html"><a href="regresion.html#seleccion-de-tamano-de-paso-eta"><i class="fa fa-check"></i><b>2.3.1</b> Selección de tamaño de paso <span class="math inline">\(\eta\)</span></a></li>
+<li class="chapter" data-level="2.3.2" data-path="regresion.html"><a href="regresion.html#funciones-de-varias-variables"><i class="fa fa-check"></i><b>2.3.2</b> Funciones de varias variables</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="regresion.html"><a href="regresion.html#descenso-en-gradiente-para-regresion-lineal"><i class="fa fa-check"></i><b>2.4</b> Descenso en gradiente para regresión lineal</a></li>
+<li class="chapter" data-level="2.5" data-path="regresion.html"><a href="regresion.html#normalizacion-de-entradas"><i class="fa fa-check"></i><b>2.5</b> Normalización de entradas</a></li>
+<li class="chapter" data-level="2.6" data-path="regresion.html"><a href="regresion.html#interpretacion-de-modelos-lineales"><i class="fa fa-check"></i><b>2.6</b> Interpretación de modelos lineales</a></li>
+<li class="chapter" data-level="2.7" data-path="regresion.html"><a href="regresion.html#solucion-analitica"><i class="fa fa-check"></i><b>2.7</b> Solución analítica</a></li>
+<li class="chapter" data-level="2.8" data-path="regresion.html"><a href="regresion.html#por-que-el-modelo-lineal-funciona-bien-muchas-veces"><i class="fa fa-check"></i><b>2.8</b> ¿Por qué el modelo lineal funciona bien (muchas veces)?</a><ul>
+<li class="chapter" data-level="2.8.1" data-path="regresion.html"><a href="regresion.html#k-vecinos-mas-cercanos"><i class="fa fa-check"></i><b>2.8.1</b> k vecinos más cercanos</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="regresion.html"><a href="regresion.html#tarea-1"><i class="fa fa-check"></i>Tarea</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="logistica.html"><a href="logistica.html"><i class="fa fa-check"></i><b>3</b> Regresión logística</a><ul>
+<li class="chapter" data-level="3.1" data-path="logistica.html"><a href="logistica.html#el-problema-de-clasificacion"><i class="fa fa-check"></i><b>3.1</b> El problema de clasificación</a><ul>
+<li class="chapter" data-level="" data-path="logistica.html"><a href="logistica.html#que-estimar-en-problemas-de-clasificacion"><i class="fa fa-check"></i>¿Qué estimar en problemas de clasificación?</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="logistica.html"><a href="logistica.html#estimacion-de-probabilidades-de-clase"><i class="fa fa-check"></i><b>3.2</b> Estimación de probabilidades de clase</a><ul>
+<li class="chapter" data-level="" data-path="logistica.html"><a href="logistica.html#ejemplo-9"><i class="fa fa-check"></i>Ejemplo</a></li>
+<li class="chapter" data-level="3.2.1" data-path="logistica.html"><a href="logistica.html#k-vecinos-mas-cercanos-1"><i class="fa fa-check"></i><b>3.2.1</b> k-vecinos más cercanos</a></li>
+<li class="chapter" data-level="" data-path="logistica.html"><a href="logistica.html#ejemplo-11"><i class="fa fa-check"></i>Ejemplo</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="logistica.html"><a href="logistica.html#error-para-modelos-de-clasificacion"><i class="fa fa-check"></i><b>3.3</b> Error para modelos de clasificación</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="logistica.html"><a href="logistica.html#ejercicio-1"><i class="fa fa-check"></i><b>3.3.1</b> Ejercicio</a></li>
+<li class="chapter" data-level="3.3.2" data-path="logistica.html"><a href="logistica.html#error-de-clasificacion-y-funcion-de-perdida-0-1"><i class="fa fa-check"></i><b>3.3.2</b> Error de clasificación y función de pérdida 0-1</a></li>
+<li class="chapter" data-level="3.3.3" data-path="logistica.html"><a href="logistica.html#discusion-relacion-entre-devianza-y-error-de-clasificacion"><i class="fa fa-check"></i><b>3.3.3</b> Discusión: relación entre devianza y error de clasificación</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="logistica.html"><a href="logistica.html#regresion-logistica"><i class="fa fa-check"></i><b>3.4</b> Regresión logística</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="logistica.html"><a href="logistica.html#regresion-logistica-simple"><i class="fa fa-check"></i><b>3.4.1</b> Regresión logística simple</a></li>
+<li class="chapter" data-level="3.4.2" data-path="logistica.html"><a href="logistica.html#funcion-logistica"><i class="fa fa-check"></i><b>3.4.2</b> Función logística</a></li>
+<li class="chapter" data-level="3.4.3" data-path="logistica.html"><a href="logistica.html#regresion-logistica-1"><i class="fa fa-check"></i><b>3.4.3</b> Regresión logística</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="logistica.html"><a href="logistica.html#aprendizaje-de-coeficientes-para-regresion-logistica-binomial."><i class="fa fa-check"></i><b>3.5</b> Aprendizaje de coeficientes para regresión logística (binomial).</a></li>
+<li class="chapter" data-level="3.6" data-path="logistica.html"><a href="logistica.html#ejercicio-datos-de-diabetes"><i class="fa fa-check"></i><b>3.6</b> Ejercicio: datos de diabetes</a><ul>
+<li class="chapter" data-level="" data-path="logistica.html"><a href="logistica.html#tarea-2"><i class="fa fa-check"></i>Tarea</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html"><i class="fa fa-check"></i><b>4</b> Más sobre problemas de clasificación</a><ul>
+<li class="chapter" data-level="4.1" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#analisis-de-error-para-clasificadores-binarios"><i class="fa fa-check"></i><b>4.1</b> Análisis de error para clasificadores binarios</a><ul>
+<li class="chapter" data-level="" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#medidas-resumen-de-desempeno"><i class="fa fa-check"></i>Medidas resumen de desempeño</a></li>
+<li class="chapter" data-level="" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#interpetacion-de-resumenes-de-desempeno-y-tasas-base"><i class="fa fa-check"></i>Interpetación de resúmenes de desempeño y tasas base</a></li>
+<li class="chapter" data-level="4.1.1" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#puntos-de-corte-para-un-clasificador-binario"><i class="fa fa-check"></i><b>4.1.1</b> Puntos de corte para un clasificador binario</a></li>
+<li class="chapter" data-level="4.1.2" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#espacio-roc-de-clasificadores"><i class="fa fa-check"></i><b>4.1.2</b> Espacio ROC de clasificadores</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#perfil-de-un-clasificador-binario-y-curvas-roc"><i class="fa fa-check"></i><b>4.2</b> Perfil de un clasificador binario y curvas ROC</a></li>
+<li class="chapter" data-level="4.3" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#regresion-logistica-para-problemas-de-mas-de-2-clases"><i class="fa fa-check"></i><b>4.3</b> Regresión logística para problemas de más de 2 clases</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#regresion-logistica-multinomial"><i class="fa fa-check"></i><b>4.3.1</b> Regresión logística multinomial</a></li>
+<li class="chapter" data-level="4.3.2" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#interpretacion-de-coeficientes"><i class="fa fa-check"></i><b>4.3.2</b> Interpretación de coeficientes</a></li>
+<li class="chapter" data-level="4.3.3" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#ejemplo-clasificacion-de-digitos-con-regresion-multinomial"><i class="fa fa-check"></i><b>4.3.3</b> Ejemplo: Clasificación de dígitos con regresión multinomial</a></li>
+<li class="chapter" data-level="" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#discusion"><i class="fa fa-check"></i>Discusión</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="mas-sobre-problemas-de-clasificacion.html"><a href="mas-sobre-problemas-de-clasificacion.html#descenso-en-gradiente-para-regresion-multinomial-logistica"><i class="fa fa-check"></i><b>4.4</b> Descenso en gradiente para regresión multinomial logística</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="regularizacion.html"><a href="regularizacion.html"><i class="fa fa-check"></i><b>5</b> Regularización</a><ul>
+<li class="chapter" data-level="5.1" data-path="regularizacion.html"><a href="regularizacion.html#sesgo-y-varianza-de-predictores"><i class="fa fa-check"></i><b>5.1</b> Sesgo y varianza de predictores</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="regularizacion.html"><a href="regularizacion.html#sesgo-y-varianza-en-modelos-lineales"><i class="fa fa-check"></i><b>5.1.1</b> Sesgo y varianza en modelos lineales</a></li>
+<li class="chapter" data-level="5.1.2" data-path="regularizacion.html"><a href="regularizacion.html#reduciendo-varianza-de-los-coeficientes"><i class="fa fa-check"></i><b>5.1.2</b> Reduciendo varianza de los coeficientes</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="regularizacion.html"><a href="regularizacion.html#regularizacion-ridge"><i class="fa fa-check"></i><b>5.2</b> Regularización ridge</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="regularizacion.html"><a href="regularizacion.html#seleccion-de-coeficiente-de-regularizacion"><i class="fa fa-check"></i><b>5.2.1</b> Selección de coeficiente de regularización</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="regularizacion.html"><a href="regularizacion.html#entrenamiento-validacion-y-prueba"><i class="fa fa-check"></i><b>5.3</b> Entrenamiento, Validación y Prueba</a><ul>
+<li class="chapter" data-level="5.3.1" data-path="regularizacion.html"><a href="regularizacion.html#validacion-cruzada"><i class="fa fa-check"></i><b>5.3.1</b> Validación cruzada</a></li>
+<li class="chapter" data-level="5.3.2" data-path="regularizacion.html"><a href="regularizacion.html#como-se-desempena-validacion-cruzada-como-estimacion-del-error"><i class="fa fa-check"></i><b>5.3.2</b> ¿Cómo se desempeña validación cruzada como estimación del error?</a></li>
+<li class="chapter" data-level="" data-path="regularizacion.html"><a href="regularizacion.html#ejercicio-4"><i class="fa fa-check"></i>Ejercicio</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="regularizacion.html"><a href="regularizacion.html#regularizacion-lasso"><i class="fa fa-check"></i><b>5.4</b> Regularización lasso</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="extensiones-para-regresion-lineal-y-logistica.html"><a href="extensiones-para-regresion-lineal-y-logistica.html"><i class="fa fa-check"></i><b>6</b> Extensiones para regresión lineal y logística</a><ul>
+<li class="chapter" data-level="6.1" data-path="extensiones-para-regresion-lineal-y-logistica.html"><a href="extensiones-para-regresion-lineal-y-logistica.html#como-hacer-mas-flexible-el-modelo-lineal"><i class="fa fa-check"></i><b>6.1</b> Cómo hacer más flexible el modelo lineal</a></li>
+<li class="chapter" data-level="6.2" data-path="extensiones-para-regresion-lineal-y-logistica.html"><a href="extensiones-para-regresion-lineal-y-logistica.html#transformacion-de-entradas"><i class="fa fa-check"></i><b>6.2</b> Transformación de entradas</a></li>
+<li class="chapter" data-level="6.3" data-path="extensiones-para-regresion-lineal-y-logistica.html"><a href="extensiones-para-regresion-lineal-y-logistica.html#variables-cualitativas"><i class="fa fa-check"></i><b>6.3</b> Variables cualitativas</a></li>
+<li class="chapter" data-level="6.4" data-path="extensiones-para-regresion-lineal-y-logistica.html"><a href="extensiones-para-regresion-lineal-y-logistica.html#interacciones"><i class="fa fa-check"></i><b>6.4</b> Interacciones</a></li>
+<li class="chapter" data-level="6.5" data-path="extensiones-para-regresion-lineal-y-logistica.html"><a href="extensiones-para-regresion-lineal-y-logistica.html#categorizacion-de-variables"><i class="fa fa-check"></i><b>6.5</b> Categorización de variables</a></li>
+<li class="chapter" data-level="6.6" data-path="extensiones-para-regresion-lineal-y-logistica.html"><a href="extensiones-para-regresion-lineal-y-logistica.html#splines-opcional"><i class="fa fa-check"></i><b>6.6</b> Splines (opcional)</a></li>
+<li class="chapter" data-level="6.7" data-path="extensiones-para-regresion-lineal-y-logistica.html"><a href="extensiones-para-regresion-lineal-y-logistica.html#modelando-en-escala-logaritmica"><i class="fa fa-check"></i><b>6.7</b> Modelando en escala logarítmica</a><ul>
+<li class="chapter" data-level="6.7.1" data-path="extensiones-para-regresion-lineal-y-logistica.html"><a href="extensiones-para-regresion-lineal-y-logistica.html#cuando-usar-estas-tecnicas"><i class="fa fa-check"></i><b>6.7.1</b> ¿Cuándo usar estas técnicas?</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html"><i class="fa fa-check"></i><b>7</b> Redes neuronales (parte 1)</a><ul>
+<li class="chapter" data-level="7.1" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#introduccion-a-redes-neuronales"><i class="fa fa-check"></i><b>7.1</b> Introducción a redes neuronales</a><ul>
+<li class="chapter" data-level="" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#como-construyen-entradas-las-redes-neuronales"><i class="fa fa-check"></i>¿Cómo construyen entradas las redes neuronales?</a></li>
+<li class="chapter" data-level="" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#como-ajustar-los-parametros"><i class="fa fa-check"></i>¿Cómo ajustar los parámetros?</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#interacciones-en-redes-neuronales"><i class="fa fa-check"></i><b>7.2</b> Interacciones en redes neuronales</a></li>
+<li class="chapter" data-level="7.3" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#calculo-en-redes-feed-forward"><i class="fa fa-check"></i><b>7.3</b> Cálculo en redes: feed-forward</a></li>
+<li class="chapter" data-level="" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#notacion"><i class="fa fa-check"></i>Notación</a></li>
+<li class="chapter" data-level="7.4" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#feed-forward"><i class="fa fa-check"></i><b>7.4</b> Feed forward</a></li>
+<li class="chapter" data-level="7.5" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#backpropagation-calculo-del-gradiente-clasificacion-binaria"><i class="fa fa-check"></i><b>7.5</b> Backpropagation: cálculo del gradiente (clasificación binaria)</a><ul>
+<li class="chapter" data-level="7.5.1" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#calculo-para-un-caso-de-entrenamiento"><i class="fa fa-check"></i><b>7.5.1</b> Cálculo para un caso de entrenamiento</a></li>
+<li class="chapter" data-level="7.5.2" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#algoritmo-de-backpropagation"><i class="fa fa-check"></i><b>7.5.2</b> Algoritmo de backpropagation</a></li>
+</ul></li>
+<li class="chapter" data-level="7.6" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#ajuste-de-parametros-introduccion"><i class="fa fa-check"></i><b>7.6</b> Ajuste de parámetros (introducción)</a><ul>
+<li class="chapter" data-level="7.6.1" data-path="redes-neuronales-parte-1.html"><a href="redes-neuronales-parte-1.html#ejemplo-35"><i class="fa fa-check"></i><b>7.6.1</b> Ejemplo</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html"><i class="fa fa-check"></i><b>8</b> Redes neuronales (parte 2)</a><ul>
+<li class="chapter" data-level="8.1" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#descenso-estocastico"><i class="fa fa-check"></i><b>8.1</b> Descenso estocástico</a></li>
+<li class="chapter" data-level="8.2" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#algoritmo-de-descenso-estocastico"><i class="fa fa-check"></i><b>8.2</b> Algoritmo de descenso estocástico</a></li>
+<li class="chapter" data-level="8.3" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#por-que-usar-descenso-estocastico-por-minilotes"><i class="fa fa-check"></i><b>8.3</b> ¿Por qué usar descenso estocástico por minilotes?</a></li>
+<li class="chapter" data-level="8.4" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#escogiendo-la-tasa-de-aprendizaje"><i class="fa fa-check"></i><b>8.4</b> Escogiendo la tasa de aprendizaje</a></li>
+<li class="chapter" data-level="8.5" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#mejoras-al-algoritmo-de-descenso-estocastico."><i class="fa fa-check"></i><b>8.5</b> Mejoras al algoritmo de descenso estocástico.</a><ul>
+<li class="chapter" data-level="8.5.1" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#decaimiento-de-tasa-de-aprendizaje"><i class="fa fa-check"></i><b>8.5.1</b> Decaimiento de tasa de aprendizaje</a></li>
+<li class="chapter" data-level="8.5.2" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#momento"><i class="fa fa-check"></i><b>8.5.2</b> Momento</a></li>
+<li class="chapter" data-level="8.5.3" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#otras-variaciones"><i class="fa fa-check"></i><b>8.5.3</b> Otras variaciones</a></li>
+</ul></li>
+<li class="chapter" data-level="8.6" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#ajuste-de-redes-con-descenso-estocastico"><i class="fa fa-check"></i><b>8.6</b> Ajuste de redes con descenso estocástico</a></li>
+<li class="chapter" data-level="8.7" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#activaciones-relu"><i class="fa fa-check"></i><b>8.7</b> Activaciones relu</a></li>
+<li class="chapter" data-level="8.8" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#dropout-para-regularizacion"><i class="fa fa-check"></i><b>8.8</b> Dropout para regularización</a><ul>
+<li class="chapter" data-level="" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#ejemplo-39"><i class="fa fa-check"></i>Ejemplo</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html"><i class="fa fa-check"></i><b>9</b> Redes convolucionales</a><ul>
+<li class="chapter" data-level="9.1" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#filtros-convolucionales"><i class="fa fa-check"></i><b>9.1</b> Filtros convolucionales</a><ul>
+<li class="chapter" data-level="" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#filtros-en-una-dimension"><i class="fa fa-check"></i>Filtros en una dimensión</a></li>
+<li class="chapter" data-level="" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#filtros-convolucionales-en-dos-dimensiones"><i class="fa fa-check"></i>Filtros convolucionales en dos dimensiones</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#filtros-convolucionales-para-redes-neuronales"><i class="fa fa-check"></i><b>9.2</b> Filtros convolucionales para redes neuronales</a></li>
+<li class="chapter" data-level="9.3" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#capas-de-agregacion-pooling"><i class="fa fa-check"></i><b>9.3</b> Capas de agregación (pooling)</a></li>
+<li class="chapter" data-level="9.4" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#ejemplo-arquitectura-lenet"><i class="fa fa-check"></i><b>9.4</b> Ejemplo (arquitectura LeNet):</a><ul>
+<li class="chapter" data-level="" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#conteo-de-parametros"><i class="fa fa-check"></i>Conteo de parámetros</a></li>
+<li class="chapter" data-level="" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#pesos-y-activaciones"><i class="fa fa-check"></i>Pesos y activaciones</a></li>
+</ul></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Aprendizaje de máquina</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="redes-convolucionales" class="section level1">
+<h1><span class="header-section-number">Clase 9</span> Redes convolucionales</h1>
+<p>Las redes convolucionales son un tipo de arquitectura de red que utiliza
+ciertos supuestos acerca de los pesos, en contraste a las redes totalmente
+conexas donde los pesos pueden tomar cualquier valor. Esos supuestos
+están adaptados para explotar la estructura señales, por ejemplo: sonido o imágenes.
+En estos dos casos,
+se trata de entradas que tienen una <strong>estructura adicional de proximidad</strong>
+(es decir, hay un concepto de pixeles cercanos y lejanos, igual de tiempos
+cercanos o lejanos). Las redes convolucionales son la arquitectura más
+exitosa para tratar con este tipo de problemas con estructura espacial o temporal.</p>
+<p>Hay tres consecuencias básicos que producen el uso de convoluciones, que explicamos
+primero intuitivamente:</p>
+<ul>
+<li><p><strong>Conexiones ralas</strong>: existen unidades que solo están conectadas a una fracción
+relativamente chica de las unidades de la capa anterior (en lugar de todas, como
+en redes totalmente conexas). Por ejemplo: una unidad que busca detectar una forma
+en una esquina de una imagen no necesita estar conectada a pixeles de otras partes
+de la imagen.</p></li>
+<li><p><strong>Parámetros compartidos</strong>: diferentes unidades tienen pesos compartidos. Por ejemplo:
+una unidad que quiere detectar el sonido de cierto animal al principio de la grabación
+puede utilizar los mismos pesos aplicados a otra parte de la grabación. Podemos
+“mover” el detector (con los mismos pesos) a lo largo de la grabación para ver en dónde detecta el sonido que nos interesa.</p></li>
+<li><p><strong>Equivarianza</strong>: Una translación de una entrada (en tiempo o espacio), produce
+una traslación equivalente en la salida. Por ejemplo, Si una unidad asociada a
+la esquina superior derecha de una imagen detecta un número, entonces habrá otra
+unidad que puede detectar el número en la esquina inferior.</p></li>
+</ul>
+<p>Todas estas propiedades inducen estructura en comparación
+con una red totalmente conexa. Cuando esa estructura es
+la apropiada, no introduce sesgo adicional y reduce considerablemente la varianza. El éxito de este tipo de redes (como las convolucionales) es encontrar la estructura
+apropiada para el problema que estamos tratando.</p>
+<div id="filtros-convolucionales" class="section level2">
+<h2><span class="header-section-number">9.1</span> Filtros convolucionales</h2>
+<div id="filtros-en-una-dimension" class="section level3 unnumbered">
+<h3>Filtros en una dimensión</h3>
+<p>Comenzamos por considerar filtros para una serie de tiempo.</p>
+
+<div class="comentario">
+Un <strong>filtro</strong> es una transformación de una señal que pretende extraer
+ciertas características y suprimir otras.
+</div>
+
+<p>Por ejemplo, consideramos la siguiente serie, y promedios móviles centrados
+de longitud 5. Los promedios móviles filtran las componentes de frecuencia
+alta (variaciones en tiempos cortos), y nos dejan con la variación de mayor
+frecuencia:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+<span class="kw">library</span>(RcppRoll)
+h &lt;-<span class="st"> </span><span class="cf">function</span>(x){<span class="kw">ifelse</span>(x<span class="op">&gt;</span><span class="dv">0</span>,x,<span class="dv">0</span>)}
+datos &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">t =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(BJsales),
+                    <span class="dt">serie =</span> <span class="kw">as.numeric</span>(BJsales) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(<span class="kw">length</span>(BJsales), <span class="dv">0</span>, <span class="dv">10</span>)) <span class="op">%&gt;%</span>
+<span class="st">          </span><span class="kw">mutate</span>(<span class="dt">promedio_mov =</span> <span class="kw">roll_mean</span>(serie, <span class="dv">5</span>, <span class="dt">align=</span><span class="st">&#39;center&#39;</span>, <span class="dt">fill =</span> <span class="ot">NA</span>))
+<span class="kw">ggplot</span>(<span class="kw">filter</span>(datos, t <span class="op">&lt;</span><span class="st"> </span><span class="dv">100</span>), <span class="kw">aes</span>(<span class="dt">x=</span>t, <span class="dt">y=</span>serie)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>promedio_mov), <span class="dt">colour=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="fl">1.2</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-2-1.png" width="480" /></p>
+<p>Podemos escribir este filtro de la siguiente manera: si <span class="math inline">\(x_t\)</span> representa
+la serie original, y <span class="math inline">\(y_t\)</span> la serie filtrada, entonces
+<span class="math display">\[ y_t = \frac{1}{5}(x_{t-2} + x_{t-1} + x_t + x_{t+1}+x_{t+2})\]</span></p>
+<p>Podemos escribir esta operación poniendo
+<span class="math display">\[f =\frac{1}{5} (\ldots, 0,0,1,1,1,1,1,0,0,\ldots)\]</span></p>
+<p>donde <span class="math inline">\(f_s=1/5\)</span> para <span class="math inline">\(s=-2,-1,0,1,2\)</span> y cero en otro caso.</p>
+<p>Entonces
+<span class="math display">\[y_t = \cdots + x_{t-2}f_{-2} +    x_{t-1}f_{-1} +    x_{t}f_{0}   +x_{t+1}f_{1} +x_{t+2}f_{2}\]</span>
+Que también se puede escribir como
+<span class="math display">\[\begin{equation}
+y_t = \sum_{s=-\infty}^{\infty} x_s f_{s-t}
+\end{equation}\]</span>
+Nótese que estamos moviendo el filtro <span class="math inline">\(f\)</span> a lo largo de la serie (tiempo) y aplicándolo
+cada vez.</p>
+<p><strong>Observación</strong>: en matemáticas y procesamiento de señales,
+la <em>convolución</em> es más comunmente
+<span class="math display">\[\begin{equation}
+y_t = \sum_{s=-\infty}^{\infty} x_s f_{t-s},
+\end{equation}\]</span>
+mientras que la fórmula que nosotros usamos se llama <em>correlación cruzada</em>.
+En redes neuronales se dice <em>filtro convolucional</em>, aunque estrictamente
+usa la correlación cruzada (por ejemplo en Tensorflow).</p>
+<p>Este es un ejemplo de <strong>filtro convolucional</strong> del tipo
+que se usa en redes neuronales: es una vector <span class="math inline">\(f\)</span> que se aplica a la
+serie <span class="math inline">\(x\)</span> como
+en la ecuación anterior para obtener una serie transformada (filtrada) <span class="math inline">\(y\)</span>. El vector se desplaza a lo largo de la serie par obtener los distintos valores filtrados.</p>
+<p>Otro ejemplo son las primeras diferencias: la diferencia del valor actual menos el anterior. Este filtro toma
+valores altos cuando
+la serie crece y bajos cuando decrece:</p>
+<pre class="sourceCode r"><code class="sourceCode r">datos &lt;-<span class="st"> </span>datos <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">dif =</span> promedio_mov <span class="op">-</span><span class="st"> </span><span class="kw">lag</span>(promedio_mov)) 
+<span class="kw">ggplot</span>(datos, <span class="kw">aes</span>(<span class="dt">x=</span>t, <span class="dt">y=</span>dif)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_abline</span>(<span class="dt">slope=</span><span class="dv">0</span>, <span class="dt">intercept=</span><span class="dv">0</span>)</code></pre>
+<pre><code>## Warning: Removed 5 rows containing missing values (geom_path).</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+¿Cuál es el filtro <span class="math inline">\(f\)</span> en este caso?</p>
+</div>
+<div id="filtros-convolucionales-en-dos-dimensiones" class="section level3 unnumbered">
+<h3>Filtros convolucionales en dos dimensiones</h3>
+<p>En dos dimensiones, nuestro filtro es una matriz <span class="math inline">\(f_{i,j}\)</span>, que se aplica
+a una matriz <span class="math inline">\(x_{i,j}\)</span> (podemos pensar que es una imagen) alrededor de cada
+posible pixel,
+para obtener la matriz (imagen) filtrada <span class="math inline">\(y_{i,j}\)</span> dada por</p>
+<p><span class="math display">\[\begin{equation}
+y_{a,b} = \sum_{s,t=-\infty}^{\infty} x_{s,t} f_{s-a,t-b}
+\end{equation}\]</span></p>
+<p>A la matriz <span class="math inline">\(f\)</span> se le llama matriz convolucional, kernel o máscara del filtro</p>
+<p>Por ejemplo, consideremos el filtro de 3x3</p>
+<pre class="sourceCode r"><code class="sourceCode r">filtro_difuminar &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">9</span>,<span class="dv">9</span>), <span class="dv">3</span>,<span class="dv">3</span>, <span class="dt">byrow=</span>T)
+filtro_difuminar</code></pre>
+<pre><code>##           [,1]      [,2]      [,3]
+## [1,] 0.1111111 0.1111111 0.1111111
+## [2,] 0.1111111 0.1111111 0.1111111
+## [3,] 0.1111111 0.1111111 0.1111111</code></pre>
+<p>El centro de este filtro se sobrepone sobre la cada pixel de la imagen <span class="math inline">\(x\)</span>,
+se multiplican los valores de la imagen por los del filtro y se suma
+para obtener el nuevo pixel de la imagen <span class="math inline">\(y\)</span>.</p>
+<p>¿Qué efecto tiene este filtro? Este filtro promedia los pixeles de un
+parche de 3x3 de la imagen, o suaviza la imagen. Es el análogo en 2 dimensiones
+del filtro de promedios móviles que vimos arriba.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(imager)
+estatua &lt;-<span class="st"> </span><span class="kw">load.image</span>(<span class="st">&#39;figuras/escultura.jpg&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span>grayscale
+<span class="kw">plot</span>(estatua, <span class="dt">axes=</span><span class="ot">FALSE</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r">estatua_mat &lt;-<span class="st"> </span><span class="kw">as.array</span>(estatua)
+<span class="kw">dim</span>(estatua_mat)</code></pre>
+<pre><code>## [1] 174 240   1   1</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">estatua_dif &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">0</span>, <span class="kw">c</span>(<span class="kw">dim</span>(estatua)[<span class="dv">1</span>]<span class="op">-</span><span class="dv">1</span>, <span class="kw">dim</span>(estatua)[<span class="dv">2</span>]<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))
+<span class="co"># Ojo: esta manera es muy lenta: si necesitas convoluciones a mano busca</span>
+<span class="co"># paquetes apropiados</span>
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span><span class="kw">dim</span>(estatua_dif)[<span class="dv">1</span>]){
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span><span class="kw">dim</span>(estatua_dif)[<span class="dv">2</span>]){
+    estatua_dif[i, j, <span class="dv">1</span>, <span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">sum</span>(filtro_difuminar<span class="op">*</span>estatua[(i<span class="dv">-1</span>)<span class="op">:</span>(i<span class="op">+</span><span class="dv">1</span>), (j<span class="dv">-1</span>)<span class="op">:</span>(j<span class="op">+</span><span class="dv">1</span>), <span class="dv">1</span>, <span class="dv">1</span>])
+  }
+}
+<span class="kw">plot</span>(<span class="kw">as.cimg</span>(estatua_dif), <span class="dt">axes=</span><span class="ot">FALSE</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<p>Podemos intentar otro filtro, que detecta bordes de arriba hacia abajo
+(es decir, cambios de intensidad que van de bajos a altos conforme bajamos
+en la imagen):</p>
+<pre class="sourceCode r"><code class="sourceCode r">filtro_borde &lt;-<span class="st"> </span>(<span class="kw">matrix</span>(<span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),  <span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">byrow=</span>T))
+filtro_borde</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]   -1   -1   -1
+## [2,]    0    0    0
+## [3,]    1    1    1</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">estatua_filtrada &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">0</span>, <span class="kw">c</span>(<span class="kw">dim</span>(estatua_dif)[<span class="dv">1</span>]<span class="op">-</span><span class="dv">1</span>, <span class="kw">dim</span>(estatua_dif)[<span class="dv">2</span>]<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span><span class="kw">dim</span>(estatua_filtrada)[<span class="dv">1</span>]){
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">2</span><span class="op">:</span><span class="kw">dim</span>(estatua_filtrada)[<span class="dv">2</span>]){
+    estatua_filtrada[i,j,<span class="dv">1</span>,<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">t</span>(filtro_borde)<span class="op">*</span>estatua_dif[(i <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>),(j <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)<span class="op">:</span>(j <span class="op">+</span><span class="st"> </span><span class="dv">1</span>), <span class="dv">1</span>, <span class="dv">1</span>])
+  }
+}
+<span class="kw">plot</span>(<span class="kw">as.cimg</span>(estatua_filtrada))</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Este filtro toma valores altos cuando hay un gradiente de intensidad
+de arriba hacia abajo.</p>
+<p>¿Cómo harías un filtro que detecta curvas? Considera el siguiente ejemplo,
+en donde construimos un detector de diagonales:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(keras)
+mnist &lt;-<span class="st"> </span><span class="kw">dataset_mnist</span>()
+digito &lt;-<span class="st"> </span><span class="kw">t</span>(mnist<span class="op">$</span>train<span class="op">$</span>x[<span class="dv">10</span>,,])
+<span class="kw">plot</span>(<span class="kw">as.cimg</span>(digito))</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-8-1.png" width="288" /></p>
+<pre class="sourceCode r"><code class="sourceCode r">filtro_diag &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">25</span>), <span class="dv">5</span>, <span class="dv">5</span>)
+<span class="kw">diag</span>(filtro_diag) &lt;-<span class="st"> </span><span class="dv">2</span>
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">4</span>){
+  filtro_diag[i, i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="dv">1</span>
+  filtro_diag[i<span class="op">+</span><span class="dv">1</span>, i] &lt;-<span class="st"> </span><span class="dv">1</span>
+}
+filtro_diag_<span class="dv">1</span> &lt;-<span class="st"> </span>filtro_diag[, <span class="dv">5</span><span class="op">:</span><span class="dv">1</span>]
+filtro_diag_<span class="dv">1</span></code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]   -1   -1   -1    1    2
+## [2,]   -1   -1    1    2    1
+## [3,]   -1    1    2    1   -1
+## [4,]    1    2    1   -1   -1
+## [5,]    2    1   -1   -1   -1</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">digito_f &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">0</span>, <span class="kw">c</span>(<span class="kw">dim</span>(digito)[<span class="dv">1</span>]<span class="op">-</span><span class="dv">2</span>, <span class="kw">dim</span>(digito)[<span class="dv">2</span>]<span class="op">-</span><span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">1</span>))
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">3</span><span class="op">:</span><span class="kw">dim</span>(digito_f)[<span class="dv">1</span>]){
+  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">3</span><span class="op">:</span><span class="kw">dim</span>(digito_f)[<span class="dv">2</span>]){
+    digito_f[i,j,<span class="dv">1</span>,<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">sum</span>((filtro_diag_<span class="dv">1</span>)<span class="op">*</span>digito[(i<span class="dv">-2</span>)<span class="op">:</span>(i<span class="op">+</span><span class="dv">2</span>),(j<span class="dv">-2</span>)<span class="op">:</span>(j<span class="op">+</span><span class="dv">2</span>)])
+  }
+}
+<span class="kw">plot</span>(<span class="kw">as.cimg</span>(digito_f))</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-8-2.png" width="288" /></p>
+</div>
+</div>
+<div id="filtros-convolucionales-para-redes-neuronales" class="section level2">
+<h2><span class="header-section-number">9.2</span> Filtros convolucionales para redes neuronales</h2>
+<p>En redes neuronales, la idea es que que qeremos aprender estos
+filtros a partir de los datos. La imagen filtrada nos da las entradas
+de la siguiente capa.</p>
+<p>Entonces, supongamos que un filtro de 3x3 está dado por ciertos pesos</p>
+<p><span class="math display">\[ 
+f = \left[ {\begin{array}{ccccc}
+\theta_{1,1} &amp; \theta_{1,2} &amp; \theta_{1,3} \\
+\theta_{2,1} &amp; \theta_{2,2} &amp; \theta_{2,3} \\
+\theta_{3,1} &amp; \theta_{3,2} &amp; \theta_{3,3} \\
+\end{array} } \right]
+\]</span></p>
+<p>Este filtro lo aplicaremos a cada parche de la imagen de entrada. Empezamos
+aplicando el filtro sobre la parte superior izquierda de la imagen para
+calcular la primera unidad de salida <span class="math inline">\(a_1\)</span></p>
+<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&#39;./figuras/conv_1.png&#39;</span>)</code></pre>
+<p><img src="figuras/conv_1.png" width="470" /></p>
+<p>Ahora nos movemos un pixel a la derecha y aplicamos el filtro para
+obtener la unidad <span class="math inline">\(a_2\)</span>. Podemos poner las unidades en el orden de la imagen
+para entender mejor las unidades:</p>
+<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&#39;./figuras/conv_2.png&#39;</span>)</code></pre>
+<p><img src="figuras/conv_2.png" width="477" /></p>
+<p>Al aplicar el filtro a lo largo de toda la imagen, obtenemos 9 unidades
+de salida:</p>
+<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&#39;./figuras/conv_3.png&#39;</span>)</code></pre>
+<p><img src="figuras/conv_3.png" width="479" /></p>
+<p>Finalmente, podemos agregar más parámetros para otros filtros:</p>
+<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&#39;./figuras/conv_4.png&#39;</span>)</code></pre>
+<p><img src="figuras/conv_4.png" width="494" /></p>
+</div>
+<div id="capas-de-agregacion-pooling" class="section level2">
+<h2><span class="header-section-number">9.3</span> Capas de agregación (pooling)</h2>
+<p>En procesamiento de imágenes y redes convolucionales también se utilizan
+capas de pooling. Estas se encargan de resumir pixeles adyacentes. Una
+de las más populares es el max pooling, donde en cada parche de la imagen
+tomamos el máximo.</p>
+<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&#39;./figuras/pooling_1.png&#39;</span>)</code></pre>
+<p><img src="figuras/pooling_1.png" width="460" /></p>
+<p>Hay dos razones para usar estas agregaciones:</p>
+<ul>
+<li>Obtener invarianza a translaciones adicional (en un parche de la imagen,
+solo importa si alguno de las unidades agregadas está activa para que el max-pooling
+esté activo)</li>
+<li>Reduce el tamaño de la imagen (o de una capa de convolución) y en consecuencia
+tenemos menos parámetros que tratar en las siguientes capas</li>
+</ul>
+</div>
+<div id="ejemplo-arquitectura-lenet" class="section level2">
+<h2><span class="header-section-number">9.4</span> Ejemplo (arquitectura LeNet):</h2>
+<p>Las capas de pooling generalmente se aplican después de las convoluciones,
+y hacia al final usamos capas totalmente conexas. Estas últimas capas
+se encargan de combinar la información de las capas de convolución anteriores,
+que detectan patrones simples, para obtener unidades que se encargan de
+detectar patrones más complejos.</p>
+<pre class="sourceCode r"><code class="sourceCode r">knitr<span class="op">::</span><span class="kw">include_graphics</span>(<span class="st">&#39;./figuras/lenet_1.png&#39;</span>)</code></pre>
+<p><img src="figuras/lenet_1.png" width="476" /></p>
+<pre><code>## [1] 7291  257</code></pre>
+<pre><code>## 
+##    0    1    2    3    4    5    6    7    8    9 
+## 1194 1005  731  658  652  556  664  645  542  644</code></pre>
+<p>Ponemos el rango entre [0,1] (pixeles positivos) y usamos codificación dummy</p>
+<pre class="sourceCode r"><code class="sourceCode r">x_train &lt;-<span class="st"> </span>digitos_entrena <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="kw">contains</span>(<span class="st">&#39;pixel&#39;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>as.matrix <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
+x_train &lt;-<span class="st"> </span>x_train<span class="op">/</span><span class="dv">2</span>
+<span class="kw">dim</span>(x_train) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">nrow</span>(x_train), <span class="dv">16</span>, <span class="dv">16</span>, <span class="dv">1</span>)
+x_test &lt;-<span class="st"> </span>digitos_prueba <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="kw">contains</span>(<span class="st">&#39;pixel&#39;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>as.matrix <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
+x_test &lt;-<span class="st"> </span>x_test<span class="op">/</span><span class="dv">2</span>
+<span class="kw">dim</span>(x_test) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">nrow</span>(x_test), <span class="dv">16</span>, <span class="dv">16</span>, <span class="dv">1</span>)
+y_train &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(digitos_entrena<span class="op">$</span>digito, <span class="dv">10</span>)
+y_test &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(digitos_prueba<span class="op">$</span>digito, <span class="dv">10</span>)</code></pre>
+<p>Para fines de interpretación, agregaremos regularización ridge además
+de dropout (puedes obtener buen desempeño usando solamente dropout),
+y usaremos una arquitectura un poco más simple:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># reproducibilidad en keras es más difícil, pues hay varias capas de software</span>
+<span class="co"># set.seed no funciona. Podemos usar use_session_with_seed https://keras.rstudio.com/articles/faq.html#how-can-i-obtain-reproducible-results-using-keras-during-development</span>
+<span class="co">#</span>
+<span class="kw">use_session_with_seed</span>(<span class="dv">72881</span>)</code></pre>
+<pre><code>## Set session seed to 72881 (disabled GPU, CPU parallelism)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">usar_cache &lt;-<span class="st"> </span><span class="ot">TRUE</span>
+<span class="cf">if</span>(<span class="op">!</span>usar_cache){
+    <span class="co"># correr modelo y guardarlo serializado</span>
+    <span class="kw">set.seed</span>(<span class="dv">213</span>)
+    lambda &lt;-<span class="st"> </span><span class="fl">0.01</span>
+    model_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>() 
+    model_<span class="dv">2</span> <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">layer_conv_2d</span>(<span class="dt">filters =</span> <span class="dv">8</span>, <span class="dt">kernel_size =</span> <span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">5</span>), 
+                    <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>,
+                    <span class="dt">input_shape =</span> <span class="kw">c</span>(<span class="dv">16</span>,<span class="dv">16</span>,<span class="dv">1</span>), 
+                    <span class="dt">padding =</span><span class="st">&#39;same&#39;</span>,
+                    <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(lambda),
+                    <span class="dt">name =</span> <span class="st">&#39;conv_1&#39;</span>) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">layer_max_pooling_2d</span>(<span class="dt">pool_size =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.25</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">layer_conv_2d</span>(<span class="dt">filters =</span> <span class="dv">12</span>, <span class="dt">kernel_size =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>), 
+                    <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>,
+                    <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(lambda),
+                    <span class="dt">name =</span> <span class="st">&#39;conv_2&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">layer_max_pooling_2d</span>(<span class="dt">pool_size =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.25</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">layer_flatten</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">50</span>, <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>,
+                  <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(lambda)) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.5</span>) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">10</span>, <span class="dt">activation =</span> <span class="st">&#39;softmax&#39;</span>, 
+                  <span class="dt">kernel_regularizer =</span> <span class="kw">regularizer_l2</span>(lambda))
+    
+    model_<span class="dv">2</span> <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(
+      <span class="dt">loss =</span> <span class="st">&#39;categorical_crossentropy&#39;</span>,
+      <span class="dt">optimizer =</span> <span class="kw">optimizer_sgd</span>(<span class="dt">lr =</span> <span class="fl">0.02</span>,  <span class="dt">momentum =</span> <span class="fl">0.5</span>),
+      <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>,<span class="st">&#39;categorical_crossentropy&#39;</span>)
+    )
+    history &lt;-<span class="st"> </span>model_<span class="dv">2</span> <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(
+      x_train, y_train, 
+      <span class="dt">epochs =</span> <span class="dv">600</span>, <span class="dt">batch_size =</span> <span class="dv">256</span>, 
+      <span class="dt">verbose =</span> <span class="dv">0</span>,
+      <span class="dt">validation_data =</span> <span class="kw">list</span>(x_test, y_test)
+    )
+    model_serialized &lt;-<span class="st"> </span><span class="kw">serialize_model</span>(model_<span class="dv">2</span>)
+    <span class="kw">saveRDS</span>(model_serialized, <span class="dt">file=</span> <span class="st">&#39;cache_obj/red_conv_ser.rds&#39;</span>)
+    
+} <span class="cf">else</span> {
+  <span class="co"># cargar modelo serializado</span>
+  model_serialized &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="dt">file =</span> <span class="st">&#39;cache_obj/red_conv_ser.rds&#39;</span>)
+  model_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">unserialize_model</span>(model_serialized)
+}
+score &lt;-<span class="st"> </span>model_<span class="dv">2</span> <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)
+score</code></pre>
+<pre><code>## $loss
+## [1] 0.5679085
+## 
+## $acc
+## [1] 0.9387145
+## 
+## $categorical_crossentropy
+## [1] 0.2172532</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">score_entrena &lt;-<span class="st"> </span>model_<span class="dv">2</span> <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_train, y_train)
+score_entrena</code></pre>
+<pre><code>## $loss
+## [1] 0.4763389
+## 
+## $acc
+## [1] 0.9709231
+## 
+## $categorical_crossentropy
+## [1] 0.1256836</code></pre>
+<div id="conteo-de-parametros" class="section level3 unnumbered">
+<h3>Conteo de parámetros</h3>
+<p>En pimer lugar, contemos el número de parámetros. Podemos ver los
+matrices donde están guardados los pesos:</p>
+<pre class="sourceCode r"><code class="sourceCode r">wts &lt;-<span class="st"> </span><span class="kw">get_weights</span>(model_<span class="dv">2</span>)
+<span class="kw">lapply</span>(wts, dim)</code></pre>
+<pre><code>## [[1]]
+## [1] 5 5 1 8
+## 
+## [[2]]
+## [1] 8
+## 
+## [[3]]
+## [1]  3  3  8 12
+## 
+## [[4]]
+## [1] 12
+## 
+## [[5]]
+## [1] 108  50
+## 
+## [[6]]
+## [1] 50
+## 
+## [[7]]
+## [1] 50 10
+## 
+## [[8]]
+## [1] 10</code></pre>
+<ol style="list-style-type: decimal">
+<li>La primera capa convolucional está construida con 8 filtros, cada uno de tamaño 5, 5. Adicionalmente, tenemos los
+8 sesgos.</li>
+<li>La segunda capa convolucional está construida con 12 filtros, cada uno de tamaño 3, 3, para cada una
+de las 12 imágenes filtradas de la capa anterior.
+Adicionalmente, tenemos los
+12 sesgos.</li>
+</ol>
+<pre class="sourceCode r"><code class="sourceCode r">num_params &lt;-<span class="st"> </span><span class="kw">sapply</span>(wts, <span class="cf">function</span>(x){ <span class="kw">length</span>(<span class="kw">as.numeric</span>(x))})
+num_params</code></pre>
+<pre><code>## [1]  200    8  864   12 5400   50  500   10</code></pre>
+<ol style="list-style-type: decimal">
+<li>En la primera capa convolucional
+tenemos 200 pesos más
+8 sesgos, para un total de 208 parámetros. Esto es porque tenemos</li>
+<li>En la segunda capa convolucional tenemos 864 pesos más
+12 sesgos, para un total de 876 parámetros.</li>
+<li>En la primera capa densa tenemos 5400 pesos más
+50 sesgos, para un total de 5450 parámetros.</li>
+<li>En la segunda capa densa tenemos 500 pesos más
+10 sesgos, para un total de 510 parámetros.</li>
+</ol>
+<p>El total de parámetros es 7044. Recalcula para confirmar
+este conteo de número de parámetros.</p>
+<p><strong>Observación</strong>: la segunda capa convolucional trata cada una de las
+8 “imágenes” filtradas como una nueva imagen. Cada una de ella tendrá
+12 filtros asociados, y estos 12 filtros se suman para producir
+las activaciones de la capa de salida de esta segunda convolución.</p>
+</div>
+<div id="pesos-y-activaciones" class="section level3 unnumbered">
+<h3>Pesos y activaciones</h3>
+<p>Y ahora graficamos los filtros aprendidos en la primera capa:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(scales)
+capa_<span class="dv">1</span> &lt;-<span class="st"> </span>wts[[<span class="dv">1</span>]] 
+capa_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, <span class="cf">function</span>(i){
+    <span class="kw">data_frame</span>(<span class="dt">val =</span> <span class="kw">as.numeric</span>(<span class="kw">t</span>(capa_<span class="dv">1</span>[,,<span class="dv">1</span>,i])), <span class="dt">pixel =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">25</span>, <span class="dt">unidad=</span>i)
+}) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span>bind_rows <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">y =</span> (pixel<span class="dv">-1</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">5</span>, <span class="dt">x =</span> (pixel<span class="dv">-1</span>) <span class="op">%/%</span><span class="st"> </span><span class="dv">5</span>) <span class="op">%&gt;%</span>
+<span class="st">     </span><span class="kw">group_by</span>(unidad)
+capa_list</code></pre>
+<pre><code>## # A tibble: 200 x 5
+## # Groups:   unidad [8]
+##         val pixel unidad     y     x
+##       &lt;dbl&gt; &lt;int&gt;  &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1  0.131       1      1     0     0
+##  2  0.278       2      1     1     0
+##  3  0.246       3      1     2     0
+##  4 -0.00461     4      1     3     0
+##  5 -0.144       5      1     4     0
+##  6 -0.165       6      1     0     1
+##  7  0.0589      7      1     1     1
+##  8  0.417       8      1     2     1
+##  9  0.268       9      1     3     1
+## 10 -0.0650     10      1     4     1
+## # ... with 190 more rows</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">graficar_pesos &lt;-<span class="st"> </span><span class="cf">function</span>(capa_list, <span class="dt">ncol =</span> <span class="dv">4</span>, <span class="dt">blank =</span> <span class="ot">FALSE</span>){
+    g_salida &lt;-<span class="st"> </span><span class="kw">ggplot</span>(capa_list, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span><span class="op">-</span>y)) <span class="op">+</span><span class="st"> </span>
+<span class="st">        </span><span class="kw">geom_raster</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>val), <span class="dt">interpolate=</span><span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">        </span><span class="kw">facet_wrap</span>(<span class="op">~</span>unidad, <span class="dt">ncol =</span> ncol) <span class="op">+</span><span class="st"> </span>
+<span class="st">        </span><span class="kw">coord_equal</span>() <span class="op">+</span><span class="st"> </span>
+<span class="st">        </span><span class="kw">scale_fill_gradient2</span>(<span class="dt">low =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">mid=</span><span class="st">&#39;gray80&#39;</span>,<span class="dt">high =</span> <span class="st">&quot;black&quot;</span>)   
+    <span class="cf">if</span>(blank){
+        g_salida &lt;-<span class="st"> </span>g_salida <span class="op">+</span><span class="st"> </span>
+<span class="st">        </span><span class="kw">theme</span>(<span class="dt">strip.background =</span> <span class="kw">element_blank</span>(), <span class="dt">strip.text =</span> <span class="kw">element_blank</span>()) 
+    }
+    g_salida
+}
+<span class="kw">graficar_pesos</span>(capa_list)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-20-1.png" width="384" /></p>
+<p>Nota que estos son detectores de formas geométricas simples (diagonales, rectas).</p>
+<ul>
+<li>1, 2 y 7 detectan diagonales.</li>
+<li>5,6 y 8 detectan bordes horizontales</li>
+<li>3 y 4 detectan bordes verticales</li>
+</ul>
+<p>Podemos ver las activaciones de la primera capa para algunos dígitos:</p>
+<pre class="sourceCode r"><code class="sourceCode r">red_conv_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">keras_model</span>(<span class="dt">inputs =</span> model_<span class="dv">2</span><span class="op">$</span>input,
+    <span class="dt">outputs =</span> <span class="kw">get_layer</span>(model_<span class="dv">2</span>, <span class="st">&#39;conv_1&#39;</span>)<span class="op">$</span>output)
+activaciones_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(red_conv_<span class="dv">1</span>, x_train[<span class="dv">1</span><span class="op">:</span><span class="dv">50</span>,,,,<span class="dt">drop=</span><span class="ot">FALSE</span>])
+
+graficar_activaciones &lt;-<span class="st"> </span><span class="cf">function</span>(activaciones, ind){
+  probas_ind &lt;-<span class="st"> </span>activaciones[ind,,,] <span class="co"># drop primera dimensión</span>
+  x_tamaño &lt;-<span class="st"> </span><span class="kw">dim</span>(probas_ind)[<span class="dv">1</span>]
+  y_tamaño &lt;-<span class="st"> </span><span class="kw">dim</span>(probas_ind)[<span class="dv">2</span>]
+  num_filtros &lt;-<span class="st"> </span><span class="kw">dim</span>(probas_ind)[<span class="dv">3</span>]
+  unidades_df &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">dim</span>(probas_ind)[<span class="dv">3</span>], <span class="cf">function</span>(i){
+    mat &lt;-<span class="st"> </span><span class="kw">t</span>(probas_ind[,,i])
+    <span class="kw">data_frame</span>(<span class="dt">val =</span> <span class="kw">as.numeric</span>(mat), <span class="dt">pixel =</span> <span class="dv">1</span><span class="op">:</span>(x_tamaño<span class="op">*</span>y_tamaño), 
+               <span class="dt">unidad =</span> i) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">mutate</span>(<span class="dt">y =</span> (pixel<span class="dv">-1</span>) <span class="op">%%</span><span class="st"> </span>x_tamaño, <span class="dt">x =</span> (pixel<span class="dv">-1</span>) <span class="op">%/%</span><span class="st"> </span>y_tamaño)  <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">group_by</span>(unidad) 
+  })
+  dat &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(unidades_df)
+  <span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span><span class="op">-</span>y, <span class="dt">fill=</span>val)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_tile</span>() <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">facet_wrap</span>(<span class="op">~</span>unidad, <span class="dt">ncol =</span> <span class="dv">4</span>) <span class="op">+</span>
+<span class="st">    </span><span class="kw">scale_fill_gradient2</span>(<span class="dt">low =</span> <span class="st">&quot;gray60&quot;</span>, <span class="dt">mid =</span> <span class="st">&quot;white&quot;</span>, <span class="dt">high =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">midpoint =</span> <span class="fl">0.5</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">coord_equal</span>()
+}
+<span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">4</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">5</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-21-2.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">15</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-21-3.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">8</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-21-4.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">33</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-21-5.png" width="672" /></p>
+<p>La segunda es capa de convolución es más difícil de interpretar. En esta
+capa, cada unidad de salida es combinación del filtrado de las
+8 “imágenes” de la capa anterior.</p>
+<p>Los filtros aprendidos en la segunda capa son:</p>
+<pre class="sourceCode r"><code class="sourceCode r">capa_<span class="dv">2</span> &lt;-<span class="st"> </span>wts[[<span class="dv">3</span>]] 
+out &lt;-<span class="st"> </span><span class="kw">list</span>()
+<span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">8</span>){
+  out_temp &lt;-<span class="st"> </span><span class="kw">list</span>()
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">12</span>){
+  dat_lay &lt;-<span class="st"> </span><span class="kw">data_frame</span>(<span class="dt">val =</span> <span class="kw">as.numeric</span>(capa_<span class="dv">2</span>[,,j,i]), 
+    <span class="dt">pixel =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">9</span>, <span class="dt">unidad=</span>i, <span class="dt">origen =</span> j) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">y =</span> (pixel<span class="dv">-1</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">3</span>, <span class="dt">x =</span> (pixel<span class="dv">-1</span>) <span class="op">%/%</span><span class="st"> </span><span class="dv">3</span>) 
+  out_temp[[i]] &lt;-<span class="st"> </span>dat_lay
+  }
+  out[[j]] &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(out_temp)
+}
+capa_out &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(out)
+<span class="kw">library</span>(gridExtra)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;gridExtra&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">g_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">graficar_pesos</span>(capa_list, <span class="dt">ncol =</span> <span class="dv">1</span>, <span class="dt">blank =</span> <span class="ot">TRUE</span>)
+g_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">ggplot</span>(capa_out, <span class="kw">aes</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> <span class="op">-</span>y)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill =</span> (val))) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">facet_grid</span>(origen <span class="op">~</span><span class="st"> </span>unidad) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">coord_equal</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">scale_fill_gradient2</span>(<span class="dt">low =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">mid=</span><span class="st">&#39;gray90&#39;</span>,<span class="dt">high =</span> <span class="st">&quot;black&quot;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">strip.background =</span> <span class="kw">element_blank</span>(), <span class="dt">strip.text =</span> <span class="kw">element_blank</span>())
+g_<span class="dv">1</span></code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r">g_<span class="dv">2</span></code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-22-2.png" width="672" /></p>
+<p>Nótese que en esta gráfica los filtros claramente tienen una
+estructura espacial (en general no se ven ruidosos). En esta gráfica:</p>
+<ul>
+<li>los renglones son las unidades de la capa origen (después de la primera convolución),</li>
+<li>las columnas son las unidades de salida de la segunda capa de convolución.</li>
+</ul>
+<p>Por ejemplo, consideremos los filtros de
+la primera y la segunda unidad de salida:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(capa_out <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(unidad <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)), 
+    <span class="kw">aes</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> <span class="op">-</span>y)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill =</span> (val))) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">facet_grid</span>(origen <span class="op">~</span><span class="st"> </span>unidad) <span class="op">+</span><span class="st"> </span><span class="kw">coord_equal</span>()<span class="op">+</span>
+<span class="st">  </span><span class="kw">scale_fill_gradient2</span>(<span class="dt">low =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">mid=</span><span class="st">&#39;gray90&#39;</span>,<span class="dt">high =</span> <span class="st">&quot;black&quot;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">strip.background =</span> <span class="kw">element_blank</span>(), <span class="dt">strip.text =</span> <span class="kw">element_blank</span>())    </code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p>Veamos las activaciones de las siguiente capa convolucional:</p>
+<pre class="sourceCode r"><code class="sourceCode r">red_conv_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">keras_model</span>(<span class="dt">inputs =</span> model_<span class="dv">2</span><span class="op">$</span>input,
+    <span class="dt">outputs =</span> <span class="kw">get_layer</span>(model_<span class="dv">2</span>, <span class="st">&#39;conv_2&#39;</span>)<span class="op">$</span>output)
+activaciones_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(red_conv_<span class="dv">2</span>, x_train[<span class="dv">1</span><span class="op">:</span><span class="dv">50</span>,,,,<span class="dt">drop=</span><span class="ot">FALSE</span>])
+<span class="kw">dim</span>(activaciones_<span class="dv">2</span>)</code></pre>
+<pre><code>## [1] 50  6  6 12</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">require</span>(gridExtra)
+<span class="kw">grid.arrange</span>(<span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">4</span>), 
+             <span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">2</span>, <span class="dv">4</span>), <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(<span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">5</span>), 
+             <span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">2</span>, <span class="dv">5</span>), <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-25-2.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(<span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">6</span>), 
+             <span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">2</span>, <span class="dv">6</span>), <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-25-3.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(<span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">15</span>), 
+             <span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">2</span>, <span class="dv">15</span>), <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-25-4.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(<span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">30</span>), 
+             <span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">2</span>, <span class="dv">30</span>), <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-25-5.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(<span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">1</span>, <span class="dv">50</span>), 
+             <span class="kw">graficar_activaciones</span>(activaciones_<span class="dv">2</span>, <span class="dv">50</span>), <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre>
+<p><img src="09-redes-convolucionales_files/figure-html/unnamed-chunk-25-6.png" width="672" /></p>
+
+<div id="refs" class="references">
+<div>
+<p>Bishop, Christopher M. 2006. <em>Pattern Recognition and Machine Learning (Information Science and Statistics)</em>. Secaucus, NJ, USA: Springer-Verlag New York, Inc.</p>
+</div>
+<div>
+<p>Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep Learning</em>. MIT Press.</p>
+</div>
+<div>
+<p>Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2017. <em>The Elements of Statistical Learning</em>. Springer Series in Statistics. Springer New York Inc. <a href="http://web.stanford.edu/~hastie/ElemStatLearn/">http://web.stanford.edu/~hastie/ElemStatLearn/</a>.</p>
+</div>
+<div>
+<p>James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. <em>An Introduction to Statistical Learning: With Applications in R</em>. Springer Publishing Company, Incorporated. <a href="http://www-bcf.usc.edu/~gareth/ISL/">http://www-bcf.usc.edu/~gareth/ISL/</a>.</p>
+</div>
+<div>
+<p>Ng, Andrew. 2017. “Machine Learning.” <a href="https://www.coursera.org/learn/machine-learning">https://www.coursera.org/learn/machine-learning</a>.</p>
+</div>
+<div>
+<p>Srivastava, Nitish, Geoffrey Hinton, Alex Krizhevsky, Ilya Sutskever, and Ruslan Salakhutdinov. 2014. “Dropout: A Simple Way to Prevent Neural Networks from Overfitting.” <em>J. Mach. Learn. Res.</em> 15 (1). JMLR.org: 1929–58. <a href="http://dl.acm.org/citation.cfm?id=2627435.2670313">http://dl.acm.org/citation.cfm?id=2627435.2670313</a>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="redes-neuronales-parte-2.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/felipegonzalez/aprendizaje-maquina-mcd/edit/master/09-redes-convolucionales.Rmd",
+"text": "Edit"
+},
+"download": null,
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

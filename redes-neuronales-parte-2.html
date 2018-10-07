@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-10-05">
+<meta name="date" content="2018-10-07">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="redes-neuronales-parte-1.html">
-
+<link rel="next" href="redes-convolucionales.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
@@ -263,6 +263,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="8.7" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#activaciones-relu"><i class="fa fa-check"></i><b>8.7</b> Activaciones relu</a></li>
 <li class="chapter" data-level="8.8" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#dropout-para-regularizacion"><i class="fa fa-check"></i><b>8.8</b> Dropout para regularización</a><ul>
 <li class="chapter" data-level="" data-path="redes-neuronales-parte-2.html"><a href="redes-neuronales-parte-2.html#ejemplo-39"><i class="fa fa-check"></i>Ejemplo</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html"><i class="fa fa-check"></i><b>9</b> Redes convolucionales</a><ul>
+<li class="chapter" data-level="9.1" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#filtros-convolucionales"><i class="fa fa-check"></i><b>9.1</b> Filtros convolucionales</a><ul>
+<li class="chapter" data-level="" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#filtros-en-una-dimension"><i class="fa fa-check"></i>Filtros en una dimensión</a></li>
+<li class="chapter" data-level="" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#filtros-convolucionales-en-dos-dimensiones"><i class="fa fa-check"></i>Filtros convolucionales en dos dimensiones</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#filtros-convolucionales-para-redes-neuronales"><i class="fa fa-check"></i><b>9.2</b> Filtros convolucionales para redes neuronales</a></li>
+<li class="chapter" data-level="9.3" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#capas-de-agregacion-pooling"><i class="fa fa-check"></i><b>9.3</b> Capas de agregación (pooling)</a></li>
+<li class="chapter" data-level="9.4" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#ejemplo-arquitectura-lenet"><i class="fa fa-check"></i><b>9.4</b> Ejemplo (arquitectura LeNet):</a><ul>
+<li class="chapter" data-level="" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#conteo-de-parametros"><i class="fa fa-check"></i>Conteo de parámetros</a></li>
+<li class="chapter" data-level="" data-path="redes-convolucionales.html"><a href="redes-convolucionales.html#pesos-y-activaciones"><i class="fa fa-check"></i>Pesos y activaciones</a></li>
 </ul></li>
 </ul></li>
 <li class="divider"></li>
@@ -739,13 +751,13 @@ history &lt;-<span class="st"> </span>modelo <span class="op">%&gt;%</span><span
 <p>Ver los pesos:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_weights</span>(modelo)</code></pre>
 <pre><code>## [[1]]
-##            [,1]
-## [1,] -0.6273137
-## [2,]  0.1021561
-## [3,]  0.2985778
+##             [,1]
+## [1,] -0.65366173
+## [2,]  0.04187169
+## [3,]  0.40315130
 ## 
 ## [[2]]
-## [1] 1.638935</code></pre>
+## [1] 1.629949</code></pre>
 <p>Y verificamos que concuerda con la salida de <em>glm</em>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">mod_logistico &lt;-<span class="st"> </span><span class="kw">glm</span>(g <span class="op">~</span><span class="st"> </span>x_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>x_<span class="dv">2</span><span class="op">+</span><span class="st"> </span>x_<span class="dv">3</span>, <span class="dt">data =</span> dat_ent, <span class="dt">family =</span> <span class="st">&#39;binomial&#39;</span>) 
 <span class="kw">coef</span>(mod_logistico)</code></pre>
@@ -817,13 +829,13 @@ history &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><s
 score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)
 score</code></pre>
 <pre><code>## $loss
-## [1] 3.133166
+## [1] 0.2899499
 ## 
 ## $acc
-## [1] 0.7623318
+## [1] 0.9352267
 ## 
 ## $categorical_crossentropy
-## [1] 3.132192</code></pre>
+## [1] 0.2889031</code></pre>
 <p>Podemos también intentar con el ejemplo de spam:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
 <span class="kw">library</span>(tidyr)
@@ -859,13 +871,13 @@ tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 901  71
-##   1  26 536</code></pre>
+##   0 901  74
+##   1  26 533</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##              0          1
-##   0 0.97195254 0.11696870
-##   1 0.02804746 0.88303130</code></pre>
+##   0 0.97195254 0.12191104
+##   1 0.02804746 0.87808896</code></pre>
 </div>
 </div>
 <div id="activaciones-relu" class="section level2">
@@ -924,13 +936,13 @@ history &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><s
 score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.2904131
+## [1] 0.3033069
 ## 
 ## $acc
-## [1] 0.941704
+## [1] 0.939711
 ## 
 ## $categorical_crossentropy
-## [1] 0.2117556</code></pre>
+## [1] 0.2186306</code></pre>
 </div>
 </div>
 <div id="dropout-para-regularizacion" class="section level2">
@@ -1054,37 +1066,37 @@ el capa oculta:</p>
 <span class="kw">graf_pesos</span>(pesos) </code></pre>
 <p><img src="08-redes-neuronales-2_files/figure-html/unnamed-chunk-46-1.png" width="480" /></p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_weights</span>(modelo_dropout)[[<span class="dv">3</span>]]</code></pre>
-<pre><code>##             [,1]
-##  [1,] -1.0854074
-##  [2,]  0.7300175
-##  [3,] -0.6652509
-##  [4,] -0.8639313
-##  [5,] -0.9045205
-##  [6,] -0.8380542
-##  [7,]  0.1137370
-##  [8,] -0.8208961
-##  [9,] -0.8242724
-## [10,]  0.8993547
-## [11,]  0.4511176
-## [12,] -0.7192121
-## [13,]  0.5161517
-## [14,] -0.7292056
-## [15,] -1.1965729
-## [16,] -0.7937957
-## [17,] -1.3841407
-## [18,]  0.9093007
-## [19,] -0.7111066
-## [20,] -0.7439093
-## [21,]  0.6517892
-## [22,] -0.6713123
-## [23,] -0.7438323
-## [24,]  0.6300237
-## [25,]  0.8706958
-## [26,] -0.6854882
-## [27,] -1.2562990
-## [28,] -1.1560189
-## [29,]  0.7717823
-## [30,]  0.3558374</code></pre>
+<pre><code>##              [,1]
+##  [1,] -0.87129760
+##  [2,]  0.59582001
+##  [3,] -0.80330515
+##  [4,] -0.59400123
+##  [5,]  0.94827473
+##  [6,] -1.30412817
+##  [7,] -0.58279014
+##  [8,]  0.05215969
+##  [9,]  0.47290686
+## [10,]  0.80435061
+## [11,]  0.85927659
+## [12,]  0.58767205
+## [13,] -0.89216191
+## [14,] -0.79976535
+## [15,]  0.54635060
+## [16,] -0.66973311
+## [17,] -0.85381663
+## [18,]  0.61467218
+## [19,] -1.21233165
+## [20,] -0.66951936
+## [21,] -0.98229045
+## [22,] -1.40069318
+## [23,]  0.62271136
+## [24,]  0.87061822
+## [25,] -0.78798503
+## [26,] -0.74200284
+## [27,] -0.72157645
+## [28,] -0.55106169
+## [29,] -0.77524400
+## [30,] -1.31088698</code></pre>
 <p>¿Cuáles de estas unidades tienen peso positivo y negativo en la capa final?</p>
 <pre class="sourceCode r"><code class="sourceCode r">pesos_capa_f &lt;-<span class="st"> </span><span class="kw">get_weights</span>(modelo_dropout)[[<span class="dv">3</span>]]
 <span class="kw">graf_pesos</span>(pesos[, pesos_capa_f <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
@@ -1102,37 +1114,37 @@ entrena_<span class="dv">3</span><span class="op">$</span>digito[indices]</code>
 dense_output &lt;-<span class="st"> </span><span class="kw">predict</span>(dense_layer, x_train_<span class="dv">3</span>[indices, , <span class="dt">drop=</span><span class="ot">FALSE</span>])
 dense_t &lt;-<span class="st"> </span><span class="kw">t</span>(dense_output)
 dense_t</code></pre>
-<pre><code>##            [,1]      [,2]     [,3]     [,4]     [,5]
-##  [1,] 0.0000000 0.7017325 0.000000 2.430639 0.000000
-##  [2,] 0.0000000 0.0000000 0.000000 0.000000 0.000000
-##  [3,] 0.0000000 0.0000000 2.608860 0.000000 7.204144
-##  [4,] 0.0000000 0.0000000 0.000000 0.000000 5.375129
-##  [5,] 0.0000000 0.0000000 0.000000 2.324657 4.402207
-##  [6,] 0.0000000 4.7860212 0.000000 2.776012 4.200238
-##  [7,] 0.0000000 0.0000000 0.000000 0.000000 0.000000
-##  [8,] 0.0000000 4.9440212 0.000000 2.198370 3.921540
-##  [9,] 0.0000000 0.0000000 0.000000 0.000000 0.000000
-## [10,] 0.0000000 0.0000000 0.000000 0.000000 0.000000
-## [11,] 1.9826502 0.0000000 0.000000 0.000000 0.000000
-## [12,] 0.0000000 6.1349773 0.186335 3.375684 0.000000
-## [13,] 4.7612104 0.0000000 0.000000 0.000000 0.000000
-## [14,] 0.0000000 0.0000000 1.941053 0.000000 0.000000
-## [15,] 0.0000000 0.0000000 4.375336 0.000000 0.000000
-## [16,] 0.0000000 0.0000000 5.492302 0.000000 0.000000
-## [17,] 0.0000000 0.0000000 4.192629 2.558190 0.000000
-## [18,] 0.4429509 0.0000000 0.000000 0.000000 0.000000
-## [19,] 0.0000000 2.4640062 0.000000 0.000000 5.940722
-## [20,] 0.0000000 1.9639004 0.000000 2.307020 6.941013
-## [21,] 2.9978426 0.0000000 0.000000 0.000000 0.000000
-## [22,] 0.0000000 0.0000000 2.942789 0.000000 0.000000
-## [23,] 0.0000000 0.0000000 2.202924 0.000000 2.423847
-## [24,] 0.4769731 0.0000000 0.000000 0.000000 0.000000
-## [25,] 0.0000000 0.0000000 0.000000 0.000000 0.000000
-## [26,] 0.0000000 0.0000000 0.000000 0.000000 5.132431
-## [27,] 0.0000000 0.0000000 4.398414 2.165497 0.000000
-## [28,] 0.0000000 0.0000000 5.258458 2.420586 0.000000
-## [29,] 0.0000000 0.0000000 0.000000 0.000000 0.000000
-## [30,] 0.0000000 0.0000000 0.000000 0.000000 0.000000</code></pre>
+<pre><code>##            [,1]      [,2]     [,3]     [,4]      [,5]
+##  [1,] 0.0000000 2.1345210 0.000000 1.633718 3.6367872
+##  [2,] 4.4872122 0.0000000 0.000000 0.000000 0.0000000
+##  [3,] 0.0000000 0.0000000 4.100938 0.000000 0.9982524
+##  [4,] 0.0000000 0.0000000 0.000000 1.267257 5.5583248
+##  [5,] 0.0000000 0.0000000 0.000000 0.000000 0.0000000
+##  [6,] 0.0000000 0.0000000 4.304670 2.590841 0.0000000
+##  [7,] 0.0000000 0.0000000 3.532188 0.000000 5.6022696
+##  [8,] 0.0000000 0.0000000 0.000000 0.000000 0.0000000
+##  [9,] 0.0000000 0.0000000 0.000000 0.000000 0.0000000
+## [10,] 0.6169270 0.0000000 0.000000 0.000000 0.0000000
+## [11,] 2.8534889 0.0000000 0.000000 0.000000 0.0000000
+## [12,] 2.4079170 0.0000000 0.000000 0.000000 0.0000000
+## [13,] 0.0000000 4.5085802 0.000000 2.996026 4.4178987
+## [14,] 0.0000000 5.5264735 0.000000 2.666283 3.0098374
+## [15,] 1.5504844 0.0000000 0.000000 0.000000 0.0000000
+## [16,] 0.0000000 4.8701944 0.000000 3.017471 5.3197718
+## [17,] 0.0000000 0.0000000 2.389233 0.000000 0.4515789
+## [18,] 0.0000000 0.0000000 0.000000 0.000000 0.0000000
+## [19,] 0.0000000 0.0000000 3.691184 2.292469 0.0000000
+## [20,] 0.0000000 0.7061796 0.000000 0.000000 4.7755318
+## [21,] 0.0000000 0.0000000 0.000000 2.038761 0.0000000
+## [22,] 0.0000000 0.0000000 4.644014 2.920276 0.0000000
+## [23,] 0.9635128 0.0000000 0.000000 0.000000 0.0000000
+## [24,] 0.0000000 0.0000000 0.000000 0.000000 0.0000000
+## [25,] 0.0000000 0.0000000 2.401789 0.000000 2.3482256
+## [26,] 0.0000000 0.0000000 3.486262 0.000000 0.0000000
+## [27,] 0.0000000 0.0000000 0.000000 0.000000 0.0000000
+## [28,] 0.0000000 4.1908393 0.000000 0.000000 7.1772575
+## [29,] 0.0000000 0.0000000 0.000000 0.000000 6.3913450
+## [30,] 0.0000000 0.0000000 5.829370 1.238079 0.0000000</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graf_pesos</span>(pesos[, dense_t[ ,<span class="dv">1</span>] <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
 <p><img src="08-redes-neuronales-2_files/figure-html/unnamed-chunk-49-1.png" width="480" /></p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graf_pesos</span>(pesos[, dense_t[ ,<span class="dv">2</span>] <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
@@ -1192,34 +1204,14 @@ history &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><s
 score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.2292586
+## [1] 0.2358313
 ## 
 ## $acc
-## [1] 0.9471849
+## [1] 0.9466866
 ## 
 ## $categorical_crossentropy
-## [1] 0.225288</code></pre>
+## [1] 0.2317874</code></pre>
 
-<div id="refs" class="references">
-<div>
-<p>Bishop, Christopher M. 2006. <em>Pattern Recognition and Machine Learning (Information Science and Statistics)</em>. Secaucus, NJ, USA: Springer-Verlag New York, Inc.</p>
-</div>
-<div>
-<p>Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep Learning</em>. MIT Press.</p>
-</div>
-<div>
-<p>Hastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2017. <em>The Elements of Statistical Learning</em>. Springer Series in Statistics. Springer New York Inc. <a href="http://web.stanford.edu/~hastie/ElemStatLearn/">http://web.stanford.edu/~hastie/ElemStatLearn/</a>.</p>
-</div>
-<div>
-<p>James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. <em>An Introduction to Statistical Learning: With Applications in R</em>. Springer Publishing Company, Incorporated. <a href="http://www-bcf.usc.edu/~gareth/ISL/">http://www-bcf.usc.edu/~gareth/ISL/</a>.</p>
-</div>
-<div>
-<p>Ng, Andrew. 2017. “Machine Learning.” <a href="https://www.coursera.org/learn/machine-learning">https://www.coursera.org/learn/machine-learning</a>.</p>
-</div>
-<div>
-<p>Srivastava, Nitish, Geoffrey Hinton, Alex Krizhevsky, Ilya Sutskever, and Ruslan Salakhutdinov. 2014. “Dropout: A Simple Way to Prevent Neural Networks from Overfitting.” <em>J. Mach. Learn. Res.</em> 15 (1). JMLR.org: 1929–58. <a href="http://dl.acm.org/citation.cfm?id=2627435.2670313">http://dl.acm.org/citation.cfm?id=2627435.2670313</a>.</p>
-</div>
-</div>
 </div>
 </div>
 </div>
@@ -1237,8 +1229,8 @@ score</code></pre>
           </div>
         </div>
       </div>
-<a href="redes-neuronales-parte-1.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="redes-neuronales-parte-1.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="redes-convolucionales.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

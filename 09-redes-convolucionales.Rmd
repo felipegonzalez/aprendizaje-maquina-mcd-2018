@@ -329,7 +329,7 @@ y usaremos una arquitectura un poco más simple:
 # set.seed no funciona. Podemos usar use_session_with_seed https://keras.rstudio.com/articles/faq.html#how-can-i-obtain-reproducible-results-using-keras-during-development
 #
 use_session_with_seed(72881)
-usar_cache <- TRUE
+usar_cache <- FALSE
 if(!usar_cache){
     # correr modelo y guardarlo serializado
     set.seed(213)
@@ -340,13 +340,15 @@ if(!usar_cache){
                     activation = 'relu',
                     input_shape = c(16,16,1), 
                     padding ='same',
-                    kernel_regularizer = regularizer_l2(lambda)) %>%
-      layer_max_pooling_2d(pool_size = c(2, 2), name = 'conv_1') %>% 
+                    kernel_regularizer = regularizer_l2(lambda),
+                    name = 'conv_1') %>%
+      layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
       layer_dropout(rate = 0.25) %>% 
       layer_conv_2d(filters = 12, kernel_size = c(3,3), 
                     activation = 'relu',
-                    kernel_regularizer = regularizer_l2(lambda)) %>% 
-      layer_max_pooling_2d(pool_size = c(2, 2), name = 'conv_2') %>% 
+                    kernel_regularizer = regularizer_l2(lambda),
+                    name = 'conv_2') %>% 
+      layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
       layer_dropout(rate = 0.25) %>% 
       layer_flatten() %>% 
       layer_dense(units = 50, activation = 'relu',
@@ -357,7 +359,7 @@ if(!usar_cache){
     
     model_2 %>% compile(
       loss = 'categorical_crossentropy',
-      optimizer = optimizer_sgd(lr = 0.035,  momentum = 0.5),
+      optimizer = optimizer_sgd(lr = 0.02,  momentum = 0.5),
       metrics = c('accuracy','categorical_crossentropy')
     )
     history <- model_2 %>% fit(
@@ -425,7 +427,6 @@ Y ahora graficamos los filtros aprendidos en la primera capa:
 
 ```{r, fig.width=4, message=FALSE, warning=FALSE}
 library(scales)
-
 capa_1 <- wts[[1]] 
 capa_list <- lapply(1:8, function(i){
     data_frame(val = as.numeric(t(capa_1[,,1,i])), pixel = 1:25, unidad=i)
@@ -534,15 +535,6 @@ ggplot(capa_out %>% filter(unidad %in% c(1, 2, 3)),
   theme(strip.background = element_blank(), strip.text = element_blank())    
 ```
 
-El primer filtro produce valores altos de activación cuando, en
-la salida de la primera capa de convolución:
-
-- La unidad 8 está encendida (hay línea horizontal)
-- 3 y 4 están apagadas (no hay verticales).
-- 1 y 2 están encendidas en un patrón diagonal (extiende la línea diagonal)
-- 5, 6  detectan comienzos de líneas horizontales.
-- 7 detecta el comienzo de una diagonal.
-
 Veamos las activaciones de las siguiente capa convolucional:
 
 ```{r}
@@ -554,16 +546,18 @@ dim(activaciones_2)
 
 ```{r}
 require(gridExtra)
-grid.arrange(graf_activaciones(activaciones_1, 4), 
-             graf_activaciones(activaciones_2, 4), ncol=2)
-grid.arrange(graf_activaciones(activaciones_1, 5), 
-             graf_activaciones(activaciones_2, 5), ncol=2)
-grid.arrange(graf_activaciones(activaciones_1, 6), 
-             graf_activaciones(activaciones_2, 6), ncol=2)
-grid.arrange(graf_activaciones(activaciones_1, 15), 
-             graf_activaciones(activaciones_2, 15), ncol=2)
-grid.arrange(graf_activaciones(activaciones_1, 50), 
-             graf_activaciones(activaciones_2, 50), ncol=2)
+grid.arrange(graficar_activaciones(activaciones_1, 4), 
+             graficar_activaciones(activaciones_2, 4), ncol=2)
+grid.arrange(graficar_activaciones(activaciones_1, 5), 
+             graficar_activaciones(activaciones_2, 5), ncol=2)
+grid.arrange(graficar_activaciones(activaciones_1, 6), 
+             graficar_activaciones(activaciones_2, 6), ncol=2)
+grid.arrange(graficar_activaciones(activaciones_1, 15), 
+             graficar_activaciones(activaciones_2, 15), ncol=2)
+grid.arrange(graficar_activaciones(activaciones_1, 30), 
+             graficar_activaciones(activaciones_2, 30), ncol=2)
+grid.arrange(graficar_activaciones(activaciones_1, 50), 
+             graficar_activaciones(activaciones_2, 50), ncol=2)
 ```
 
 

@@ -1281,13 +1281,13 @@ score
 
 ```
 ## $loss
-## [1] 0.4793418
+## [1] 0.4807612
 ## 
 ## $acc
 ## [1] 0.7891566
 ## 
 ## $binary_crossentropy
-## [1] 0.4397354
+## [1] 0.4377872
 ```
 
 ```r
@@ -1328,7 +1328,7 @@ ggplot(df_iteraciones, aes(x=epoch, y=value, colour=data, group=data)) +
 
 **Observación**: puedes utilizar *Tensorboard*, una herramienta
 para visualizar resultados del entrenamiento de modelos incluída
-en *Tensorflow* (que es lo que usa keras para hacer los cálculos):
+en *Tensorflow* (que es lo que usa *keras* para hacer los cálculos):
 
 
 ```r

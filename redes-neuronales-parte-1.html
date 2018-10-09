@@ -1175,13 +1175,13 @@ en tensorflow:</p>
 <pre class="sourceCode r"><code class="sourceCode r">score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_valid_s, y_valid)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.4793418
+## [1] 0.4807612
 ## 
 ## $acc
 ## [1] 0.7891566
 ## 
 ## $binary_crossentropy
-## [1] 0.4397354</code></pre>
+## [1] 0.4377872</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">predict_classes</span>(x_valid_s),y_valid) 
 tab_confusion</code></pre>
 <pre><code>##    y_valid
@@ -1201,7 +1201,7 @@ validación) para diagnosticar mejoras:</p>
 <p><img src="07-redes-neuronales_files/figure-html/unnamed-chunk-48-1.png" width="768" /></p>
 <p><strong>Observación</strong>: puedes utilizar <em>Tensorboard</em>, una herramienta
 para visualizar resultados del entrenamiento de modelos incluída
-en <em>Tensorflow</em> (que es lo que usa keras para hacer los cálculos):</p>
+en <em>Tensorflow</em> (que es lo que usa <em>keras</em> para hacer los cálculos):</p>
 <pre class="sourceCode r"><code class="sourceCode r">iteraciones &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(
   x_ent_s, y_ent, 
   <span class="co">#batch size mismo que nrow(x_ent_s) es descenso en grad.</span>

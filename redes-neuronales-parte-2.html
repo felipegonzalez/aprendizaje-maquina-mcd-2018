@@ -751,13 +751,13 @@ history &lt;-<span class="st"> </span>modelo <span class="op">%&gt;%</span><span
 <p>Ver los pesos:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_weights</span>(modelo)</code></pre>
 <pre><code>## [[1]]
-##             [,1]
-## [1,] -0.65661317
-## [2,]  0.09352535
-## [3,]  0.37390178
+##            [,1]
+## [1,] -0.6231799
+## [2,]  0.2337103
+## [3,]  0.2526886
 ## 
 ## [[2]]
-## [1] 1.639627</code></pre>
+## [1] 1.656774</code></pre>
 <p>Y verificamos que concuerda con la salida de <em>glm</em>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">mod_logistico &lt;-<span class="st"> </span><span class="kw">glm</span>(g <span class="op">~</span><span class="st"> </span>x_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>x_<span class="dv">2</span><span class="op">+</span><span class="st"> </span>x_<span class="dv">3</span>, <span class="dt">data =</span> dat_ent, <span class="dt">family =</span> <span class="st">&#39;binomial&#39;</span>) 
 <span class="kw">coef</span>(mod_logistico)</code></pre>
@@ -829,13 +829,13 @@ history &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><s
 score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.292969
+## [1] 0.2860148
 ## 
 ## $acc
-## [1] 0.9327354
+## [1] 0.9322372
 ## 
 ## $categorical_crossentropy
-## [1] 0.2919191</code></pre>
+## [1] 0.2849682</code></pre>
 <p>Podemos también intentar con el ejemplo de spam:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
 <span class="kw">library</span>(tidyr)
@@ -871,13 +871,13 @@ tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 899  67
-##   1  28 540</code></pre>
+##   0 895  51
+##   1  32 556</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##              0          1
-##   0 0.96979504 0.11037891
-##   1 0.03020496 0.88962109</code></pre>
+##   0 0.96548004 0.08401977
+##   1 0.03451996 0.91598023</code></pre>
 </div>
 </div>
 <div id="activaciones-relu" class="section level2">
@@ -936,13 +936,13 @@ history &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><s
 score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.2927104
+## [1] 0.3082152
 ## 
 ## $acc
-## [1] 0.941704
+## [1] 0.9407075
 ## 
 ## $categorical_crossentropy
-## [1] 0.2135457</code></pre>
+## [1] 0.2202282</code></pre>
 </div>
 </div>
 <div id="dropout-para-regularizacion" class="section level2">
@@ -1067,43 +1067,43 @@ el capa oculta:</p>
 <p><img src="08-redes-neuronales-2_files/figure-html/unnamed-chunk-46-1.png" width="480" /></p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_weights</span>(modelo_dropout)[[<span class="dv">3</span>]]</code></pre>
 <pre><code>##             [,1]
-##  [1,]  0.1922586
-##  [2,]  0.4609754
-##  [3,]  0.7616825
-##  [4,] -1.4060063
-##  [5,] -0.7433133
-##  [6,] -0.8546037
-##  [7,]  0.5995978
-##  [8,]  0.8447461
-##  [9,]  0.4300321
-## [10,] -0.6526658
-## [11,] -0.7037638
-## [12,] -0.8668762
-## [13,] -0.9415179
-## [14,] -1.0496036
-## [15,]  0.5158167
-## [16,] -0.7672067
-## [17,] -0.8049797
-## [18,] -1.2100118
-## [19,] -0.8310540
-## [20,]  0.6770635
-## [21,]  0.7630519
-## [22,]  0.8537263
-## [23,]  0.5069730
-## [24,]  0.8146623
-## [25,]  0.6464267
-## [26,] -1.4314976
-## [27,] -0.8607564
-## [28,] -1.0363877
-## [29,] -1.4137676
-## [30,] -0.7970183</code></pre>
+##  [1,] -1.3060355
+##  [2,] -0.8962326
+##  [3,]  0.5584190
+##  [4,] -0.7517519
+##  [5,] -0.9466311
+##  [6,] -0.8476058
+##  [7,] -1.0529205
+##  [8,]  0.8203707
+##  [9,] -0.9697056
+## [10,] -1.2459600
+## [11,] -0.9713163
+## [12,]  0.7914423
+## [13,]  0.5328714
+## [14,] -1.2981867
+## [15,]  0.4770784
+## [16,]  0.6496189
+## [17,] -0.8220353
+## [18,]  0.8034667
+## [19,] -1.2709395
+## [20,]  0.8830382
+## [21,] -0.7487084
+## [22,] -0.9039102
+## [23,] -1.1940895
+## [24,]  0.7401406
+## [25,] -0.6604319
+## [26,]  0.5287667
+## [27,]  0.3565938
+## [28,] -0.8315576
+## [29,] -0.5798898
+## [30,]  1.0247883</code></pre>
 <p>¿Cuáles de estas unidades tienen peso positivo y negativo en la capa final?</p>
 <pre class="sourceCode r"><code class="sourceCode r">pesos_capa_f &lt;-<span class="st"> </span><span class="kw">get_weights</span>(modelo_dropout)[[<span class="dv">3</span>]]
 <span class="kw">graf_pesos</span>(pesos[, pesos_capa_f <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
-<pre><code>## Warning: Removed 17 rows containing missing values (geom_tile).</code></pre>
+<pre><code>## Warning: Removed 18 rows containing missing values (geom_tile).</code></pre>
 <p><img src="08-redes-neuronales-2_files/figure-html/unnamed-chunk-47-1.png" width="480" /></p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graf_pesos</span>(pesos[, pesos_capa_f <span class="op">&lt;</span><span class="st"> </span><span class="dv">-0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
-<pre><code>## Warning: Removed 13 rows containing missing values (geom_tile).</code></pre>
+<pre><code>## Warning: Removed 12 rows containing missing values (geom_tile).</code></pre>
 <p><img src="08-redes-neuronales-2_files/figure-html/unnamed-chunk-47-2.png" width="480" /></p>
 <p>Veamos cómo se activan distintas unidades con diferentes entradas:</p>
 <pre class="sourceCode r"><code class="sourceCode r">indices &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">28</span>, <span class="dv">3</span>, <span class="dv">29</span>, <span class="dv">16</span>)
@@ -1114,37 +1114,37 @@ entrena_<span class="dv">3</span><span class="op">$</span>digito[indices]</code>
 dense_output &lt;-<span class="st"> </span><span class="kw">predict</span>(dense_layer, x_train_<span class="dv">3</span>[indices, , <span class="dt">drop=</span><span class="ot">FALSE</span>])
 dense_t &lt;-<span class="st"> </span><span class="kw">t</span>(dense_output)
 dense_t</code></pre>
-<pre><code>##           [,1]     [,2]      [,3]     [,4]      [,5]
-##  [1,] 0.000000 0.000000 0.0000000 0.000000 0.0000000
-##  [2,] 1.886895 0.000000 0.0000000 0.000000 0.0000000
-##  [3,] 0.000000 0.000000 0.0000000 0.000000 0.0000000
-##  [4,] 0.000000 0.000000 4.0259008 2.366729 0.0000000
-##  [5,] 0.000000 0.000000 0.0000000 0.000000 0.5163201
-##  [6,] 0.000000 4.513873 0.0000000 2.733686 2.9752693
-##  [7,] 0.000000 0.000000 0.0000000 0.000000 0.0000000
-##  [8,] 0.000000 0.000000 0.0000000 0.000000 0.0000000
-##  [9,] 1.262641 0.000000 0.0000000 0.000000 0.0000000
-## [10,] 0.000000 3.056377 0.0000000 0.000000 6.4118252
-## [11,] 0.000000 4.465224 0.0000000 0.000000 5.6671538
-## [12,] 0.000000 0.000000 0.0000000 0.000000 4.3094668
-## [13,] 0.000000 0.000000 0.0000000 2.959131 4.1823287
-## [14,] 0.000000 0.000000 0.0000000 2.180802 0.0000000
-## [15,] 0.000000 0.000000 0.0000000 0.000000 0.0000000
-## [16,] 0.000000 0.000000 5.5187788 0.000000 0.0000000
-## [17,] 0.000000 6.462203 0.3244852 1.993399 0.0000000
-## [18,] 0.000000 0.000000 4.5019293 0.000000 0.0000000
-## [19,] 0.000000 0.000000 4.8514433 0.000000 0.0000000
-## [20,] 1.960023 0.000000 0.0000000 0.000000 0.0000000
-## [21,] 0.000000 0.000000 0.0000000 0.000000 0.0000000
-## [22,] 1.948387 0.000000 0.0000000 0.000000 0.0000000
-## [23,] 2.783401 0.000000 0.0000000 0.000000 0.0000000
-## [24,] 0.000000 0.000000 0.0000000 0.000000 0.0000000
-## [25,] 1.907736 0.000000 0.0000000 0.000000 0.0000000
-## [26,] 0.000000 0.000000 3.0829594 2.616267 0.0000000
-## [27,] 0.000000 0.000000 2.9671943 0.000000 3.0245070
-## [28,] 0.000000 1.355164 0.0000000 2.652662 5.3972569
-## [29,] 0.000000 0.000000 3.6072133 1.718831 0.0000000
-## [30,] 0.000000 0.000000 0.0000000 0.000000 6.6532111</code></pre>
+<pre><code>##            [,1]     [,2]      [,3]     [,4]     [,5]
+##  [1,] 0.0000000 0.000000 4.5994582 1.808235 0.000000
+##  [2,] 0.0000000 5.214591 0.0000000 3.271486 3.801979
+##  [3,] 0.0000000 0.000000 0.0000000 0.000000 0.000000
+##  [4,] 0.0000000 5.416330 0.0000000 1.538537 5.230970
+##  [5,] 0.0000000 2.599339 0.0000000 2.135650 0.000000
+##  [6,] 0.0000000 0.000000 2.0948184 0.000000 4.934194
+##  [7,] 0.0000000 0.000000 0.0000000 0.000000 0.000000
+##  [8,] 0.0000000 0.000000 0.0000000 0.000000 0.000000
+##  [9,] 0.0000000 2.321973 0.0000000 2.712654 4.327315
+## [10,] 0.0000000 0.000000 4.6904292 2.268869 0.000000
+## [11,] 0.0000000 1.206332 0.0000000 2.791762 2.245070
+## [12,] 0.6887603 0.000000 0.0000000 0.000000 0.000000
+## [13,] 0.0000000 0.000000 0.0000000 0.000000 0.000000
+## [14,] 0.0000000 0.000000 3.8585701 1.540073 0.000000
+## [15,] 5.1248970 0.000000 0.0000000 0.000000 0.000000
+## [16,] 0.0000000 0.000000 0.0000000 0.000000 0.000000
+## [17,] 0.0000000 0.000000 3.1826835 0.000000 4.297050
+## [18,] 0.0000000 0.000000 0.0000000 0.000000 0.000000
+## [19,] 0.0000000 0.000000 4.3709044 1.816100 0.000000
+## [20,] 3.5378709 0.000000 0.0000000 0.000000 0.000000
+## [21,] 0.0000000 1.756270 0.0000000 0.000000 4.731445
+## [22,] 0.0000000 0.000000 3.0452178 0.000000 0.000000
+## [23,] 0.0000000 0.000000 4.1155519 0.000000 0.000000
+## [24,] 1.0754156 0.000000 0.0000000 0.000000 0.000000
+## [25,] 0.0000000 2.658264 0.9779851 0.000000 5.715424
+## [26,] 0.0000000 0.000000 0.0000000 0.000000 0.000000
+## [27,] 3.7712345 0.000000 0.0000000 0.000000 0.000000
+## [28,] 0.0000000 0.000000 0.0000000 0.000000 6.072142
+## [29,] 0.0000000 0.000000 0.0000000 1.152769 4.393791
+## [30,] 0.0000000 0.000000 0.0000000 0.000000 0.000000</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graf_pesos</span>(pesos[, dense_t[ ,<span class="dv">1</span>] <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
 <p><img src="08-redes-neuronales-2_files/figure-html/unnamed-chunk-49-1.png" width="480" /></p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graf_pesos</span>(pesos[, dense_t[ ,<span class="dv">2</span>] <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
@@ -1204,13 +1204,13 @@ history &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><s
 score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.2202365
+## [1] 0.216575
 ## 
 ## $acc
-## [1] 0.9526657
+## [1] 0.9501744
 ## 
 ## $categorical_crossentropy
-## [1] 0.2161112</code></pre>
+## [1] 0.2124475</code></pre>
 
 </div>
 </div>

@@ -492,7 +492,7 @@ Como se ilustra en la siguiente gráfica:
 ```
 
 Para visualizar las ordenadas (que también se llaman  **sesgos** en este contexto),
-ponemos $a_0^2=1$.
+ponemos $a_{0}^{(2)}=1$.
 ```{r, echo=FALSE, fig.width=7}
  gr <- graph(
    c(c(1,5,1,6,2,5,2,6,3,5,3,6,4,5,4,6)))

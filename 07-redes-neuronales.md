@@ -24,7 +24,7 @@ que seleccionaremos más tarde. La idea es hacer **combinaciones lineales** de
 variables **transformadas**. 
 
 
- Modelamos ahora la probabilidad de clase 1 con regresión logística -pero en lugar de usar las entradas originales X usamos las entradas derivadas 
+ Modelamos ahora la probabilidad de clase 1 con regresión logística, pero en lugar de usar las entradas originales X usamos las entradas derivadas 
 $a_1, . . . , a_m$:
 $$p_1(x) = h \left ( \beta_0 + \sum_{j=1}^m \beta_ja_j
 \right)$$ 
@@ -137,6 +137,7 @@ geom_line(data=dat_p, aes(x=x,y=p), col='red') +ylim(c(0,1))+
 ```
 
 <img src="07-redes-neuronales_files/figure-html/unnamed-chunk-8-1.png" width="480" />
+
 que da un ajuste razonable. Este es un ejemplo de cómo
 la mezcla de dos funciones logísticas puede 
 replicar esta función con forma de chipote.
@@ -155,7 +156,7 @@ usamos la función *optim* de R para
 minimizar la devianza. En primer lugar, creamos una
 función que para todas las entradas calcula los valores
 de salida. En esta función hacemos **feed-forward** de las entradas
-a través de la red para calcular la salida
+a través de la red para calcular la salida.
 
 
 ```r
@@ -168,6 +169,7 @@ feed_fow <- function(beta, x){
   p
 }
 ```
+
 Nótese que simplemente seguimos el diagrama mostrado arriba
 para hacer los cálculos, combinando linealmente las entradas en cada
 capa.
@@ -246,6 +248,7 @@ geom_line(data = dat_p, aes(x = x, y = p), col='red') +ylim(c(0,1))+
 ```
 
 <img src="07-redes-neuronales_files/figure-html/unnamed-chunk-13-1.png" width="480" />
+
 Los coeficientes estimados, que en este caso muchas veces se llaman
 *pesos*, son: 
 
@@ -438,7 +441,7 @@ ggplot(dat, aes(x=x1, y=x2)) + geom_tile(aes(fill=p))
 <img src="07-redes-neuronales_files/figure-html/unnamed-chunk-20-1.png" width="480" />
 
 Esta función puede entenderse como un o exclusivo: la probabilidad es alta
-sólo cuando x1 y x2 tienen valores opuestos (x1 grande pero x2 chica y viceversa). 
+sólo cuando $x_1$ y $x_2$ tienen valores opuestos ($x_1$ grande pero $x_2$ chica y viceversa). 
 
 No es posible modelar esta función mediante el modelo logístico (sin interacciones).
 Pero podemos incluir la interacción en el modelo logístico o intentar
@@ -511,7 +514,7 @@ table(predict(mod_2) > 0.5, dat_ent$y)
  Observese la gran diferencia de devianza entre los dos modelos (en este caso,
  el sobreajuste no es un problema).
 
-Ahora consideramos qué red neuronal puede ser apropiada
+Ahora consideramos qué red neuronal puede ser apropiada.
 
 
 ```r
@@ -620,7 +623,7 @@ ggplot(dat, aes(x=x1, y=x2)) + geom_tile(aes(fill=p_red))
 
 <img src="07-redes-neuronales_files/figure-html/unnamed-chunk-25-1.png" width="480" />
 
-**Observación**: ¿cómo funciona esta red? Consideremos la capa intermedia
+**Observación**: ¿cómo funciona esta red? Consideremos la capa intermedia.
 
 
 ```r
@@ -1278,13 +1281,13 @@ score
 
 ```
 ## $loss
-## [1] 0.4772712
+## [1] 0.4702533
 ## 
 ## $acc
-## [1] 0.7831325
+## [1] 0.7801205
 ## 
 ## $binary_crossentropy
-## [1] 0.4353863
+## [1] 0.435232
 ```
 
 ```r
@@ -1295,8 +1298,8 @@ tab_confusion
 ```
 ##    y_valid
 ##       0   1
-##   0 195  44
-##   1  28  65
+##   0 192  42
+##   1  31  67
 ```
 
 ```r
@@ -1306,8 +1309,8 @@ prop.table(tab_confusion, 2)
 ```
 ##    y_valid
 ##             0         1
-##   0 0.8744395 0.4036697
-##   1 0.1255605 0.5963303
+##   0 0.8609865 0.3853211
+##   1 0.1390135 0.6146789
 ```
 
 Es importante monitorear las curvas de aprendizaje (entrenamiento y

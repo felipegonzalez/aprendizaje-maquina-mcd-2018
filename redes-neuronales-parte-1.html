@@ -790,7 +790,7 @@ por</p>
 <p>Como se ilustra en la siguiente gráfica:</p>
 <p><img src="07-redes-neuronales_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
 <p>Para visualizar las ordenadas (que también se llaman <strong>sesgos</strong> en este contexto),
-ponemos <span class="math inline">\(a_0^2=1\)</span>.
+ponemos <span class="math inline">\(a_{0}^{(2)}=1\)</span>.
 <img src="07-redes-neuronales_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 </div>
 <div id="ejemplo-34" class="section level4 unnumbered">
@@ -1175,24 +1175,24 @@ en tensorflow:</p>
 <pre class="sourceCode r"><code class="sourceCode r">score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_valid_s, y_valid)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.4712798
+## [1] 0.4717249
 ## 
 ## $acc
-## [1] 0.7861446
+## [1] 0.7801205
 ## 
 ## $binary_crossentropy
-## [1] 0.4349154</code></pre>
+## [1] 0.4344332</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">predict_classes</span>(x_valid_s),y_valid) 
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 194  42
-##   1  29  67</code></pre>
+##   0 193  43
+##   1  30  66</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##             0         1
-##   0 0.8699552 0.3853211
-##   1 0.1300448 0.6146789</code></pre>
+##   0 0.8654709 0.3944954
+##   1 0.1345291 0.6055046</code></pre>
 <p>Es importante monitorear las curvas de aprendizaje (entrenamiento y
 validación) para diagnosticar mejoras:</p>
 <pre class="sourceCode r"><code class="sourceCode r">df_iteraciones &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(iteraciones)

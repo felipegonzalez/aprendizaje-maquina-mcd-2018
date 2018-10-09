@@ -783,7 +783,7 @@ Como se ilustra en la siguiente gráfica:
 <img src="07-redes-neuronales_files/figure-html/unnamed-chunk-30-1.png" width="672" />
 
 Para visualizar las ordenadas (que también se llaman  **sesgos** en este contexto),
-ponemos $a_0^2=1$.
+ponemos $a_{0}^{(2)}=1$.
 <img src="07-redes-neuronales_files/figure-html/unnamed-chunk-31-1.png" width="672" />
 
 
@@ -1278,13 +1278,13 @@ score
 
 ```
 ## $loss
-## [1] 0.4712798
+## [1] 0.4717249
 ## 
 ## $acc
-## [1] 0.7861446
+## [1] 0.7801205
 ## 
 ## $binary_crossentropy
-## [1] 0.4349154
+## [1] 0.4344332
 ```
 
 ```r
@@ -1295,8 +1295,8 @@ tab_confusion
 ```
 ##    y_valid
 ##       0   1
-##   0 194  42
-##   1  29  67
+##   0 193  43
+##   1  30  66
 ```
 
 ```r
@@ -1306,8 +1306,8 @@ prop.table(tab_confusion, 2)
 ```
 ##    y_valid
 ##             0         1
-##   0 0.8699552 0.3853211
-##   1 0.1300448 0.6146789
+##   0 0.8654709 0.3944954
+##   1 0.1345291 0.6055046
 ```
 
 Es importante monitorear las curvas de aprendizaje (entrenamiento y

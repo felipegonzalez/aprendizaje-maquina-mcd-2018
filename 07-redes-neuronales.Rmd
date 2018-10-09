@@ -758,7 +758,7 @@ $$\frac{\partial  a_s^{(l+1)}}{\partial a_j^{(l)}}=h'(z_s^{(l+1)})\theta_{s,j}^{
 
 de modo que
 
-$$\frac{\partial D}{\partial a_j^{(l)}}= \sum_{s=1}^{n_l}
+$$\frac{\partial D}{\partial a_j^{(l+1)}}= \sum_{s=1}^{n_l}
 \frac{\partial D}{\partial a_s^{(l+1)}} h'(z_s^{(l+1)})\theta_{s,j}^{(l)}.$$
 
 

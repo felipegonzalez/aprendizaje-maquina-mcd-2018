@@ -695,7 +695,7 @@ ggplot(dat_wage) + geom_point(aes(x=age, y=wage)) +
 - Podemos escoger los puntos de corte en lugares que son razonables para el problema
 (rangos en los es razonable modelar como una constante).
 - También podemos hacer cortes automáticos usando percentiles de los datos: por ejemplo,
-cortar en cuatro usando los percentiles 25\%, 0.5\% y 0.75\%. Con más datos es posible
+cortar en cuatro usando los percentiles 25\%, 50\% y 75\%. Con más datos es posible
 incrementar el número de cortes.
 - Nótese que cuando hacemos estas categorizaciones estamos incrementando el 
 número de parámetros a estimar del modelo (si hacemos tres cortes, por ejemplo, aumentamos

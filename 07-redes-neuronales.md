@@ -1080,12 +1080,12 @@ de manera recursiva.
 
 ### Algoritmo de backpropagation
 
-\BeginKnitrBlock{comentario}<div class="comentario">**Backpropagation** Para problema de clasificación con regularización $\lambda\geq 0 $.
-Para $i=1,\ldots, N$, tomamos el dato de entrenamiento  $(x^{(i)}, y^{(i)})$ y hacemos:
+\BeginKnitrBlock{comentario}<div class="comentario">**Backpropagation** Para problema de clasificación con regularización $ \lambda \geq 0 $.
+Para $i=1,\ldots, N,$ tomamos el dato de entrenamiento  $(x^{(i)}, y^{(i)})$ y hacemos:
 
 1. Ponemos $a^{(1)}=x^{(i)}$ (vector de entradas, incluyendo 1).
-2. Calculamos $a^{(2)},a^{(3)},\ldots, a^{(L)}$ usando feed forward para la entrada $x^{(i)}$
-3. Calculamos $\delta^{(L)}=a^{ (L)}-y^{(i)}$, y luego
+2. Calculamos $a^{(2)},a^{(3)},\ldots, a^{(L)}$ usando feed forward para la entrada $x^{(i)}.$
+3. Calculamos $\delta^{(L)}=a^{(L)}-y^{(i)}$, y luego
 $\delta^{(L-1)},\ldots, \delta^{(2)}$ según la recursión \@ref(eq:delta-recursion).
 4. Acumulamos
 $\Delta_{j,k}^{(l)}=\Delta_{j,k}^{(l)} + \delta_j^{(l+1)}a_k^{(l)}$.
@@ -1278,13 +1278,13 @@ score
 
 ```
 ## $loss
-## [1] 0.4766945
+## [1] 0.4712798
 ## 
 ## $acc
-## [1] 0.7891566
+## [1] 0.7861446
 ## 
 ## $binary_crossentropy
-## [1] 0.4345762
+## [1] 0.4349154
 ```
 
 ```r
@@ -1295,8 +1295,8 @@ tab_confusion
 ```
 ##    y_valid
 ##       0   1
-##   0 193  40
-##   1  30  69
+##   0 194  42
+##   1  29  67
 ```
 
 ```r
@@ -1306,8 +1306,8 @@ prop.table(tab_confusion, 2)
 ```
 ##    y_valid
 ##             0         1
-##   0 0.8654709 0.3669725
-##   1 0.1345291 0.6330275
+##   0 0.8699552 0.3853211
+##   1 0.1300448 0.6146789
 ```
 
 Es importante monitorear las curvas de aprendizaje (entrenamiento y

@@ -1026,12 +1026,12 @@ de manera recursiva.</p>
 <h3><span class="header-section-number">7.5.2</span> Algoritmo de backpropagation</h3>
 
 <div class="comentario">
-<p><strong>Backpropagation</strong> Para problema de clasificación con regularización $0 $.
-Para <span class="math inline">\(i=1,\ldots, N\)</span>, tomamos el dato de entrenamiento <span class="math inline">\((x^{(i)}, y^{(i)})\)</span> y hacemos:</p>
+<p><strong>Backpropagation</strong> Para problema de clasificación con regularización $ 0 $.
+Para <span class="math inline">\(i=1,\ldots, N,\)</span> tomamos el dato de entrenamiento <span class="math inline">\((x^{(i)}, y^{(i)})\)</span> y hacemos:</p>
 <ol style="list-style-type: decimal">
 <li>Ponemos <span class="math inline">\(a^{(1)}=x^{(i)}\)</span> (vector de entradas, incluyendo 1).</li>
-<li>Calculamos <span class="math inline">\(a^{(2)},a^{(3)},\ldots, a^{(L)}\)</span> usando feed forward para la entrada <span class="math inline">\(x^{(i)}\)</span></li>
-<li>Calculamos <span class="math inline">\(\delta^{(L)}=a^{ (L)}-y^{(i)}\)</span>, y luego
+<li>Calculamos <span class="math inline">\(a^{(2)},a^{(3)},\ldots, a^{(L)}\)</span> usando feed forward para la entrada <span class="math inline">\(x^{(i)}.\)</span></li>
+<li>Calculamos <span class="math inline">\(\delta^{(L)}=a^{(L)}-y^{(i)}\)</span>, y luego
 <span class="math inline">\(\delta^{(L-1)},\ldots, \delta^{(2)}\)</span> según la recursión <a href="redes-neuronales-parte-1.html#eq:delta-recursion">(7.4)</a>.</li>
 <li>Acumulamos
 <span class="math inline">\(\Delta_{j,k}^{(l)}=\Delta_{j,k}^{(l)} + \delta_j^{(l+1)}a_k^{(l)}\)</span>.</li>
@@ -1175,24 +1175,24 @@ en tensorflow:</p>
 <pre class="sourceCode r"><code class="sourceCode r">score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_valid_s, y_valid)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.4766945
+## [1] 0.4712798
 ## 
 ## $acc
-## [1] 0.7891566
+## [1] 0.7861446
 ## 
 ## $binary_crossentropy
-## [1] 0.4345762</code></pre>
+## [1] 0.4349154</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">predict_classes</span>(x_valid_s),y_valid) 
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 193  40
-##   1  30  69</code></pre>
+##   0 194  42
+##   1  29  67</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##             0         1
-##   0 0.8654709 0.3669725
-##   1 0.1345291 0.6330275</code></pre>
+##   0 0.8699552 0.3853211
+##   1 0.1300448 0.6146789</code></pre>
 <p>Es importante monitorear las curvas de aprendizaje (entrenamiento y
 validación) para diagnosticar mejoras:</p>
 <pre class="sourceCode r"><code class="sourceCode r">df_iteraciones &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(iteraciones)

@@ -656,7 +656,7 @@ $\frac{\Delta x}{x_j}$ es chica, entonces aproximadamente
 $$ \frac{\Delta y}{y} \approx b_j \frac{\Delta x}{x_j}$$
 Es decir, el cambio relativo en $y$ es proporcional al cambio relativo en $x_j$ para
 cambios relativamente chicos en $x_j$, y el coeficiente es la constante de
-proporcionalidad
+proporcionalidad.
 
 ---
 

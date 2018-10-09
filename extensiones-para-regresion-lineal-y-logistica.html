@@ -355,9 +355,9 @@ sin cambios: el modelo sigue siendo lineal, pero el espacio de entradas
 es diferente (generalmente expandido).</p>
 <p>Veremos las siguientes técnicas:</p>
 <ul>
-<li>Agregar versiones transformadas de las variables de entrada</li>
+<li>Agregar versiones transformadas de las variables de entrada.</li>
 <li>Incluir variables cualitativas (categóricas).</li>
-<li>Interacciones entre variables: incluir términos de la forma <span class="math inline">\(x_1x_2\)</span></li>
+<li>Interacciones entre variables: incluir términos de la forma <span class="math inline">\(x_1x_2\)</span>.</li>
 <li>Regresión polinomial: incluír términos de la forma <span class="math inline">\(x_1^2\)</span>, <span class="math inline">\(x_1^3\)</span>, etcétera.</li>
 <li>Splines de regresión.</li>
 </ul>
@@ -437,7 +437,7 @@ podríamos incluir la relación que hay entre tamaño del sótano y área habita
 Pero en la expresión</p>
 <p><span class="math display">\[ f(x) = \beta_0 +  \sum_{i=1}^p \beta_jx_j,\]</span>
 todas las entradas son numéricas. Podemos usar un truco simple para incluir
-variables cualitativas</p>
+variables cualitativas.</p>
 <div id="ejemplo-28" class="section level4 unnumbered">
 <h4>Ejemplo</h4>
 <p>Supongamos que queremos incluir la variable <em>CentralAir</em>, si tiene aire acondicionado
@@ -493,7 +493,7 @@ una indicadora para la última clase.</p>
 </div>
 <div id="ejemplo-29" class="section level4 unnumbered">
 <h4>Ejemplo</h4>
-<p>Vamos a incluir la variable BsmtQual, que tiene los niveles:</p>
+<p>Vamos a incluir la variable <em>BsmtQual</em>, que tiene los niveles:</p>
 <pre class="sourceCode r"><code class="sourceCode r">casas_e <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(BsmtQual) <span class="op">%&gt;%</span><span class="st"> </span>count</code></pre>
 <pre><code>## # A tibble: 5 x 2
 ## # Groups:   BsmtQual [5]
@@ -532,7 +532,7 @@ con <em>dummy coding</em>:</p>
 <span class="kw">coef</span>(mod_<span class="dv">6</span>)[bsmt_ind] <span class="op">%&gt;%</span><span class="st"> </span>sort</code></pre>
 <pre><code>## BsmtQualFa BsmtQualTA BsmtQualNA BsmtQualGd 
 ##  -66355.09  -54621.42  -50546.76  -34231.49</code></pre>
-<p>Nótese que la categoría base (con coeficiente 0 es ‘Ex’, es decir, no aparece TotalBsmtEx).
+<p>Nótese que la categoría base (con coeficiente 0 es ‘Ex’, es decir, no aparece <em>TotalBsmtEx</em>).
 Esta es la razón por la que todos estos coeficientes son negativos (Ex es el mejor nivel).</p>
 <hr />
 <p><strong>Observaciones</strong>:
@@ -616,10 +616,10 @@ pred_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">pr
 <pre><code>## [1] 15.52405</code></pre>
 <p>Podemos interpretar el modelo con interacción de la siguiente forma:</p>
 <ul>
-<li>Si <span class="math inline">\(Wind = 5\)</span>, entonces la relación Temperatura Ozono es:
+<li>Si <span class="math inline">\(Wind = 5\)</span>, entonces la relación Temperatura &lt;-&gt; Ozono es:
 <span class="math display">\[ Ozono = -290 + 4.5Temp + 14.6(5) - 0.2(Temp)(5) = -217 + 3.5Temp\]</span></li>
 <li>Si <span class="math inline">\(Wind=10\)</span>,
-entonces la relación Temperatura Ozono es:
+entonces la relación Temperatura &lt;-&gt; Ozono es:
 <span class="math display">\[ Ozono = -290 + 4.5Temp + 14.6(15) - 0.2(Temp)(15) = -71 + 1.5Temp\]</span></li>
 </ul>
 <p>Incluir interacciones en modelos lineales es buena idea para problemas con un número relativamente chico de variables (por ejemplo, <span class="math inline">\(p &lt; 10\)</span>).
@@ -892,7 +892,7 @@ mod_age</code></pre>
 <p>En muchos problemas, es natural transformar variables numéricas con el logaritmo.
 Supongamos por ejemplo que en nuestro problema la variable <span class="math inline">\(y\)</span> es positiva,
 y también las entradas son positivas. En primer lugar podríamos intentar modelar
-<span class="math display">\[ y =  b_0 + \sum b_j x_j \]</span>
+<span class="math display">\[ y =  b_0 + \sum b_j x_j, \]</span>
 pero también podemos transformar las entradas y la salida para construir un
 modelo multiplicativo:
 <span class="math inline">\(y&#39; = log(y) = b_0 + \sum b_k \log(x_j)\)</span>

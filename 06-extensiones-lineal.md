@@ -66,9 +66,9 @@ es diferente (generalmente expandido).
 
 Veremos las siguientes técnicas:
 
-- Agregar versiones transformadas de las variables de entrada
+- Agregar versiones transformadas de las variables de entrada.
 - Incluir variables cualitativas (categóricas). 
-- Interacciones entre variables: incluir términos de la forma $x_1x_2$
+- Interacciones entre variables: incluir términos de la forma $x_1x_2$.
 - Regresión polinomial: incluír términos de la forma $x_1^2$, $x_1^3$, etcétera.
 - Splines de regresión.
 
@@ -195,7 +195,7 @@ Pero en la expresión
 
 $$ f(x) = \beta_0 +  \sum_{i=1}^p \beta_jx_j,$$
 todas las entradas son numéricas. Podemos usar un truco simple para incluir
-variables cualitativas
+variables cualitativas.
 
 #### Ejemplo {-}
 Supongamos que queremos incluir la variable *CentralAir*, si tiene aire acondicionado
@@ -285,7 +285,7 @@ una indicadora para la última clase.
 
 #### Ejemplo {-}
 
-Vamos a incluir la variable BsmtQual, que tiene los niveles:
+Vamos a incluir la variable *BsmtQual*, que tiene los niveles:
 
 
 ```r
@@ -361,7 +361,7 @@ coef(mod_6)[bsmt_ind] %>% sort
 ##  -66355.09  -54621.42  -50546.76  -34231.49
 ```
 
-Nótese que la categoría base (con coeficiente 0 es 'Ex', es decir, no aparece TotalBsmtEx). 
+Nótese que la categoría base (con coeficiente 0 es 'Ex', es decir, no aparece *TotalBsmtEx*). 
 Esta es la razón por la que todos estos coeficientes son negativos (Ex es el mejor nivel). 
 
 ---
@@ -495,10 +495,10 @@ mean(abs(pred_2-air[51:116,'Ozone']))
 
 Podemos interpretar el modelo con interacción de la siguiente forma:
 
-- Si $Wind = 5$, entonces la relación Temperatura Ozono es:
+- Si $Wind = 5$, entonces la relación Temperatura <-> Ozono es:
 $$ Ozono = -290 + 4.5Temp + 14.6(5) - 0.2(Temp)(5) = -217 + 3.5Temp$$
 - Si $Wind=10$, 
- entonces la relación Temperatura Ozono es:
+ entonces la relación Temperatura <-> Ozono es:
 $$ Ozono = -290 + 4.5Temp + 14.6(15) - 0.2(Temp)(15) = -71 + 1.5Temp$$
 
 Incluir interacciones en modelos lineales es buena idea para problemas con un número relativamente chico de variables (por ejemplo, $p < 10$).
@@ -903,7 +903,7 @@ ggplot(dat_wage) + geom_point(aes(x=age, y=wage)) +
 En muchos problemas, es natural transformar variables numéricas con el logaritmo. 
 Supongamos por ejemplo que en nuestro problema la variable $y$ es positiva,
 y también las entradas son positivas. En primer lugar podríamos intentar modelar
-$$ y =  b_0 + \sum b_j x_j $$
+$$ y =  b_0 + \sum b_j x_j, $$
 pero también podemos transformar las entradas y la salida para construir un 
 modelo multiplicativo:
 $y' = log(y) = b_0 + \sum b_k \log(x_j)$ 

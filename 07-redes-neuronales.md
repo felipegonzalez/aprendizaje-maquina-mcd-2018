@@ -1164,7 +1164,7 @@ del gradiente.
 
 - Generalmente los pesos se inicializan al azar con variables independientes
 gaussianas o uniformes centradas en cero, y con varianza chica
-(por ejemplo $U(-0.5,0.5)$). Una recomendación es usar $U(-1/\sqrt(m), 1/\sqrt(m))$
+(por ejemplo $U(-0.5,0.5)$). Una recomendación es usar $U(-1/\sqrt{m}, 1/\sqrt{m})$
 donde $m$ es el número de entradas. En general, hay que experimentar con este 
 parámetro.
 
@@ -1281,13 +1281,13 @@ score
 
 ```
 ## $loss
-## [1] 0.4807612
+## [1] 0.4790868
 ## 
 ## $acc
-## [1] 0.7891566
+## [1] 0.7831325
 ## 
 ## $binary_crossentropy
-## [1] 0.4377872
+## [1] 0.4365023
 ```
 
 ```r
@@ -1298,8 +1298,8 @@ tab_confusion
 ```
 ##    y_valid
 ##       0   1
-##   0 195  42
-##   1  28  67
+##   0 193  42
+##   1  30  67
 ```
 
 ```r
@@ -1309,8 +1309,8 @@ prop.table(tab_confusion, 2)
 ```
 ##    y_valid
 ##             0         1
-##   0 0.8744395 0.3853211
-##   1 0.1255605 0.6146789
+##   0 0.8654709 0.3853211
+##   1 0.1345291 0.6146789
 ```
 
 Es importante monitorear las curvas de aprendizaje (entrenamiento y

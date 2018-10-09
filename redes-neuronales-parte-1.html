@@ -1099,7 +1099,7 @@ tener gradientes demasiado grandes y produzcan inestabilidad en el cálculo
 del gradiente.</p></li>
 <li><p>Generalmente los pesos se inicializan al azar con variables independientes
 gaussianas o uniformes centradas en cero, y con varianza chica
-(por ejemplo <span class="math inline">\(U(-0.5,0.5)\)</span>). Una recomendación es usar <span class="math inline">\(U(-1/\sqrt(m), 1/\sqrt(m))\)</span>
+(por ejemplo <span class="math inline">\(U(-0.5,0.5)\)</span>). Una recomendación es usar <span class="math inline">\(U(-1/\sqrt{m}, 1/\sqrt{m})\)</span>
 donde <span class="math inline">\(m\)</span> es el número de entradas. En general, hay que experimentar con este
 parámetro.</p></li>
 </ul>
@@ -1175,24 +1175,24 @@ en tensorflow:</p>
 <pre class="sourceCode r"><code class="sourceCode r">score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_valid_s, y_valid)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.4807612
+## [1] 0.4790868
 ## 
 ## $acc
-## [1] 0.7891566
+## [1] 0.7831325
 ## 
 ## $binary_crossentropy
-## [1] 0.4377872</code></pre>
+## [1] 0.4365023</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">predict_classes</span>(x_valid_s),y_valid) 
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 195  42
-##   1  28  67</code></pre>
+##   0 193  42
+##   1  30  67</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##             0         1
-##   0 0.8744395 0.3853211
-##   1 0.1255605 0.6146789</code></pre>
+##   0 0.8654709 0.3853211
+##   1 0.1345291 0.6146789</code></pre>
 <p>Es importante monitorear las curvas de aprendizaje (entrenamiento y
 validación) para diagnosticar mejoras:</p>
 <pre class="sourceCode r"><code class="sourceCode r">df_iteraciones &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(iteraciones)

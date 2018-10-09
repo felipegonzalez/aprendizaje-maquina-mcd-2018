@@ -21,16 +21,16 @@ library(igraph)
 
  Supón que los sesgos son 0 para la unidad $a_1$, 0 para la unidad $a_2$ y -0.5 para la unidad $p$.
 
-1. Escribe cada $\theta_{i,j}^{(l)}$ según la notación de clase e identifica su valor. Por ejemplo, tenemos que $\theta^{(1)}_{1,0} = 0$ (tienes que escribir 7 valores como este). Escribe las matrices $\Theta^{(1)}$ y $\Theta^{(2)}$
+1. Escribe cada $\theta_{i,j}^{(l)}$ según la notación de clase e identifica su valor. Por ejemplo, tenemos que $\theta^{(1)}_{1,0} = 0$ (tienes que escribir 7 valores como este). Escribe las matrices $\Theta^{(1)}$ y $\Theta^{(2)}$.
 
-2. Supón que tenemos un caso (observación) con $(x, p)=(1, 0)$. ¿Qué es $a_1^{(1)}$? Haz forward feed para calcular los valores de $a_1^{(2)}$, $a_2^{(2)}$ y $p=a_1^{(3)}$.
-3. Calcula la devianza para el caso $(x, y)=(1, 0)$
+2. Supón que tenemos un caso (observación) con $(x, p)=(1, y)$. ¿Qué es $a_1^{(1)}$? Haz forward feed para calcular los valores de $a_1^{(2)}$, $a_2^{(2)}$ y $p=a_1^{(3)}$.
+3. Calcula la devianza para el caso $(x, y)=(1, 0)$.
 4. Según el cálculo que hiciste en 2 y 3, intuitivamente, ¿qué conviene hacer con los dos últimos pesos de la última capa para reducir la devianza? ¿Incrementarlos o disminuirlos? 
 5. Según tu cálculo de 2, y 3, ¿qué conviene hacer con
 las unidades
 $a_1^{(2)}$, $a_2^{(2)}$  para reducir la devianza? 
 6. Usando el inciso anterior, contesta qué conviene hacer con los pesos $\Theta^{(1)}$ para reducir la devianza.
-7. Error en la última capa (3): Calcula $\delta^{(3)}_1$
+7. Error en la última capa (3): Calcula $\delta^{(3)}_1$.
 8. Ahora calcula (ver algoritmo de backpropagation) la derivada $\frac{\partial D}{\partial \theta^{(2)}_{1,1}}$. El resultado coincide con tu intuición del inciso 4? Puedes intentar calcular directamente esta derivada también, con el método que quieras.
 9. ¿Cómo se calculan las derivadas de los sesgos? Calcula $\frac{\partial D}{\partial \theta^{(2)}_{1,0}}$ usando 
 el inciso anterior.

@@ -395,7 +395,7 @@ La idea es entonces producir una estimación de f que nos permita hacer predicci
 
 Si denotamos por $\hat{f}$ a una estimación de $f$ construida a partir de los datos,
 podemos hacer predicciones aplicando $\hat{f}$ a valores de $X$.
-La predicción de Y la denotamos por $\hat{Y}$, y $$\hat{Y}=\hat{f}(X).$$
+La predicción de $Y$ la denotamos por $\hat{Y}$, y $$\hat{Y}=\hat{f}(X).$$
 El error de predicción (residual) está dado por el valor observado menos la predicción:
 $$Y-\hat{Y}.$$
 

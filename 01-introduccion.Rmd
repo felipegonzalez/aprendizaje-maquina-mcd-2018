@@ -759,7 +759,7 @@ que nos obligue encontrar un balance adecuado de complejidad y error de
 predicción bajo. Por ejemplo, penalizar el objetivo 
 de modelos que son poco creíbles o demasiado complicados.
 - Perturbar la muestra de entrenamiento de distintas maneras para evitar que
-un algoritmo aprenda información irrelevante
+un algoritmo aprenda información irrelevante.
 
 La mayor parte del curso se concentra en considerar qué familias podemos
 utilizar, qué modificaciones de la función objetivo pueden hacerse,

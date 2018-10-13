@@ -67,8 +67,8 @@ y podríamos obtener después de nuestra análisis las estimaciones
  
  y entonces haríamos predicciones con el modelo
 
-$$\hat{f} (X_1,X_2,X_3,X_4) = 
-800000 + 4\, X_1 + 1.5 \,X_2 + 400000\, X_3 +6\, X_4$$
+$$\hat{f}_\beta (X_1,X_2,X_3,X_4) = 
+800000 + 4\, X_1 + 1.5 \,X_2 + 400000\, X_3 +6\, X_4.$$
 
 ## Aprendizaje de coeficientes (ajuste)
 

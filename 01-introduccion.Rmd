@@ -691,7 +691,7 @@ datos que tenemos.
 Para construir buenos predictores, requerimos que:
 
 - El algoritmo tenga la **flexibilidad** necesaria para capturar patrones generales y
-fuertes en los datos
+fuertes en los datos.
 - El algoritmo tenga la **rigidez** necesaria para tener robustez a patrones de ruido
 o particularidades no repetibles de nuestra muestra de entrenamiento.
 - Saber intuitivamente cuál es el grado adecuado de complejidad para un problema
@@ -706,7 +706,7 @@ En términos teóricos, podemos ver cuál es el problema de intentar evaluar el
 error de predicción utilizando la muestra de entrenamiento. 
 
 En primer lugar consideremos evaluar el error de predicción para
-un ejemplo $$(y_0- \hat{f}(x_0))^2$$
+un ejemplo $$(y_0- \hat{f}(x_0))^2,$$
 
 donde $(x_0, y_0)$ es independiente de la muestra de entrenamiento. En este
 caso, la $\hat{f}$ está fija, y el valor esperado (error de predicción) nos

@@ -265,14 +265,14 @@ Consideremos datos de diabetes en mujeres Pima:
 
 A population of women who were at least 21 years old, of Pima Indian heritage and living near Phoenix, Arizona, was tested for diabetes according to World Health Organization criteria. The data were collected by the US National Institute of Diabetes and Digestive and Kidney Diseases. We used the 532 complete records after dropping the (mainly missing) data on serum insulin.
 
-- npreg number of pregnancies.
-- glu plasma glucose concentration in an oral glucose tolerance test.
-- bp diastolic blood pressure (mm Hg).
-- skin triceps skin fold thickness (mm).
-- bmi body mass index (weight in kg/(height in m)\^2).
-- ped diabetes pedigree function.
-- age age in years.
-- type Yes or No, for diabetic according to WHO criteria.
+- *npreg* number of pregnancies.
+- *glu* plasma glucose concentration in an oral glucose tolerance test.
+- *bp* diastolic blood pressure (mm Hg).
+- *skin* triceps skin fold thickness (mm).
+- *bmi* body mass index (weight in kg/(height in m)\^2).
+- *ped* diabetes pedigree function.
+- *age* age in years.
+- *type* Yes or No, for diabetic according to WHO criteria.
 
 ```{r, message=FALSE, warning=FALSE}
 diabetes_ent <- as_data_frame(MASS::Pima.tr)

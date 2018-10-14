@@ -637,8 +637,8 @@ $${g}_{\beta^s} (X) = (\beta_0^s - \sum_{j=1}^p \mu_j/s_j) + \frac{\beta_1^s}{s_
 Y vemos que tiene la misma forma funcional de $f_\beta(X)$. Si la solución de mínimos cuadrados es única,
 entonces una vez que ajustemos tenemos que tener $\hat{f}_\beta(X) = \hat{g}_{\beta^s} (X)$,
 lo que implica que
-$$\hat{\beta}_0 = \hat{\beta}_0^s -  \sum_{j=1}^p \mu_j/s_j$$ y
-$$\hat{\beta}_j = \hat{\beta}_j^s/s_j.$$
+$$\hat{\beta}_0 = \beta_0^s -  \sum_{j=1}^p \mu_j/s_j$$ y
+$$\hat{\beta}_j = \beta_j^s/s_j.$$
 
 Nótese que para pasar del problema estandarizado al no estandarizado simplemente
 se requiere escalar los coeficientes por la $s_j$ correspondiente.

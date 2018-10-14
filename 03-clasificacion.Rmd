@@ -120,7 +120,7 @@ $1$ corresponde al corriente y $2$ representa impago.
  ser, por ejemplo:
 
 - $p_1(x) = P(G=1|X = x) =0.95$  si $x < 15\%$
-- $p_1(x) = P(G=1|X = x) = 0.95 - 0.007(x-15)$ si $x>=15\%$
+- $p_1(x) = P(G=1|X = x) = 0.95 - 0.007(x-15)$ si $x\geq 15\%$
   
 Estas son probabilidades, pues hay otras variables que influyen en que un cliente
 permanezca al corriente o no en sus pagos más allá de información contenida en el

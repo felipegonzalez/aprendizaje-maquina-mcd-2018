@@ -810,7 +810,7 @@ $f(X)$ no sea lineal, y resulta que esta aproximación da buenos resultados. Est
 ### k vecinos más cercanos
 
 Un método popular, con buen desempeño en varios ejemplos, 
-es el de k-vecinos más cercanos, 
+es el de $k$-vecinos más cercanos, 
 que consiste en hacer aproximaciones locales directas de $f(X)$.
 Sea ${\mathcal L}$  un conjunto de entrenamiento. Para $k$ entera fija, y 
 $x_0$ una entrada donde queremos predecir, definimos a $N_k(x_0)$ como el conjunto de los $k$ elementos
@@ -830,7 +830,7 @@ datos$rendimiento_kpl <- datos$mpg*(1.609344/3.78541178)
 nrow(datos)
 ```
 
-Vamos a separa en muestra de entrenamiento y de prueba estos datos. Podemos
+Vamos a separar en muestra de entrenamiento y de prueba estos datos. Podemos
 hacerlo como sigue (2/3 para entrenamiento aproximadamente en este caso, así
 obtenemos alrededor de 100 casos para prueba):
 

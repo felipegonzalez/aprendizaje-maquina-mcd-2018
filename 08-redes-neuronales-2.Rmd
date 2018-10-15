@@ -969,3 +969,48 @@ history <- modelo_tc %>% fit(
 score <- modelo_tc %>% evaluate(x_test, y_test)
 score
 ```
+
+
+
+## Ajuste de hiperparámetros
+
+Esta sección es de [@Goodfellow-et-al-2016]
+
+Dos enfoques: Manual (entender teoría, experiencia) o automático (computo).
+
+### Ajuste Manual de Hiperparámetros
+
+- Ajustar la flexibilidad del modelo al problema: debe tener el
+sesgo apropiado (capacidad
+de representar patrones), ajustando con regularización
+de costo y proceso de entrenamiento.
+
+Por ejemplo: más capas tiene más poder de representación (menos sesgo), pero
+el algoritmo de minimización puede tener dificultades por varianza o por dificultades
+en minimización, o si la regularización es demasiado grande.
+
+- Forma de U del error según capacidad del modelo: en un extremo, 
+baja capacidad (sesgo alto). En otro extremo,
+hay alta capacidad y brecha grande entre error de entrenamiento y de prueba.
+
+- La tasa de aprendizaje es el hiperparámetro más importante. Si es demasiado alta, entonces  puede aumentar el error de entrenamiento. Cuando es muy baja, el proceso es lento
+y se puede atorar.
+
+- Si el error en entrenamiento es más alto que tu tasa objetivo (el error
+que quisieras lograr), hay que bajar sesgo (con parámetros o arquitectura)
+
+- Si el error de prueba es más grande que el de entrenamiento, hay dos acciones: 
+prueba = entrena + gap. Hay que hacer tradeoff entre estas dos. En deep learning,
+generalmente funciona mejor cuando el error de entrenamiento es muy chico,
+y hay que reducir el gap regularizando: conviene comenzar con una red
+sobreajustada que tenga error de entrenamiento bajo, y regularizar y controlar
+complejidad a partir de esta.
+
+## Ajuste automático
+
+- Grid search cuando hay pocos: todas las combinaciones de parámetros. 
+Prohibitivo si hay demasiados.
+
+- Random search es más rápido. Definir distribuciones para los hiperparámetros.
+Puedes correr repetidamente con distintos rangos. Es eficiente porque no gasta corridas
+(por ejemplo, cuando un parámetro no tiene mucho efecto).

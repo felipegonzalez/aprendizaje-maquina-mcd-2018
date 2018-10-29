@@ -1,0 +1,852 @@
+# Métodos basados en árboles: boosting
+
+```{r, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(fig.width=5, fig.asp=0.7) 
+```
+
+Boosting también utiliza la idea de un "ensamble" de árboles. La diferencia
+grande con
+ bagging y bosques aleatorios en que la sucesión de árboles de boosting se 
+'adapta' al comportamiento del predictor a lo largo de las iteraciones, 
+haciendo reponderaciones de los datos de entrenamiento para que el algoritmo
+se concentre en las predicciones más pobres. Boosting generalmente funciona
+bien con árboles chicos (cada uno con sesgo alto), mientras que bosques
+aleatorios funciona con árboles grandes (sesgo bajo). 
+
+- En boosting usamos muchos árboles chicos adaptados secuencialmente. La disminución
+del sesgo proviene de usar distintos árboles que se encargan de adaptar el predictor
+a distintas partes del conjunto de entrenamiento. El control de varianza se
+logra con tasas de aprendizaje y tamaño de árboles, como veremos más adelante.
+
+- En bosques aleatorios usamos muchos árboles grandes, cada uno con una muestra
+de entrenamiento perturbada (bootstrap). El control de varianza se logra promediando sobre esas muestras bootstrap de entrenamiento.
+
+Igual que bosques aleatorios, boosting es también un método que generalmente
+tiene  alto poder predictivo.
+
+
+## Forward stagewise additive modeling (FSAM)
+
+Aunque existen versiones de boosting (Adaboost) desde los 90s, una buena
+manera de entender los algoritmos es mediante un proceso general
+de modelado por estapas (FSAM).
+
+##  Discusión
+Consideramos primero un problema de *regresión*, que queremos atacar
+con un predictor de la forma
+$$f(x) = \sum_{k=1}^m \beta_k b_k(x),$$
+donde los $b_k$ son árboles. Podemos absorber el coeficiente $\beta_k$
+dentro del árbol $b_k(x)$, y escribimos
+
+$$f(x) = \sum_{k=1}^m T_k(x),$$
+
+
+Para ajustar este tipo de modelos, buscamos minimizar
+la pérdida de entrenamiento:
+
+\begin{equation}
+\min \sum_{i=1}^N L(y^{(i)}, \sum_{k=1}^M T_k(x^{(i)}))
+\end{equation}
+
+Este puede ser un problema difícil, dependiendo de la familia 
+que usemos para los árboles $T_k$, y sería difícil resolver por fuerza bruta. Para resolver este problema, podemos
+intentar una heurística secuencial o por etapas:
+
+Si  tenemos
+$$f_{m-1}(x) = \sum_{k=1}^{m-1} T_k(x),$$
+
+intentamos resolver el problema (añadir un término adicional)
+
+\begin{equation}
+\min_{T} \sum_{i=1}^N L(y^{(i)}, f_{m-1}(x^{(i)}) + T(x^{(i)}))
+\end{equation}
+
+Por ejemplo, para pérdida cuadrática (en regresión), buscamos resolver
+
+\begin{equation}
+\min_{T} \sum_{i=1}^N (y^{(i)} - f_{m-1}(x^{(i)}) - T(x^{(i)}))^2
+\end{equation}
+
+Si ponemos 
+$$ r_{m-1}^{(i)} = y^{(i)} - f_{m-1}(x^{(i)}),$$
+que es el error para el caso $i$ bajo el modelo $f_{m-1}$, entonces
+reescribimos el problema anterior como
+\begin{equation}
+\min_{T} \sum_{i=1}^N ( r_{m-1}^{(i)} - T(x^{(i)}))^2
+\end{equation}
+
+Este problema consiste en *ajustar un árbol a los residuales o errores
+del paso anterior*. Otra manera de decir esto es que añadimos un término adicional
+que intenta corregir los que el modelo anterior no pudo predecir bien.
+La idea es repetir este proceso para ir reduciendo los residuales, agregando
+un árbol a la vez.
+
+```{block2, type = 'comentario'}
+La primera idea central de boosting es concentrarnos, en el siguiente paso, en los datos donde tengamos errores, e intentar corregir añadiendo un término
+adicional al modelo. 
+```
+
+## Algoritmo FSAM
+
+Esta idea es la base del siguiente algoritmo:
+
+```{block2, type ='comentario'}
+**Algoritmo FSAM** (forward stagewise additive modeling)
+
+1. Tomamos $f_0(x)=0$
+2. Para $m=1$ hasta $M$, 
+  - Resolvemos
+$$T_m = argmin_{T} \sum_{i=1}^N L(y^{(i)}, f_{m-1}(x^{(i)}) + T(x^{(i)}))$$
+  - Ponemos
+$$f_m(x) = f_{m-1}(x) + T_m(x)$$
+3. Nuestro predictor final es $f(x) = \sum_{m=1}^M T_(x)$.
+```
+
+
+**Observaciones**:
+Generalmente los árboles sobre los que optimizamos están restringidos a una familia relativamente chica: por ejemplo, árboles de profundidad no mayor a 
+$2,3,\ldots, 8$.
+
+Este algoritmo se puede aplicar directamente para problemas de regresión, como vimos en la discusión anterior: simplemente hay que ajustar árboles a los residuales del modelo del paso anterior. Sin embargo, no está claro cómo aplicarlo cuando la función de pérdida no es mínimos cuadrados (por ejemplo,
+regresión logística). 
+
+
+#### Ejemplo (regresión) {-}
+Podemos hacer FSAM directamente sobre un problema de regresión.
+```{r, message=FALSE, warning=FALSE}
+set.seed(227818)
+library(rpart)
+library(tidyverse)
+x <- rnorm(200, 0, 30)
+y <- 2*ifelse(x < 0, 0, sqrt(x)) + rnorm(200, 0, 0.5)
+dat <- data.frame(x=x, y=y)
+```
+
+Pondremos los árboles de cada paso en una lista. Podemos comenzar con una constante
+en lugar de 0.
+
+```{r}
+arboles_fsam <- list()
+arboles_fsam[[1]] <- rpart(y~x, data = dat, 
+                           control = list(maxdepth=0))
+arboles_fsam[[1]]
+```
+
+Ahora construirmos nuestra función de predicción y el paso
+que agrega un árbol
+
+```{r}
+predecir_arboles <- function(arboles_fsam, x){
+  preds <- lapply(arboles_fsam, function(arbol){
+    predict(arbol, data.frame(x=x))
+  })
+  reduce(preds, `+`)
+}
+agregar_arbol <- function(arboles_fsam, dat, plot=TRUE){
+  n <- length(arboles_fsam)
+  preds <- predecir_arboles(arboles_fsam, x=dat$x)
+  dat$res <- y - preds
+  arboles_fsam[[n+1]] <- rpart(res ~ x, data = dat, 
+                           control = list(maxdepth = 1))
+  dat$preds_nuevo <- predict(arboles_fsam[[n+1]])
+  dat$preds <- predecir_arboles(arboles_fsam, x=dat$x)
+  g_res <- ggplot(dat, aes(x = x)) + geom_line(aes(y=preds_nuevo)) +
+    geom_point(aes(y=res)) + labs(title = 'Residuales') + ylim(c(-10,10))
+  g_agregado <- ggplot(dat, aes(x=x)) + geom_line(aes(y=preds), col = 'red',
+                                                  size=1.1) +
+    geom_point(aes(y=y)) + labs(title ='Ajuste')
+  if(plot){
+    print(g_res)
+    print(g_agregado)
+  }
+  arboles_fsam
+}
+```
+
+Ahora construiremos el primer árbol. Usaremos 'troncos' (stumps), árboles con
+un solo corte: Los primeros residuales son simplemente las $y$'s observadas
+
+```{r, fig.width=4, fig.asp=0.7}
+arboles_fsam <- agregar_arbol(arboles_fsam, dat)
+```
+
+Ajustamos un árbol de regresión a los residuales:
+
+```{r, fig.width=4, fig.asp=0.7}
+arboles_fsam <- agregar_arbol(arboles_fsam, dat)
+```
+
+```{r, fig.width=4, fig.asp=0.7}
+arboles_fsam <- agregar_arbol(arboles_fsam, dat)
+```
+
+```{r, fig.width=4, fig.asp=0.7}
+arboles_fsam <- agregar_arbol(arboles_fsam, dat)
+```
+
+```{r, fig.width=4, fig.asp=0.7}
+arboles_fsam <- agregar_arbol(arboles_fsam, dat)
+```
+
+```{r, fig.width=4, fig.asp=0.7}
+arboles_fsam <- agregar_arbol(arboles_fsam, dat)
+```
+
+Después de 20 iteraciones obtenemos:
+
+```{r, fig.width=4, fig.asp=0.7}
+for(j in 1:19){
+arboles_fsam <- agregar_arbol(arboles_fsam, dat, plot = FALSE)
+}
+arboles_fsam <- agregar_arbol(arboles_fsam, dat)
+
+```
+
+
+## FSAM para clasificación binaria.
+
+Para problemas de clasificación, no tiene mucho sentido trabajar con un modelo
+aditivo sobre las probabilidades:
+
+$$p(x) = \sum_{k=1}^m T_k(x),$$
+
+Así que hacemos lo mismo que en regresión logística. Ponemos
+
+$$f(x) = \sum_{k=1}^m T_k(x),$$
+
+y entonces las probabilidades son
+$$p(x) = h(f(x)),$$
+
+donde $h(z)=1/(1+e^{-z})$ es la función logística. La optimización de la etapa $m$ según fsam es
+
+\begin{equation}
+T = argmin_{T} \sum_{i=1}^N L(y^{(i)}, f_{m-1}(x^{(i)}) + T(x^{(i)}))
+(\#eq:fsam-paso)
+\end{equation}
+
+y queremos usar la devianza como función de pérdida. Por razones
+de comparación (con nuestro libro de texto y con el algoritmo Adaboost
+que mencionaremos más adelante), escogemos usar 
+$$y \in \{1,-1\}$$
+
+en lugar de nuestro tradicional $y \in \{1,0\}$. En ese caso, la devianza
+binomial se ve como
+
+$$L(y, z) = -\left [ (y+1)\log h(z) - (y-1)\log(1-h(z))\right ],$$
+que a su vez se puede escribir como (demostrar):
+
+$$L(y,z) = 2\log(1+e^{-yz})$$
+Ahora consideremos cómo se ve nuestro problema de optimización:
+
+$$T = argmin_{T} 2\sum_{i=1}^N \log (1+ e^{-y^{(i)}(f_{m-1}(x^{(i)}) + T(x^{(i)})})$$
+
+Nótese que sólo optimizamos con respecto a $T$, así que
+podemos escribir
+
+$$T = argmin_{T} 2\sum_{i=1}^N \log (1+ d_{m,i}e^{- y^{(i)}T(x^{(i)})})$$
+
+Y vemos que el problema es más difícil que en regresión. No podemos usar
+un ajuste de árbol usual de regresión o clasificación, *como hicimos en
+regresión*. No está claro, por ejemplo, cuál debería ser el residual
+que tenemos que ajustar (aunque parece un problema donde los casos
+de entrenamiento están ponderados por $d_{m,i}$). Una solución para resolver aproximadamente este problema de minimización, es **gradient boosting**.
+
+## Gradient boosting
+
+La idea de gradient boosting es replicar la idea del residual en regresión, y usar
+árboles de regresión para resolver \@ref(eq:fsam-paso).
+
+Gradient boosting es una técnica general para funciones de pérdida
+generales.Regresamos entonces a nuestro problema original
+
+$$(\beta_m, b_m) = argmin_{T} \sum_{i=1}^N L(y^{(i)}, f_{m-1}(x^{(i)}) + T(x^{(i)}))$$
+
+La pregunta es: ¿hacia dónde tenemos qué mover la predicción de
+$f_{m-1}(x^{(i)})$ sumando
+el término $T(x^{(i)})$? Consideremos un solo término de esta suma,
+y denotemos $z_i = T(x^{(i)})$. Queremos agregar una cantidad $z_i$
+tal que el valor de la pérdida
+$$L(y, f_{m-1}(x^{(i)})+z_i)$$
+se reduzca. Entonces sabemos que podemos mover la z en la dirección opuesta al gradiente
+
+$$z_i = -\gamma \frac{\partial L}{\partial z}(y^{(i)}, f_{m-1}(x^{(i)}))$$
+
+Sin embargo, necesitamos que las $z_i$ estén generadas por una función $T(x)$ que se pueda evaluar en toda $x$. Quisiéramos que
+$$T(x^{(i)})\approx -\gamma \frac{\partial L}{\partial z}(y^{(i)}, f_{m-1}(x^{(i)}))$$
+Para tener esta aproximación, podemos poner
+$$g_{i,m} = -\frac{\partial L}{\partial z}(y^{(i)}, f_{m-1}(x^{(i)}))$$
+e intentar resolver
+\begin{equation}
+\min_T \sum_{i=1}^n (g_{i,m} - T(x^{(i)}))^2,
+(\#eq:min-cuad-boost)
+\end{equation}
+
+es decir, intentamos replicar los gradientes lo más que sea posible. **Este problema lo podemos resolver con un árbol usual de regresión**. Finalmente,
+podríamos escoger $\nu$ (tamaño de paso) suficientemente chica y ponemos
+$$f_m(x) = f_{m-1}(x)+\nu T(x).$$
+
+Podemos hacer un refinamiento adicional que consiste en encontrar los cortes del árbol $T$ según \@ref(eq:min-cuad-boost), pero optimizando por separado los valores que T(x) toma en cada una de las regiones encontradas.
+
+## Algoritmo de gradient boosting
+
+```{block2, type='comentario'}
+**Gradient boosting** (versión simple)
+  
+1. Inicializar con $f_0(x) =\gamma$
+
+2. Para $m=0,1,\ldots, M$, 
+
+  - Para $i=1,\ldots, n$, calculamos el residual
+  $$r_{i,m}=-\frac{\partial L}{\partial z}(y^{(i)}, f_{m-1}(x^{(i)}))$$
+  
+  - Ajustamos un árbol de regresión  a la respuesta $r_{1,m},r_{2,m},\ldots, r_{n,m}$. Supongamos que tiene regiones $R_{j,m}$.
+
+  - Resolvemos (optimizamos directamente el valor que toma el árbol en cada región - este es un problema univariado, más fácil de resolver)
+  $$\gamma_{j,m} = argmin_\gamma \sum_{x^{(i)}\in R_{j,m}} L(y^{(i)},f_{m-1}(x^{i})+\gamma )$$
+    para cada región $R_{j,m}$ del árbol del inciso anterior.
+  - Actualizamos $$f_m (x) = f_{m-1}(x) + \sum_j \gamma_{j,m} I(x\in R_{j,m})$$
+  3. El predictor final es $f_M(x)$.
+```
+
+
+## Funciones de pérdida
+
+Para aplicar gradient boosting, tenemos primero que poder calcular
+el gradiente de la función de pérdida. Algunos ejemplos populares son:
+
+- Pérdida cuadrática: $L(y,f(x))=(y-f(x))^2$, 
+$\frac{\partial L}{\partial z} = -2(y-f(x))$.
+- Pérdida absoluta (más robusta a atípicos que la cuadrática) $L(y,f(x))=|y-f(x)|$,
+$\frac{\partial L}{\partial z} = signo(y-f(x))$.
+- Devianza binomial $L(y, f(x))$ = -\log(1+e^{-yf(x)}), $y\in\{-1,1\}$,
+$\frac{\partial L}{\partial z} = I(y=1) - h(f(x))$.
+- Adaboost, pérdida exponencial (para clasificación) $L(y,z) = e^{-yf(x)}$,
+$y\in\{-1,1\}$,
+$\frac{\partial L}{\partial z} = -ye^{-yf(x)}$.
+
+### Discusión: adaboost (opcional)
+
+Adaboost es uno de los algoritmos originales para boosting, y no es necesario
+usar gradient boosting para aplicarlo. La razón es que  los árboles de clasificación
+$T(x)$ toman valores $T(x)\in \{-1,1\}$, y el paso de optimización
+\@ref(eq:fsam-paso) de cada árbol queda
+
+$$T = argmin_{T} \sum_{i=1}^N e^{-y^{(i)}f_{m-1}(x^{(i)})} e^{-y^{(i)}T(x^{(i)})}
+$$
+$$T = argmin_{T} \sum_{i=1}^N d_{m,i} e^{-y^{(i)}T(x^{(i)})}
+$$
+De modo que la función objetivo toma dos valores: Si $T(x^{i})$ clasifica
+correctamente, entonces $e^{-y^{(i)}T(x^{(i)})}=e^{-1}$, y si
+clasifica incorrectamente $e^{-y^{(i)}T(x^{(i)})}=e^{1}$. Podemos entonces
+encontrar el árbol $T$ construyendo un árbol usual pero con datos ponderados
+por $d_{m,i}$, donde buscamos maximizar la tasa de clasificación correcta (puedes
+ver más en nuestro libro de texto, o en [@ESL].
+
+¿Cuáles son las consecuencias de usar la pérdida exponencial? Una es que perdemos
+la conexión con los modelos logísticos e interpretación de probabilidad que tenemos
+cuando usamos la devianza. Sin embargo, son similares: compara cómo se ve
+la devianza (como la formulamos arriba, con $y\in\{-1,1\}$) con la pérdida exponencial.
+
+### Ejemplo {-}
+
+Podemos usar el paquete de R *gbm* para hacer gradient boosting. Para el 
+caso de precios de casas de la sección anterior (un problema de regresión).
+
+
+Fijaremos el número de árboles en 200, de profundidad 3, usando
+75\% de la muestra para entrenar y el restante para validación:
+
+```{r, warning=FALSE, message=FALSE, fig.asp = 0.5}
+library(gbm)
+entrena <- read_rds('datos/ameshousing-entrena-procesado.rds')
+set.seed(23411)
+
+ajustar_boost <- function(entrena, ...){
+  mod_boosting <- gbm(log(vSalePrice) ~.,  data = entrena,
+                distribution = 'gaussian',
+                n.trees = 200, 
+                interaction.depth = 3,
+                shrinkage = 1, # tasa de aprendizaje
+                bag.fraction = 1,
+                train.fraction = 0.75)
+  mod_boosting
+}
+
+house_boosting <- ajustar_boost(entrena)
+dat_entrenamiento <- data_frame(entrena = sqrt(house_boosting$train.error),
+                                valida = sqrt(house_boosting$valid.error),
+                                n_arbol = 1:length(house_boosting$train.error)) %>%
+                      gather(tipo, valor, -n_arbol)
+print(house_boosting)
+ggplot(dat_entrenamiento, aes(x=n_arbol, y=valor, colour=tipo, group=tipo)) +
+  geom_line()
+```
+
+Que se puede graficar también así:
+```{r}
+gbm.perf(house_boosting)
+```
+Como vemos, tenemos que afinar los parámetros del algoritmo. 
+
+
+
+## Modificaciones de Gradient Boosting
+
+Hay algunas adiciones al algoritmo de gradient boosting que podemos
+usar para mejorar el desempeño. Los dos métodos que comunmente se
+usan son encogimiento (*shrinkage*), que es una especie de tasa de 
+aprendizaje, y submuestreo, donde construimos cada árbol adicional 
+usando una submuestra de la muestra de entrenamiento.
+
+Ambas podemos verlas como técnicas de regularización, que limitan
+sobreajuste producido por el algoritmo agresivo de boosting.
+
+
+
+
+### Tasa de aprendizaje (shrinkage)
+Funciona bien modificar el algoritmo usando una tasa de aprendizae
+$0<\nu<1$:
+$$f_m(x) = f_{m-1}(x) + \nu \sum_j \gamma_{j,m} I(x\in R_{j,m})$$
+
+Este parámetro sirve como una manera de evitar sobreajuste rápido cuando
+construimos los predictores. Si este número es muy alto, podemos sobreajustar
+rápidamente con pocos árboles, y terminar con predictor de varianza alta. Si este
+número es muy bajo, puede ser que necesitemos demasiadas iteraciones para llegar
+a buen desempeño.
+
+Igualmente se prueba con varios valores de $0<\nu<1$ (típicamente $\nu<0.1$)
+para mejorar el desempeño en validación. **Nota**: cuando hacemos $\nu$ más chica, es necesario hacer $M$ más grande (correr más árboles) para obtener desempeño 
+óptimo.
+
+Veamos que efecto tiene en nuestro ejemplo:
+
+```{r, include = FALSE, fig.asp=0.5}
+ajustar_boost <- function(entrena){
+  out_fun <- function(shrinkage = 0.5, bag.fraction = 1, depth = 3, ...){
+    mod_boosting <- gbm(log(vSalePrice) ~.,  data = entrena,
+                distribution = 'gaussian',
+                n.trees = 500, 
+                interaction.depth = depth,
+                shrinkage = shrinkage, # tasa de aprendizaje
+                bag.fraction = bag.fraction,
+                train.fraction = 0.75)
+    mod_boosting
+  }
+  out_fun
+}
+eval_modelo <- function(modelo){
+   dat_eval <- data_frame(entrena = sqrt(modelo$train.error),
+                                valida = sqrt(modelo$valid.error),
+                                n_arbol = 1:length(modelo$train.error)) %>%
+                      gather(tipo, valor, -n_arbol)
+   dat_eval
+}
+boost <- ajustar_boost(entrena)
+
+```
+
+```{r}
+modelos_dat <- data_frame(n_modelo = 1:4, shrinkage = c(0.05, 0.1, 0.5, 1))
+modelos_dat <- modelos_dat %>% 
+  mutate(modelo = map(shrinkage, boost)) %>%
+  mutate(eval = map(modelo, eval_modelo))
+modelos_dat
+graf_eval <- modelos_dat %>% select(shrinkage, eval) %>% unnest
+graf_eval
+ggplot(filter(graf_eval, tipo=='valida'), aes(x = n_arbol, y= valor, colour=factor(shrinkage), group =
+                        shrinkage)) + geom_line() +
+  facet_wrap(~tipo)
+```
+
+Obsérvese que podemos obtener un mejor resultado de validación afinando
+la tasa de aprendizaje. Cuando es muy grande, el modelo rápidamente sobreajusta
+cuando agregamos árboles. Si la tasa es demasiado chica, podos tardar
+mucho en llegar a un predictor de buen desempeño.
+
+¿Cómo crees que se ven las gráfica de error de entrenamiento?
+
+### Submuestreo (bag.fraction)
+Funciona bien construir cada uno de los árboles con submuestras de la muestra
+de entrenamiento, como una manera adicional de reducir varianza al construir
+nuestro predictor (esta idea es parecida a la de los bosques aleatorios, 
+aquí igualmente perturbamos la muestra de entrenamiento en cada paso para evitar
+sobreajuste). Adicionalmente, este proceso acelera considerablemente las
+iteraciones de boosting, y en algunos casos sin penalización en desempeño.
+
+En boosting generalmente se toman submuestras (una
+fracción de alrededor de 0.5 de la muestra de entrenamiento, pero puede
+ser más chica para conjuntos grandes de entrenamiento) sin reemplazo.
+
+Este parámetro también puede ser afinado con muestra
+de validación o validación cruzada. 
+
+```{r}
+boost <- ajustar_boost(entrena)
+modelos_dat <- data_frame(n_modelo = 1:3, 
+                          bag.fraction = c(0.25, 0.5, 1),
+                          shrinkage = 0.25)
+modelos_dat <- modelos_dat %>% 
+  mutate(modelo = pmap(., boost)) %>%
+  mutate(eval = map(modelo, eval_modelo))
+modelos_dat
+graf_eval <- modelos_dat %>% select(bag.fraction, eval) %>% unnest
+graf_eval
+ggplot((graf_eval), aes(x = n_arbol, y= valor, colour=factor(bag.fraction), group =
+                        bag.fraction)) + geom_line() +
+  facet_wrap(~tipo, ncol = 1)
+```
+
+En este ejemplo, podemos reducir el tiempo de ajuste usando una 
+fracción de submuestro de 0.5, con quizá algunas mejoras en desempeño.
+
+
+Ahora veamos los dos parámetros actuando en conjunto:
+
+```{r}
+modelos_dat <- list(bag.fraction = c(0.1, 0.25, 0.5, 1),
+                          shrinkage = c(0.01, 0.1, 0.25, 0.5)) %>% expand.grid
+modelos_dat <- modelos_dat %>% 
+  mutate(modelo = pmap(., boost)) %>%
+  mutate(eval = map(modelo, eval_modelo))
+graf_eval <- modelos_dat %>% select(shrinkage, bag.fraction, eval) %>% unnest
+head(graf_eval)
+ggplot(filter(graf_eval, tipo =='valida'), aes(x = n_arbol, y= valor, colour=factor(bag.fraction), group =
+                        bag.fraction)) + geom_line() +
+  facet_wrap(~shrinkage)
+```
+
+Bag fraction demasiado chico no funciona bien, especialmente si la tasa
+de aprendizaje es alta (¿Por qué?). Filtremos para ver con detalle el resto
+de los datos:
+
+```{r}
+ggplot(filter(graf_eval, tipo =='valida', bag.fraction>0.1), aes(x = n_arbol, y= valor, colour=factor(bag.fraction), group =
+                        bag.fraction)) + geom_line() +
+  facet_wrap(~shrinkage) + scale_y_log10()
+```
+
+
+Y parece ser que para este número de iteraciones, una tasa de aprendizaje
+de 0.1 junto con un bag fraction de 0.5 funciona bien:
+
+```{r}
+graf_eval %>% filter(tipo=='valida') %>%
+  group_by(shrinkage, bag.fraction) %>%
+  summarise(valor = min(valor)) %>%
+   arrange(valor) %>% head(10)
+```
+
+
+
+### Número de árboles M
+
+Se monitorea el error sobre una muestra de validación cuando agregamos
+cada árboles. Escogemos el número de árboles de manera que minimize el
+error de validación. Demasiados árboles pueden producir sobreajuste. Ver el ejemplo
+de arriba.
+
+
+### Tamaño de árboles
+
+Los árboles se construyen de tamaño fijo $J$, donde $J$ es el número
+de cortes. Usualmente $J=1,2,\ldots, 10$, y es un parámetro que hay que
+elegir. $J$ más grande permite interacciones de orden más alto entre 
+las variables de entrada. Se intenta con varias $J$ y $M$ para minimizar
+el error de vaidación.
+
+### Controlar número de casos para cortes
+
+Igual que en bosques aleatorios, podemos establecer mínimos de muestra en nodos
+terminales, o mínimo de casos necesarios para hacer un corte.
+
+### Ejemplo {-}
+
+
+```{r}
+modelos_dat <- list(bag.fraction = c( 0.25, 0.5, 1),
+                          shrinkage = c(0.01, 0.1, 0.25, 0.5),
+                    depth = c(1,5,10,12)) %>% expand.grid
+modelos_dat <- modelos_dat %>% 
+  mutate(modelo = pmap(., boost)) %>%
+  mutate(eval = map(modelo, eval_modelo))
+graf_eval <- modelos_dat %>% select(shrinkage, bag.fraction, depth, eval) %>% unnest
+ggplot(filter(graf_eval, tipo =='valida'), aes(x = n_arbol, y= valor, colour=factor(bag.fraction), group =
+                        bag.fraction)) + geom_line() +
+  facet_grid(depth~shrinkage) + scale_y_log10()
+```
+
+
+Podemos ver con más detalle donde ocurre el mejor desempeño:
+
+```{r}
+ggplot(filter(graf_eval, tipo =='valida', shrinkage == 0.1, n_arbol>100), aes(x = n_arbol, y= valor, colour=factor(bag.fraction), group =
+                        bag.fraction)) + geom_line() +
+  facet_grid(depth~shrinkage) 
+```
+
+```{r}
+head(arrange(filter(graf_eval,tipo=='valida'), valor))
+```
+
+### Evaluación con validación cruzada.
+
+Para datos no muy grandes, conviene escoger modelos usando validación cruzada.
+
+Por ejemplo,
+
+```{r cv1, eval=FALSE}
+set.seed(9983)
+rm('modelos_dat')
+mod_boosting <- gbm(log(vSalePrice) ~.,  data = entrena,
+                distribution = 'gaussian',
+                n.trees = 200, 
+                interaction.depth = 10,
+                shrinkage = 0.1, # tasa de aprendizaje
+                bag.fraction = 0.5,
+                cv.folds = 10)
+gbm.perf(mod_boosting)
+```
+
+
+```{r cveval, eval=FALSE}
+eval_modelo_2 <- function(modelo){
+   dat_eval <- data_frame(entrena = sqrt(modelo$train.error),
+                          valida = sqrt(modelo$cv.error),
+                          n_arbol = 1:length(modelo$train.error)) %>%
+                      gather(tipo, valor, -n_arbol)
+   dat_eval
+}
+dat <- eval_modelo_2(mod_boosting)
+sqrt(min(mod_boosting$cv.error))
+ggplot(dat, aes(x = n_arbol, y=valor, colour=tipo, group=tipo)) + geom_line()
+```
+
+## Gráficas de dependencia parcial
+
+La idea de dependencia parcial que veremos a continuación se puede aplicar a cualquier método de aprendizaje,
+y en boosting ayuda a entender el funcionamiento del predictor complejo que resulta
+del algoritmo. Aunque podemos evaluar el predictor en distintos valores y observar
+cómo se comporta, cuando tenemos varias variables de entrada este proceso no
+siempre tiene resultados muy claros o completos. Dependencia parcial es un intento
+por entender de manera más sistemática parte del funcionamiento de 
+un modelo complejo.
+
+
+### Dependencia parcial
+Supongamos que tenemos un predictor $f(x_1,x_2)$ que depende de dos variables de
+entrada. Podemos considerar la función
+$${f}_{1}(x_1) = E_{x_2}[f(x_1,x_2)],$$
+que es el promedio de $f(x)$ fijando $x_1$ sobre la marginal de $x_2$. Si tenemos
+una muestra de entrenamiento, podríamos estimarla promediando sobre la muestra 
+de entrenamiento
+
+$$\bar{f}_1(x_1) = \frac{1}{n}\sum_{i=1}^n f(x_1, x_2^{(i)}),$$
+que consiste en fijar el valor de $x_1$ y promediar sobre todos los valores
+de la muestra de entrenamiento para $x_2$.
+
+### Ejemplo {-}
+
+Construimos un modelo con solamente tres variables para nuestro ejemplo anterior
+
+```{r}
+mod_2 <- gbm(log(vSalePrice) ~ vGrLivArea +vNeighborhood  +vOverallQual,  
+                data = entrena,
+                distribution = 'gaussian',
+                n.trees = 100, 
+                interaction.depth = 3,
+                shrinkage = 0.1, 
+                bag.fraction = 0.5,
+                train.fraction = 0.75)
+gbm.perf(mod_2)
+```
+
+Podemos calcular a mano la gráfica de dependencia parcial para 
+el tamaño de la "General Living Area". 
+```{r}
+dat_dp <- entrena %>% select(vGrLivArea, vNeighborhood, vOverallQual) 
+```
+Consideramos el rango de la variable:
+```{r}
+cuantiles <- quantile(entrena$vGrLivArea, probs= seq(0, 1, 0.1))
+cuantiles
+```
+
+Por ejemplo, vamos evaluar el efecto parcial cuando vGrLivArea = 912. Hacemos
+
+```{r}
+dat_dp_1 <- dat_dp %>% mutate(vGrLivArea = 912) %>%
+            mutate(pred = predict(mod_2, .)) %>%
+            summarise(mean_pred = mean(pred))
+dat_dp_1
+```
+
+Evaluamos en vGrLivArea = 912
+```{r}
+dat_dp_1 <- dat_dp %>% mutate(vGrLivArea = 1208) %>%
+            mutate(pred = predict(mod_2, .)) %>%
+            summarise(mean_pred = mean(pred))
+dat_dp_1
+```
+(un incremento de alrededor del 10\% en el precio de venta).
+Hacemos todos los cuantiles como sigue:
+
+```{r}
+cuantiles <- quantile(entrena$vGrLivArea, probs= seq(0, 1, 0.01))
+
+prom_parcial <- function(x, variable, df, mod){
+  variable <- enquo(variable)
+  variable_nom <- quo_name(variable)
+  salida <- df %>% mutate(!!variable_nom := x) %>% 
+    mutate(pred = predict(mod, ., n.trees=100)) %>%
+    group_by(!!variable) %>%
+    summarise(f_1 = mean(pred)) 
+  salida
+}
+dep_parcial <- map_dfr(cuantiles, 
+                       ~prom_parcial(.x, vGrLivArea, entrena, mod_2))
+ggplot(dep_parcial, aes(x=vGrLivArea, y= f_1)) + 
+  geom_line() + geom_line() + geom_rug(sides='b')
+
+```
+Y transformando a las unidades originales
+
+```{r}
+ggplot(dep_parcial, aes(x=vGrLivArea, y= exp(f_1))) + 
+  geom_line() + geom_line() + geom_rug(sides='b')
+
+```
+Y vemos que cuando aumenta el area de habitación, aumenta el precio. Podemos hacer esta gráfica más simple haciendo
+
+```{r}
+plot(mod_2, 1) # 1 pues es vGrLivArea la primer variable 
+```
+
+Y para una variable categórica se ve como sigue:
+
+```{r}
+plot(mod_2, 2, return.grid = TRUE) %>% arrange(y)
+plot(mod_2, 2, return.grid = FALSE)
+```
+
+---
+
+En general, si nuestro predictor depende de más variables 
+$f(x_1,x_2, \ldots, x_p)$ 
+entrada. Podemos considerar las funciones
+$${f}_{j}(x_j) = E_{(x_1,x_2, \ldots x_p) - x_j}[f(x_1,x_2, \ldots, x_p)],$$
+que es el valor esperado de $f(x)$ fijando $x_j$, y promediando sobre el resto
+de las variables. Si tenemos
+una muestra de entrenamiento, podríamos estimarla promediando sobre la muestra 
+de entrenamiento
+
+$$\bar{f}_j(x_j) = \frac{1}{n}\sum_{i=1}^n f(x_1^{(i)}, x_2^{(i)}, \ldots, x_{j-1}^{(i)},x_{j+1}^{(i)},\ldots, x_p^{(i)}).$$
+
+Podemos hacer también  gráficas de dependencia parcial para más de una variable,
+si fijamos un subconjunto de variables y promediamos sobre el resto.
+
+```{r}
+plot(mod_2, c(1,3))
+```
+
+### Discusión
+
+En primer lugar, veamos qué obtenemos de la dependencia parcial
+cuando aplicamos al modelo lineal sin interacciones. En el caso de dos variables,
+
+$$f_1(x_1) = E_{x_2}[f(x_1,x_2)] =E_{x_2}[a + bx_1 + cx_2)] = \mu + bx_1,$$
+que es equivalente al análisis marginal que hacemos en regresión lineal (
+incrementos en la variable $x_1$ con todo lo demás fijo, donde el incremento
+marginal de la respuesta es el coeficiente $b$). 
+
+Desde este punto de vista, dependencia parcial da una interpretación similar
+a la del análisis usual de coeficientes en regresión lineal, donde pensamos
+en "todo lo demás constante".
+
+Nótese también que cuando hay **interacciones** fuertes entre las variables, ningún
+análisis marginal (dependencia parcial o examen de coeficientes) da un resultado
+fácilmente interpretable - la única solución es considerar el efecto conjunto de las
+variables que interactúan. De modo que este tipo de análisis funciona mejor
+cuando no hay interacciones grandes entre las variables (es cercano a un modelo
+aditivo con efectos no lineales).
+
+#### Ejemplo {-}
+Considera qué pasa con las gráficas de dependencia parcial cuando
+$f(x_1,x_2) = -10 x_1x_2$, y $x_1$ y $x_2$ tienen media cero. Explica por qué
+en este caso es mejor ver el efecto conjunto de las dos variables.
+
+---
+
+Es importante también evitar la interpretación incorrecta de que la función
+de dependencia parcial da el valor esperado del predictor condicionado a valores
+de la variable cuya dependencia examinamos. Es decir, 
+$$f_1(x_1) = E_{x_2}(f(x_1,x_2)) \neq E(f(x_1,x_2)|x_1).$$
+La última cantidad es un valor esperado diferente (calculado sobre la
+condicional de $x_2$ dada $x_1$), de manera que utiliza información acerca
+de la relación que hay entre $x_1$ y $x_2$. La función de dependencia parcial
+da el efecto de $x_1$ tomando en cuenta los efectos promedio de las otras variables.
+
+
+## xgboost y gbm
+
+Los paquetes *xgboost* y *gbm* parecen ser los más populares para hacer
+gradient boosting.  *xgboost*,
+adicionalmente, parece ser más rápido y más flexible que *gbm* (paralelización, uso de GPU integrado). Existe una lista considerable de competencias de predicción donde el algoritmo/implementación
+ganadora es *xgboost*. 
+
+
+```{r}
+library(xgboost)
+x <- entrena %>% select(-vSalePrice) %>% model.matrix(~., .)
+x_entrena <- x[1:1100, ]
+x_valida <- x[1101:1460, ]
+set.seed(1293)
+d_entrena <- xgb.DMatrix(x_entrena, label = log(entrena$vSalePrice[1:1100])) 
+d_valida <- xgb.DMatrix(x_valida, label = log(entrena$vSalePrice[1101:1460])) 
+watchlist <- list(eval = d_valida, train = d_entrena)
+params <- list(booster = "gbtree",
+               max_depth = 3, 
+               eta = 0.03, 
+               nthread = 1, 
+               subsample = 0.75, 
+               lambda = 0.001,
+               objective = "reg:linear", 
+               eval_metric = "rmse")
+bst <- xgb.train(params, d_entrena, nrounds = 1000, watchlist = watchlist, verbose=1)
+eval <- bst$evaluation_log %>% gather(tipo, rmse, -iter)
+ggplot(eval, aes(x=iter, y=rmse, colour=tipo, group= tipo)) + geom_line() +
+  scale_y_log10()
+               
+            
+```
+
+
+## Tarea {-}
+
+
+1. Revisa el script que vimos en clase de aplicación de bosques para
+predecir precios de casa (bosque-housing.Rmd). Argumenta por qué es mejor
+el segundo método para limpiar faltantes que el primero. Considera
+ - Cómo respeta cada método la división entrenamiento y validación
+ - El desempeño de cada método
+ 
+2. Considera las importancia de variables de bosque-housing.Rmd. Muestra
+las importancias basadas en permutaciones escaladas y no escaladas. ¿Con
+qué valores en el objeto randomForest se escalan las importancias?
+
+3. Grafica importancias de Gini (MeanDecreaseGini) y de permutaciones. 
+¿Los resultados son similiares? Explica qué significa MeanDecreaseGini en el
+contexto de un problema de regresión.
+
+4. Considera nuestra primera corrida de gradient boosting
+en las notas para el ejemplo de los precios de las casas. Corre este ejemplo
+usando pérdida absoluta ($|y-f(x)|$) en lugar de pérdida cuadrática
+($(y-f(x))^2$)
+
+- Grafica las curvas de entrenamiento y validación conforme se agregan árboles
+- Explica teóricamente cuál es la diferencia del algoritmo cuando utilizas estas
+dos pérdidas.
+- Da razones por las que pérdida absoluta puede ser una mejor selección para
+algunos problemas de regresión.
+
+

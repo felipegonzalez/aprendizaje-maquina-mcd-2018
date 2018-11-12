@@ -811,7 +811,7 @@ da el efecto de $x_1$ tomando en cuenta los efectos *promedio* de las otras vari
 
 #### Ejemplos {-}
 
-Considramos $f(x_1,x_2) = h_1(x_1)h_2(x_2) = x_1x_2$, donde  x_1 y x_2 tienen medias $a_1$ y $a_2$.
+Considramos $f(x_1,x_2) = h_1(x_1)h_2(x_2) = x_1x_2$, donde  $x_1$ y $x_2$ tienen medias $a_1$ y $a_2$.
 La función de dependiencia parcial de $x_1$ es (demuéstralo):
 $\bar{f}_1(x_1) = a_2 x_1,$
 que nos muestra el efecto de $x_1$ promediando sobre $x_2$.

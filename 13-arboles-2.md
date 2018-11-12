@@ -379,7 +379,8 @@ la devianza (como la formulamos arriba, con $y\in\{-1,1\}$) con la pérdida expo
 
 Podemos usar el paquete de R *gbm* para hacer gradient boosting. Para el 
 caso de precios de casas de la sección anterior (un problema de regresión).
-
+Para ver un ejemplo distinto, utilizaremos la pérdida absoluta en lugar
+de pérdida cuadrática:
 
 Fijaremos el número de árboles en 200, de profundidad 3, usando
 75\% de la muestra para entrenar y el restante para validación:
@@ -392,7 +393,7 @@ set.seed(23411)
 
 ajustar_boost <- function(entrena, ...){
   mod_boosting <- gbm(log(vSalePrice) ~.,  data = entrena,
-                distribution = 'gaussian',
+                distribution = 'laplace',
                 n.trees = 200, 
                 interaction.depth = 3,
                 shrinkage = 1, # tasa de aprendizaje
@@ -402,26 +403,26 @@ ajustar_boost <- function(entrena, ...){
 }
 
 house_boosting <- ajustar_boost(entrena)
-dat_entrenamiento <- data_frame(entrena = sqrt(house_boosting$train.error),
-                                valida = sqrt(house_boosting$valid.error),
+dat_entrenamiento <- data_frame(entrena = house_boosting$train.error,
+                                valida = house_boosting$valid.error,
                                 n_arbol = 1:length(house_boosting$train.error)) %>%
                       gather(tipo, valor, -n_arbol)
 print(house_boosting)
 ```
 
 ```
-## gbm(formula = log(vSalePrice) ~ ., distribution = "gaussian", 
+## gbm(formula = log(vSalePrice) ~ ., distribution = "laplace", 
 ##     data = entrena, n.trees = 200, interaction.depth = 3, shrinkage = 1, 
 ##     bag.fraction = 1, train.fraction = 0.75)
-## A gradient boosted model with gaussian loss function.
+## A gradient boosted model with laplace loss function.
 ## 200 iterations were performed.
 ```
 
 <img src="13-arboles-2_files/figure-html/unnamed-chunk-15-1.png" width="480" />
 
 ```
-## The best test-set iteration was 20.
-## There were 79 predictors of which 28 had non-zero influence.
+## The best test-set iteration was 161.
+## There were 79 predictors of which 63 had non-zero influence.
 ```
 
 ```r
@@ -440,7 +441,7 @@ gbm.perf(house_boosting)
 <img src="13-arboles-2_files/figure-html/unnamed-chunk-16-1.png" width="480" />
 
 ```
-## [1] 20
+## [1] 161
 ```
 Como vemos, tenemos que afinar los parámetros del algoritmo. 
 
@@ -481,7 +482,7 @@ Veamos que efecto tiene en nuestro ejemplo:
 
 
 ```r
-modelos_dat <- data_frame(n_modelo = 1:4, shrinkage = c(0.05, 0.1, 0.5, 1))
+modelos_dat <- data_frame(n_modelo = 1:4, shrinkage = c(0.02, 0.05, 0.25, 0.5))
 modelos_dat <- modelos_dat %>% 
   mutate(modelo = map(shrinkage, boost)) %>%
   mutate(eval = map(modelo, eval_modelo))
@@ -492,10 +493,10 @@ modelos_dat
 ## # A tibble: 4 x 4
 ##   n_modelo shrinkage modelo    eval                
 ##      <int>     <dbl> <list>    <list>              
-## 1        1      0.05 <S3: gbm> <tibble [1,000 × 3]>
-## 2        2      0.1  <S3: gbm> <tibble [1,000 × 3]>
-## 3        3      0.5  <S3: gbm> <tibble [1,000 × 3]>
-## 4        4      1    <S3: gbm> <tibble [1,000 × 3]>
+## 1        1      0.02 <S3: gbm> <tibble [1,000 × 3]>
+## 2        2      0.05 <S3: gbm> <tibble [1,000 × 3]>
+## 3        3      0.25 <S3: gbm> <tibble [1,000 × 3]>
+## 4        4      0.5  <S3: gbm> <tibble [1,000 × 3]>
 ```
 
 ```r
@@ -507,22 +508,24 @@ graf_eval
 ## # A tibble: 4,000 x 4
 ##    shrinkage n_arbol tipo    valor
 ##        <dbl>   <int> <chr>   <dbl>
-##  1      0.05       1 entrena 0.391
-##  2      0.05       2 entrena 0.380
-##  3      0.05       3 entrena 0.368
-##  4      0.05       4 entrena 0.358
-##  5      0.05       5 entrena 0.348
-##  6      0.05       6 entrena 0.339
-##  7      0.05       7 entrena 0.330
-##  8      0.05       8 entrena 0.321
-##  9      0.05       9 entrena 0.313
-## 10      0.05      10 entrena 0.305
+##  1      0.02       1 entrena 0.309
+##  2      0.02       2 entrena 0.305
+##  3      0.02       3 entrena 0.301
+##  4      0.02       4 entrena 0.297
+##  5      0.02       5 entrena 0.294
+##  6      0.02       6 entrena 0.290
+##  7      0.02       7 entrena 0.287
+##  8      0.02       8 entrena 0.283
+##  9      0.02       9 entrena 0.280
+## 10      0.02      10 entrena 0.277
 ## # ... with 3,990 more rows
 ```
 
 ```r
-ggplot(filter(graf_eval, tipo=='valida'), aes(x = n_arbol, y= valor, colour=factor(shrinkage), group =
-                        shrinkage)) + geom_line() +
+ggplot(filter(graf_eval), 
+       aes(x = n_arbol, y= valor, 
+           colour=factor(shrinkage), group = shrinkage)) + 
+    geom_line() +
   facet_wrap(~tipo)
 ```
 
@@ -532,8 +535,6 @@ Obsérvese que podemos obtener un mejor resultado de validación afinando
 la tasa de aprendizaje. Cuando es muy grande, el modelo rápidamente sobreajusta
 cuando agregamos árboles. Si la tasa es demasiado chica, podos tardar
 mucho en llegar a un predictor de buen desempeño.
-
-¿Cómo crees que se ven las gráfica de error de entrenamiento?
 
 ### Submuestreo (bag.fraction)
 Funciona bien construir cada uno de los árboles con submuestras de la muestra
@@ -580,16 +581,16 @@ graf_eval
 ## # A tibble: 3,000 x 4
 ##    bag.fraction n_arbol tipo    valor
 ##           <dbl>   <int> <chr>   <dbl>
-##  1         0.25       1 entrena 0.340
-##  2         0.25       2 entrena 0.295
-##  3         0.25       3 entrena 0.258
-##  4         0.25       4 entrena 0.232
-##  5         0.25       5 entrena 0.211
-##  6         0.25       6 entrena 0.195
-##  7         0.25       7 entrena 0.183
-##  8         0.25       8 entrena 0.173
-##  9         0.25       9 entrena 0.165
-## 10         0.25      10 entrena 0.160
+##  1         0.25       1 entrena 0.269
+##  2         0.25       2 entrena 0.232
+##  3         0.25       3 entrena 0.211
+##  4         0.25       4 entrena 0.194
+##  5         0.25       5 entrena 0.179
+##  6         0.25       6 entrena 0.170
+##  7         0.25       7 entrena 0.162
+##  8         0.25       8 entrena 0.152
+##  9         0.25       9 entrena 0.147
+## 10         0.25      10 entrena 0.142
 ## # ... with 2,990 more rows
 ```
 
@@ -620,12 +621,12 @@ head(graf_eval)
 
 ```
 ##   shrinkage bag.fraction n_arbol    tipo     valor
-## 1      0.01          0.1       1 entrena 0.4016655
-## 2      0.01          0.1       2 entrena 0.3991252
-## 3      0.01          0.1       3 entrena 0.3964301
-## 4      0.01          0.1       4 entrena 0.3942135
-## 5      0.01          0.1       5 entrena 0.3914665
-## 6      0.01          0.1       6 entrena 0.3891097
+## 1      0.01          0.1       1 entrena 0.3108616
+## 2      0.01          0.1       2 entrena 0.3087372
+## 3      0.01          0.1       3 entrena 0.3065518
+## 4      0.01          0.1       4 entrena 0.3047564
+## 5      0.01          0.1       5 entrena 0.3027629
+## 6      0.01          0.1       6 entrena 0.3010770
 ```
 
 ```r
@@ -663,19 +664,19 @@ graf_eval %>% filter(tipo=='valida') %>%
 
 ```
 ## # A tibble: 10 x 3
-## # Groups:   shrinkage [3]
-##    shrinkage bag.fraction valor
-##        <dbl>        <dbl> <dbl>
-##  1      0.1          0.5  0.125
-##  2      0.25         0.5  0.128
-##  3      0.1          1    0.131
-##  4      0.1          0.25 0.131
-##  5      0.01         0.25 0.131
-##  6      0.1          0.1  0.132
-##  7      0.25         0.25 0.133
-##  8      0.25         1    0.135
-##  9      0.01         0.5  0.137
-## 10      0.01         0.1  0.137
+## # Groups:   shrinkage [4]
+##    shrinkage bag.fraction  valor
+##        <dbl>        <dbl>  <dbl>
+##  1      0.1          0.25 0.0830
+##  2      0.1          0.5  0.0837
+##  3      0.1          1    0.0864
+##  4      0.25         0.5  0.0865
+##  5      0.25         1    0.0903
+##  6      0.1          0.1  0.0964
+##  7      0.25         0.25 0.0979
+##  8      0.01         1    0.100 
+##  9      0.01         0.5  0.100 
+## 10      0.5          0.5  0.101
 ```
 
 
@@ -694,7 +695,7 @@ Los árboles se construyen de tamaño fijo $J$, donde $J$ es el número
 de cortes. Usualmente $J=1,2,\ldots, 10$, y es un parámetro que hay que
 elegir. $J$ más grande permite interacciones de orden más alto entre 
 las variables de entrada. Se intenta con varias $J$ y $M$ para minimizar
-el error de vaidación.
+el error de validación.
 
 ### Controlar número de casos para cortes
 
@@ -713,8 +714,9 @@ modelos_dat <- modelos_dat %>%
   mutate(modelo = pmap(., boost)) %>%
   mutate(eval = map(modelo, eval_modelo))
 graf_eval <- modelos_dat %>% select(shrinkage, bag.fraction, depth, eval) %>% unnest
-ggplot(filter(graf_eval, tipo =='valida'), aes(x = n_arbol, y= valor, colour=factor(bag.fraction), group =
-                        bag.fraction)) + geom_line() +
+ggplot(filter(graf_eval, tipo =='valida'), aes(x = n_arbol, y= valor,
+    colour=factor(bag.fraction), group = bag.fraction)) + 
+  geom_line() +
   facet_grid(depth~shrinkage) + scale_y_log10()
 ```
 
@@ -725,7 +727,8 @@ Podemos ver con más detalle donde ocurre el mejor desempeño:
 
 
 ```r
-ggplot(filter(graf_eval, tipo =='valida', shrinkage == 0.1, n_arbol>100), aes(x = n_arbol, y= valor, colour=factor(bag.fraction), group =
+ggplot(
+    filter(graf_eval, tipo =='valida', shrinkage == 0.1, n_arbol > 100), aes(x = n_arbol, y= valor, colour=factor(bag.fraction), group =
                         bag.fraction)) + geom_line() +
   facet_grid(depth~shrinkage) 
 ```
@@ -733,18 +736,19 @@ ggplot(filter(graf_eval, tipo =='valida', shrinkage == 0.1, n_arbol>100), aes(x 
 <img src="13-arboles-2_files/figure-html/unnamed-chunk-24-1.png" width="480" />
 
 
+
 ```r
 head(arrange(filter(graf_eval,tipo=='valida'), valor))
 ```
 
 ```
-##   shrinkage bag.fraction depth n_arbol   tipo     valor
-## 1       0.1          0.5    10      98 valida 0.1218075
-## 2       0.1          0.5    10      95 valida 0.1218644
-## 3       0.1          0.5    10      97 valida 0.1218835
-## 4       0.1          0.5    10      96 valida 0.1219046
-## 5       0.1          0.5    10     100 valida 0.1220013
-## 6       0.1          0.5    10      94 valida 0.1220148
+##   shrinkage bag.fraction depth n_arbol   tipo      valor
+## 1       0.1          0.5    10     348 valida 0.08126603
+## 2       0.1          0.5    10     342 valida 0.08128108
+## 3       0.1          0.5    10     346 valida 0.08128677
+## 4       0.1          0.5    10     343 valida 0.08129096
+## 5       0.1          0.5    10     347 valida 0.08129531
+## 6       0.1          0.5    10     341 valida 0.08129727
 ```
 
 ### Evaluación con validación cruzada.
@@ -758,7 +762,7 @@ Por ejemplo,
 set.seed(9983)
 rm('modelos_dat')
 mod_boosting <- gbm(log(vSalePrice) ~.,  data = entrena,
-                distribution = 'gaussian',
+                distribution = 'laplace',
                 n.trees = 200, 
                 interaction.depth = 10,
                 shrinkage = 0.1, # tasa de aprendizaje
@@ -771,14 +775,14 @@ gbm.perf(mod_boosting)
 
 ```r
 eval_modelo_2 <- function(modelo){
-   dat_eval <- data_frame(entrena = sqrt(modelo$train.error),
-                          valida = sqrt(modelo$cv.error),
+   dat_eval <- data_frame(entrena = modelo$train.error,
+                          valida = modelo$cv.error,
                           n_arbol = 1:length(modelo$train.error)) %>%
                       gather(tipo, valor, -n_arbol)
    dat_eval
 }
 dat <- eval_modelo_2(mod_boosting)
-sqrt(min(mod_boosting$cv.error))
+(min(mod_boosting$cv.error))
 ggplot(dat, aes(x = n_arbol, y=valor, colour=tipo, group=tipo)) + geom_line()
 ```
 
@@ -811,30 +815,25 @@ Construimos un modelo con solamente tres variables para nuestro ejemplo anterior
 
 
 ```r
-mod_2 <- gbm(log(vSalePrice) ~ vGrLivArea +vNeighborhood  +vOverallQual,  
+mod_2 <- gbm(log(vSalePrice) ~ vGrLivArea +vNeighborhood  +
+                 vOverallQual + vBsmtFinSF1,  
                 data = entrena,
-                distribution = 'gaussian',
-                n.trees = 100, 
-                interaction.depth = 3,
+                distribution = 'laplace',
+                n.trees = 500, 
+                interaction.depth = 4,
                 shrinkage = 0.1, 
                 bag.fraction = 0.5,
                 train.fraction = 0.75)
-gbm.perf(mod_2)
-```
-
-<img src="13-arboles-2_files/figure-html/unnamed-chunk-26-1.png" width="480" />
-
-```
-## [1] 87
 ```
 
 Podemos calcular a mano la gráfica de dependencia parcial para 
-el tamaño de la "General Living Area". 
+el tamaño de la "General Living Area". Seleccionamos las variables:
 
 ```r
-dat_dp <- entrena %>% select(vGrLivArea, vNeighborhood, vOverallQual) 
+dat_dp <- entrena %>% select(vGrLivArea, vNeighborhood, vOverallQual, vBsmtFinSF1) 
 ```
-Consideramos el rango de la variable:
+Ahora consideramos el rango de la variable para establecer en dónde
+vamos evaluar las función de dependiencia parcial:
 
 ```r
 cuantiles <- quantile(entrena$vGrLivArea, probs= seq(0, 1, 0.1))
@@ -860,7 +859,7 @@ dat_dp_1 <- dat_dp %>% mutate(vGrLivArea = 912) %>%
 <img src="13-arboles-2_files/figure-html/unnamed-chunk-29-1.png" width="480" />
 
 ```
-## Using 87 trees...
+## Using 105 trees...
 ```
 
 ```r
@@ -869,10 +868,10 @@ dat_dp_1
 
 ```
 ##   mean_pred
-## 1  11.84206
+## 1  11.84386
 ```
 
-Evaluamos en vGrLivArea = 912
+Evaluamos en vGrLivArea = 1208
 
 ```r
 dat_dp_1 <- dat_dp %>% mutate(vGrLivArea = 1208) %>%
@@ -883,7 +882,7 @@ dat_dp_1 <- dat_dp %>% mutate(vGrLivArea = 1208) %>%
 <img src="13-arboles-2_files/figure-html/unnamed-chunk-30-1.png" width="480" />
 
 ```
-## Using 87 trees...
+## Using 105 trees...
 ```
 
 ```r
@@ -892,10 +891,11 @@ dat_dp_1
 
 ```
 ##   mean_pred
-## 1  11.96576
+## 1  11.96169
 ```
 (un incremento de alrededor del 10\% en el precio de venta).
-Hacemos todos los cuantiles como sigue:
+
+Hacemos todos los percentiles como sigue:
 
 
 ```r
@@ -905,14 +905,14 @@ prom_parcial <- function(x, variable, df, mod){
   variable <- enquo(variable)
   variable_nom <- quo_name(variable)
   salida <- df %>% mutate(!!variable_nom := x) %>% 
-    mutate(pred = predict(mod, ., n.trees=100)) %>%
+    mutate(pred = predict(mod, ., n.trees = 500)) %>%
     group_by(!!variable) %>%
     summarise(f_1 = mean(pred)) 
   salida
 }
 dep_parcial <- map_dfr(cuantiles, 
                        ~prom_parcial(.x, vGrLivArea, entrena, mod_2))
-ggplot(dep_parcial, aes(x=vGrLivArea, y= f_1)) + 
+ggplot(dep_parcial, aes(x=vGrLivArea, y = f_1)) + 
   geom_line() + geom_line() + geom_rug(sides='b')
 ```
 
@@ -935,43 +935,39 @@ plot(mod_2, 1) # 1 pues es vGrLivArea la primer variable
 
 <img src="13-arboles-2_files/figure-html/unnamed-chunk-33-1.png" width="480" />
 
-Y para una variable categórica se ve como sigue:
+
+### Discusión {-}
+
+En primer lugar, veamos qué obtenemos de la dependencia parcial
+cuando aplicamos al modelo lineal sin interacciones. En el caso de dos variables,
+
+$$f_1(x_1) = E_{x_2}[f(x_1,x_2)] =E_{x_2}[a + bx_1 + cx_2)] = \mu + bx_1,$$
+que es equivalente al análisis marginal que hacemos en regresión lineal (
+incrementos en la variable $x_1$ con todo lo demás fijo, donde el incremento
+marginal de la respuesta es el coeficiente $b$). 
+
+Desde este punto de vista, dependencia parcial da una interpretación similar
+a la del análisis usual de coeficientes en regresión lineal, donde pensamos
+en "todo lo demás constante".
+
+Igualmente, si el modelo fuera aditivo de la forma 
+$f(x_1,x_2) = h_1(x_1) + h_2(x_2)$
+obtendríamos
+$$f_1(x_1) = E_{x_2}[h_1(x_1) + h_2(x_2)] = \mu + h_1(x_1),$$
+y recuperaríamos otra vez la interpetación de "todo lo demás constante".
+
+---
+
+Para una variable categórica las gráficas de dependencia
+parcial se ven como sigue. Escribimos las
+cantidades logarítmicas en la escala original:
 
 
 ```r
-plot(mod_2, 2, return.grid = TRUE) %>% arrange(y)
-```
-
-```
-##    vNeighborhood        y
-## 1         IDOTRR 11.74437
-## 2         BrDale 11.79033
-## 3        OldTown 11.81014
-## 4          SWISU 11.85419
-## 5        MeadowV 11.85748
-## 6        Edwards 11.86859
-## 7        BrkSide 11.91787
-## 8          Otros 11.95479
-## 9          NAmes 11.98455
-## 10        Sawyer 12.00362
-## 11       SawyerW 12.03340
-## 12       Mitchel 12.06104
-## 13        NWAmes 12.08210
-## 14       Crawfor 12.08735
-## 15       Gilbert 12.09874
-## 16       Blmngtn 12.11353
-## 17       CollgCr 12.12275
-## 18       Somerst 12.15674
-## 19        Timber 12.17366
-## 20       ClearCr 12.18768
-## 21       NoRidge 12.20368
-## 22       StoneBr 12.22289
-## 23       NridgHt 12.24190
-## 24       Veenker 12.25304
-```
-
-```r
-plot(mod_2, 2, return.grid = FALSE)
+dep_parcial <- plot(mod_2, 2, return.grid = TRUE) %>% arrange(y)
+dep_parcial$vNeighborhood <- reorder(dep_parcial$vNeighborhood, dep_parcial$y)
+ggplot(dep_parcial, aes(x = vNeighborhood, y = exp(y))) + geom_point() +
+    coord_flip()
 ```
 
 <img src="13-arboles-2_files/figure-html/unnamed-chunk-34-1.png" width="480" />
@@ -987,7 +983,7 @@ de las variables. Si tenemos
 una muestra de entrenamiento, podríamos estimarla promediando sobre la muestra 
 de entrenamiento
 
-$$\bar{f}_j(x_j) = \frac{1}{n}\sum_{i=1}^n f(x_1^{(i)}, x_2^{(i)}, \ldots, x_{j-1}^{(i)},x_{j+1}^{(i)},\ldots, x_p^{(i)}).$$
+$$\bar{f}_j(x_j) = \frac{1}{n}\sum_{i=1}^n f(x_1^{(i)}, x_2^{(i)}, \ldots, x_{j-1}^{(i)},\, x_j,\,  x_{j+1}^{(i)},\ldots, x_p^{(i)}).$$
 
 Podemos hacer también  gráficas de dependencia parcial para más de una variable,
 si fijamos un subconjunto de variables y promediamos sobre el resto.
@@ -999,43 +995,168 @@ plot(mod_2, c(1,3))
 
 <img src="13-arboles-2_files/figure-html/unnamed-chunk-35-1.png" width="480" />
 
-### Discusión
+Que también podemos graficar como
 
-En primer lugar, veamos qué obtenemos de la dependencia parcial
-cuando aplicamos al modelo lineal sin interacciones. En el caso de dos variables,
 
-$$f_1(x_1) = E_{x_2}[f(x_1,x_2)] =E_{x_2}[a + bx_1 + cx_2)] = \mu + bx_1,$$
-que es equivalente al análisis marginal que hacemos en regresión lineal (
-incrementos en la variable $x_1$ con todo lo demás fijo, donde el incremento
-marginal de la respuesta es el coeficiente $b$). 
+```r
+grid_dp <- plot(mod_2, c(1,3), level.plot = FALSE, return.grid = TRUE)
+ggplot(grid_dp, aes(x = vGrLivArea, y = y, 
+        colour = vOverallQual, group = vOverallQual)) + geom_line() +
+    xlim(c(0, 3000))
+```
 
-Desde este punto de vista, dependencia parcial da una interpretación similar
-a la del análisis usual de coeficientes en regresión lineal, donde pensamos
-en "todo lo demás constante".
+```
+## Warning: Removed 5000 rows containing missing values (geom_path).
+```
 
-Nótese también que cuando hay **interacciones** fuertes entre las variables, ningún
-análisis marginal (dependencia parcial o examen de coeficientes) da un resultado
-fácilmente interpretable - la única solución es considerar el efecto conjunto de las
-variables que interactúan. De modo que este tipo de análisis funciona mejor
-cuando no hay interacciones grandes entre las variables (es cercano a un modelo
-aditivo con efectos no lineales).
+<img src="13-arboles-2_files/figure-html/unnamed-chunk-36-1.png" width="480" />
 
-#### Ejemplo {-}
-Considera qué pasa con las gráficas de dependencia parcial cuando
-$f(x_1,x_2) = -10 x_1x_2$, y $x_1$ y $x_2$ tienen media cero. Explica por qué
-en este caso es mejor ver el efecto conjunto de las dos variables.
+En este caso, no vemos interacciones grandes (GrLivArea y OverallQual) 
+en nuestro modelo.
 
 ---
 
-Es importante también evitar la interpretación incorrecta de que la función
+#### Más de interpretación {-}
+
+Es importante evitar la interpretación incorrecta de que la función
 de dependencia parcial da el valor esperado del predictor condicionado a valores
 de la variable cuya dependencia examinamos. Es decir, 
 $$f_1(x_1) = E_{x_2}(f(x_1,x_2)) \neq E(f(x_1,x_2)|x_1).$$
 La última cantidad es un valor esperado diferente (calculado sobre la
 condicional de $x_2$ dada $x_1$), de manera que utiliza información acerca
-de la relación que hay entre $x_1$ y $x_2$. La función de dependencia parcial
-da el efecto de $x_1$ tomando en cuenta los efectos promedio de las otras variables.
+de la relación que hay entre $x_1$ y $x_2$, y se puede interpretar
+como el valor esperado del predictor ingorando $x_2$. 
+La función de dependencia parcial
+da el efecto de $x_1$ tomando en cuenta los efectos *promedio* de las otras variables.
 
+#### Ejemplos {-}
+
+Considramos $f(x_1,x_2) = h_1(x_1)h_2(x_2) = x_1x_2$, donde  x_1 y x_2 tienen medias $a_1$ y $a_2$.
+La función de dependiencia parcial de $x_1$ es (demuéstralo):
+$\bar{f}_1(x_1) = a_2 x_1,$
+que nos muestra el efecto de $x_1$ promediando sobre $x_2$.
+Sin embargo, la condicional de la predicción dada $x_1$ es diferente:
+$$f_1(x_1) = E(x_1x_2 | x_1) = x_1 E(x_2 | x_1)$$
+y el valor esperado condicional puede ser una función complicada. Por ejemplo,
+si hay correlación lineal entre $x_1$ y $x_2$ podríamos tener
+$E(x_2 | x_1) = ax_1 + b$, etc. Esta cantidad tiene sus usos (por ejemplo,
+hacer predicciones cuando no tenemos $x_2$), pero para entender el
+efecto univariado de $x_1$ generalmente es más fácil considerar la 
+función de dependiencia parcial.
+
+---
+
+Finalmente, nótese que cuando hay **interacciones** fuertes entre las variables, ningún análisis marginal (dependencia parcial o examen de coeficientes) da un resultado tan fácilmente interpretabl. La única solución es considerar el efecto conjunto de las variables que interactúan. De modo que este tipo de análisis funciona mejor
+cuando no hay interacciones grandes entre las variables (es cercano a un modelo
+aditivo con efectos no lineales).
+
+### Gráficas de dependencia parcial para otros modelos
+
+Como dijimos en la introducción, las gráficas de dependiencia parcial
+pueden utilizarse para cualquier tipo de modelo.
+
+#### Ejemplo: regresión lineal
+
+¿Qué esperamos si aplicamos a un modelo de regresión lineal?
+
+
+```r
+library(pdp)
+```
+
+```
+## 
+## Attaching package: 'pdp'
+```
+
+```
+## The following object is masked from 'package:purrr':
+## 
+##     partial
+```
+
+```r
+mod_lm <- lm(log(vSalePrice) ~ vGrLivArea +vNeighborhood  +
+                 vOverallQual + vBsmtFinSF1, entrena)
+mod_lm
+```
+
+```
+## 
+## Call:
+## lm(formula = log(vSalePrice) ~ vGrLivArea + vNeighborhood + vOverallQual + 
+##     vBsmtFinSF1, data = entrena)
+## 
+## Coefficients:
+##          (Intercept)            vGrLivArea   vNeighborhoodBrDale  
+##           10.9781318             0.0002519            -0.3876381  
+## vNeighborhoodBrkSide  vNeighborhoodClearCr  vNeighborhoodCollgCr  
+##           -0.1931159             0.0784516             0.0131924  
+## vNeighborhoodCrawfor  vNeighborhoodEdwards  vNeighborhoodGilbert  
+##            0.0180111            -0.2231209             0.0006351  
+##  vNeighborhoodIDOTRR  vNeighborhoodMeadowV  vNeighborhoodMitchel  
+##           -0.3716332            -0.3176807            -0.0713348  
+##   vNeighborhoodNAmes  vNeighborhoodNoRidge  vNeighborhoodNridgHt  
+##           -0.0981734             0.0806283             0.1502544  
+##  vNeighborhoodNWAmes  vNeighborhoodOldTown    vNeighborhoodOtros  
+##           -0.0528433            -0.2732835            -0.1615437  
+##  vNeighborhoodSawyer  vNeighborhoodSawyerW  vNeighborhoodSomerst  
+##           -0.0956738            -0.0621679             0.0521564  
+## vNeighborhoodStoneBr    vNeighborhoodSWISU   vNeighborhoodTimber  
+##            0.1231436            -0.2302935             0.0593881  
+## vNeighborhoodVeenker          vOverallQual           vBsmtFinSF1  
+##            0.1294244             0.1129118             0.0001089
+```
+
+```r
+mod_lm %>%
+    partial(pred.var = "vGrLivArea") %>%
+    autoplot(rug = TRUE, train = entrena)
+```
+
+<img src="13-arboles-2_files/figure-html/unnamed-chunk-37-1.png" width="480" />
+
+#### Ejemplo: bosque aleatorio
+
+
+```r
+library(randomForest)
+mod_bosque <- randomForest(log(vSalePrice) ~ vGrLivArea +vNeighborhood  +
+                 vOverallQual + vBsmtFinSF1, data = entrena)
+mod_bosque
+```
+
+```
+## 
+## Call:
+##  randomForest(formula = log(vSalePrice) ~ vGrLivArea + vNeighborhood +      vOverallQual + vBsmtFinSF1, data = entrena) 
+##                Type of random forest: regression
+##                      Number of trees: 500
+## No. of variables tried at each split: 1
+## 
+##           Mean of squared residuals: 0.02367802
+##                     % Var explained: 85.15
+```
+
+```r
+mod_bosque %>%
+    partial(pred.var = "vGrLivArea") %>%
+    autoplot(rug = TRUE, train = entrena)
+```
+
+<img src="13-arboles-2_files/figure-html/unnamed-chunk-38-1.png" width="480" />
+
+
+```r
+mod_bosque %>%
+    partial(pred.var = c("vGrLivArea", "vOverallQual")) %>%
+    autoplot(rug = TRUE, train = entrena)
+```
+
+<img src="13-arboles-2_files/figure-html/unnamed-chunk-39-1.png" width="480" />
+
+
+Puedes ver más técnicas en [Interpretable Machine Learning](https://christophm.github.io/interpretable-ml-book/), por ejemplo.
 
 ## xgboost y gbm
 
@@ -1076,1011 +1197,1011 @@ params <- list(booster = "gbtree",
                subsample = 0.75, 
                lambda = 0.001,
                objective = "reg:linear", 
-               eval_metric = "rmse")
+               eval_metric = "mae") # error absoluto
 bst <- xgb.train(params, d_entrena, nrounds = 1000, watchlist = watchlist, verbose=1)
 ```
 
 ```
-## [1]	eval-rmse:11.183367	train-rmse:11.185970 
-## [2]	eval-rmse:10.848030	train-rmse:10.850441 
-## [3]	eval-rmse:10.522327	train-rmse:10.524883 
-## [4]	eval-rmse:10.206756	train-rmse:10.209215 
-## [5]	eval-rmse:9.901018	train-rmse:9.903183 
-## [6]	eval-rmse:9.604361	train-rmse:9.606353 
-## [7]	eval-rmse:9.316499	train-rmse:9.318384 
-## [8]	eval-rmse:9.037509	train-rmse:9.038843 
-## [9]	eval-rmse:8.766625	train-rmse:8.767856 
-## [10]	eval-rmse:8.504042	train-rmse:8.504976 
-## [11]	eval-rmse:8.249103	train-rmse:8.249992 
-## [12]	eval-rmse:8.001815	train-rmse:8.002570 
-## [13]	eval-rmse:7.762049	train-rmse:7.762605 
-## [14]	eval-rmse:7.529464	train-rmse:7.529853 
-## [15]	eval-rmse:7.303868	train-rmse:7.304183 
-## [16]	eval-rmse:7.085173	train-rmse:7.085240 
-## [17]	eval-rmse:6.873233	train-rmse:6.872812 
-## [18]	eval-rmse:6.667545	train-rmse:6.666743 
-## [19]	eval-rmse:6.467870	train-rmse:6.466797 
-## [20]	eval-rmse:6.274136	train-rmse:6.272933 
-## [21]	eval-rmse:6.085811	train-rmse:6.084670 
-## [22]	eval-rmse:5.903286	train-rmse:5.902312 
-## [23]	eval-rmse:5.726332	train-rmse:5.725288 
-## [24]	eval-rmse:5.555059	train-rmse:5.553725 
-## [25]	eval-rmse:5.388524	train-rmse:5.387316 
-## [26]	eval-rmse:5.226866	train-rmse:5.225660 
-## [27]	eval-rmse:5.070144	train-rmse:5.069087 
-## [28]	eval-rmse:4.918210	train-rmse:4.917084 
-## [29]	eval-rmse:4.770644	train-rmse:4.769682 
-## [30]	eval-rmse:4.627788	train-rmse:4.626754 
-## [31]	eval-rmse:4.489161	train-rmse:4.488088 
-## [32]	eval-rmse:4.354557	train-rmse:4.353536 
-## [33]	eval-rmse:4.223987	train-rmse:4.223086 
-## [34]	eval-rmse:4.097580	train-rmse:4.096651 
-## [35]	eval-rmse:3.974845	train-rmse:3.973879 
-## [36]	eval-rmse:3.855764	train-rmse:3.854761 
-## [37]	eval-rmse:3.740262	train-rmse:3.739241 
-## [38]	eval-rmse:3.628328	train-rmse:3.627258 
-## [39]	eval-rmse:3.520058	train-rmse:3.518757 
-## [40]	eval-rmse:3.414457	train-rmse:3.413175 
-## [41]	eval-rmse:3.312317	train-rmse:3.310966 
-## [42]	eval-rmse:3.213198	train-rmse:3.211770 
-## [43]	eval-rmse:3.117117	train-rmse:3.115627 
-## [44]	eval-rmse:3.023922	train-rmse:3.022294 
-## [45]	eval-rmse:2.933381	train-rmse:2.931745 
-## [46]	eval-rmse:2.845738	train-rmse:2.843973 
-## [47]	eval-rmse:2.760700	train-rmse:2.758906 
-## [48]	eval-rmse:2.678176	train-rmse:2.676355 
-## [49]	eval-rmse:2.598284	train-rmse:2.596345 
-## [50]	eval-rmse:2.520782	train-rmse:2.518759 
-## [51]	eval-rmse:2.445457	train-rmse:2.443495 
-## [52]	eval-rmse:2.372283	train-rmse:2.370391 
-## [53]	eval-rmse:2.301332	train-rmse:2.299367 
-## [54]	eval-rmse:2.232533	train-rmse:2.230658 
-## [55]	eval-rmse:2.166043	train-rmse:2.163950 
-## [56]	eval-rmse:2.101366	train-rmse:2.099274 
-## [57]	eval-rmse:2.038792	train-rmse:2.036566 
-## [58]	eval-rmse:1.978027	train-rmse:1.975905 
-## [59]	eval-rmse:1.919023	train-rmse:1.916914 
-## [60]	eval-rmse:1.861887	train-rmse:1.859752 
-## [61]	eval-rmse:1.806416	train-rmse:1.804133 
-## [62]	eval-rmse:1.752722	train-rmse:1.750435 
-## [63]	eval-rmse:1.700586	train-rmse:1.698211 
-## [64]	eval-rmse:1.649718	train-rmse:1.647352 
-## [65]	eval-rmse:1.600789	train-rmse:1.598278 
-## [66]	eval-rmse:1.553377	train-rmse:1.550703 
-## [67]	eval-rmse:1.507320	train-rmse:1.504523 
-## [68]	eval-rmse:1.462657	train-rmse:1.459791 
-## [69]	eval-rmse:1.418975	train-rmse:1.416199 
-## [70]	eval-rmse:1.377086	train-rmse:1.374123 
-## [71]	eval-rmse:1.336371	train-rmse:1.333250 
-## [72]	eval-rmse:1.296991	train-rmse:1.293647 
-## [73]	eval-rmse:1.258685	train-rmse:1.255167 
-## [74]	eval-rmse:1.221414	train-rmse:1.217896 
-## [75]	eval-rmse:1.185352	train-rmse:1.181752 
-## [76]	eval-rmse:1.150467	train-rmse:1.146795 
-## [77]	eval-rmse:1.116551	train-rmse:1.112809 
-## [78]	eval-rmse:1.083800	train-rmse:1.079873 
-## [79]	eval-rmse:1.051880	train-rmse:1.047876 
-## [80]	eval-rmse:1.021156	train-rmse:1.016918 
-## [81]	eval-rmse:0.991035	train-rmse:0.986742 
-## [82]	eval-rmse:0.962071	train-rmse:0.957656 
-## [83]	eval-rmse:0.933817	train-rmse:0.929293 
-## [84]	eval-rmse:0.906693	train-rmse:0.901907 
-## [85]	eval-rmse:0.880243	train-rmse:0.875294 
-## [86]	eval-rmse:0.854782	train-rmse:0.849542 
-## [87]	eval-rmse:0.830050	train-rmse:0.824504 
-## [88]	eval-rmse:0.805921	train-rmse:0.800332 
-## [89]	eval-rmse:0.782437	train-rmse:0.776819 
-## [90]	eval-rmse:0.759826	train-rmse:0.754110 
-## [91]	eval-rmse:0.737987	train-rmse:0.731999 
-## [92]	eval-rmse:0.716596	train-rmse:0.710499 
-## [93]	eval-rmse:0.695845	train-rmse:0.689677 
-## [94]	eval-rmse:0.675893	train-rmse:0.669581 
-## [95]	eval-rmse:0.656634	train-rmse:0.650188 
-## [96]	eval-rmse:0.637819	train-rmse:0.631238 
-## [97]	eval-rmse:0.619622	train-rmse:0.612868 
-## [98]	eval-rmse:0.602074	train-rmse:0.595118 
-## [99]	eval-rmse:0.585125	train-rmse:0.577886 
-## [100]	eval-rmse:0.568653	train-rmse:0.561235 
-## [101]	eval-rmse:0.552748	train-rmse:0.545138 
-## [102]	eval-rmse:0.537232	train-rmse:0.529475 
-## [103]	eval-rmse:0.522264	train-rmse:0.514420 
-## [104]	eval-rmse:0.507737	train-rmse:0.499568 
-## [105]	eval-rmse:0.493683	train-rmse:0.485270 
-## [106]	eval-rmse:0.480088	train-rmse:0.471373 
-## [107]	eval-rmse:0.467011	train-rmse:0.458003 
-## [108]	eval-rmse:0.454471	train-rmse:0.445108 
-## [109]	eval-rmse:0.442196	train-rmse:0.432627 
-## [110]	eval-rmse:0.430161	train-rmse:0.420445 
-## [111]	eval-rmse:0.418728	train-rmse:0.408734 
-## [112]	eval-rmse:0.407583	train-rmse:0.397402 
-## [113]	eval-rmse:0.396891	train-rmse:0.386446 
-## [114]	eval-rmse:0.386403	train-rmse:0.375683 
-## [115]	eval-rmse:0.376224	train-rmse:0.365231 
-## [116]	eval-rmse:0.366555	train-rmse:0.355268 
-## [117]	eval-rmse:0.357100	train-rmse:0.345474 
-## [118]	eval-rmse:0.348049	train-rmse:0.336072 
-## [119]	eval-rmse:0.339081	train-rmse:0.326911 
-## [120]	eval-rmse:0.330555	train-rmse:0.318151 
-## [121]	eval-rmse:0.322332	train-rmse:0.309662 
-## [122]	eval-rmse:0.314413	train-rmse:0.301313 
-## [123]	eval-rmse:0.306936	train-rmse:0.293350 
-## [124]	eval-rmse:0.299666	train-rmse:0.285707 
-## [125]	eval-rmse:0.292627	train-rmse:0.278202 
-## [126]	eval-rmse:0.285736	train-rmse:0.271015 
-## [127]	eval-rmse:0.279120	train-rmse:0.263965 
-## [128]	eval-rmse:0.272776	train-rmse:0.257218 
-## [129]	eval-rmse:0.266653	train-rmse:0.250740 
-## [130]	eval-rmse:0.260639	train-rmse:0.244375 
-## [131]	eval-rmse:0.254979	train-rmse:0.238334 
-## [132]	eval-rmse:0.249520	train-rmse:0.232493 
-## [133]	eval-rmse:0.244305	train-rmse:0.226824 
-## [134]	eval-rmse:0.239293	train-rmse:0.221404 
-## [135]	eval-rmse:0.234296	train-rmse:0.216137 
-## [136]	eval-rmse:0.229649	train-rmse:0.211090 
-## [137]	eval-rmse:0.225018	train-rmse:0.206201 
-## [138]	eval-rmse:0.220736	train-rmse:0.201420 
-## [139]	eval-rmse:0.216580	train-rmse:0.196735 
-## [140]	eval-rmse:0.212492	train-rmse:0.192254 
-## [141]	eval-rmse:0.208535	train-rmse:0.187981 
-## [142]	eval-rmse:0.204758	train-rmse:0.183909 
-## [143]	eval-rmse:0.201153	train-rmse:0.179919 
-## [144]	eval-rmse:0.197871	train-rmse:0.176156 
-## [145]	eval-rmse:0.194602	train-rmse:0.172538 
-## [146]	eval-rmse:0.191536	train-rmse:0.169072 
-## [147]	eval-rmse:0.188481	train-rmse:0.165594 
-## [148]	eval-rmse:0.185642	train-rmse:0.162233 
-## [149]	eval-rmse:0.182883	train-rmse:0.159094 
-## [150]	eval-rmse:0.180309	train-rmse:0.156101 
-## [151]	eval-rmse:0.177700	train-rmse:0.153151 
-## [152]	eval-rmse:0.175306	train-rmse:0.150395 
-## [153]	eval-rmse:0.173040	train-rmse:0.147771 
-## [154]	eval-rmse:0.170899	train-rmse:0.145262 
-## [155]	eval-rmse:0.168613	train-rmse:0.142754 
-## [156]	eval-rmse:0.166581	train-rmse:0.140343 
-## [157]	eval-rmse:0.164577	train-rmse:0.137980 
-## [158]	eval-rmse:0.162924	train-rmse:0.135876 
-## [159]	eval-rmse:0.161292	train-rmse:0.133715 
-## [160]	eval-rmse:0.159499	train-rmse:0.131702 
-## [161]	eval-rmse:0.157958	train-rmse:0.129754 
-## [162]	eval-rmse:0.156499	train-rmse:0.127893 
-## [163]	eval-rmse:0.155177	train-rmse:0.126165 
-## [164]	eval-rmse:0.153927	train-rmse:0.124461 
-## [165]	eval-rmse:0.152500	train-rmse:0.122801 
-## [166]	eval-rmse:0.151255	train-rmse:0.121221 
-## [167]	eval-rmse:0.150158	train-rmse:0.119813 
-## [168]	eval-rmse:0.149063	train-rmse:0.118423 
-## [169]	eval-rmse:0.148007	train-rmse:0.117068 
-## [170]	eval-rmse:0.147039	train-rmse:0.115699 
-## [171]	eval-rmse:0.146059	train-rmse:0.114400 
-## [172]	eval-rmse:0.145131	train-rmse:0.113225 
-## [173]	eval-rmse:0.144247	train-rmse:0.112032 
-## [174]	eval-rmse:0.143229	train-rmse:0.110904 
-## [175]	eval-rmse:0.142309	train-rmse:0.109833 
-## [176]	eval-rmse:0.141448	train-rmse:0.108782 
-## [177]	eval-rmse:0.140599	train-rmse:0.107804 
-## [178]	eval-rmse:0.139951	train-rmse:0.106835 
-## [179]	eval-rmse:0.139426	train-rmse:0.106012 
-## [180]	eval-rmse:0.138739	train-rmse:0.105105 
-## [181]	eval-rmse:0.138129	train-rmse:0.104319 
-## [182]	eval-rmse:0.137643	train-rmse:0.103520 
-## [183]	eval-rmse:0.137096	train-rmse:0.102771 
-## [184]	eval-rmse:0.136695	train-rmse:0.102021 
-## [185]	eval-rmse:0.136162	train-rmse:0.101332 
-## [186]	eval-rmse:0.135784	train-rmse:0.100630 
-## [187]	eval-rmse:0.135153	train-rmse:0.100006 
-## [188]	eval-rmse:0.134752	train-rmse:0.099359 
-## [189]	eval-rmse:0.134304	train-rmse:0.098714 
-## [190]	eval-rmse:0.133908	train-rmse:0.098198 
-## [191]	eval-rmse:0.133472	train-rmse:0.097655 
-## [192]	eval-rmse:0.133200	train-rmse:0.097155 
-## [193]	eval-rmse:0.132919	train-rmse:0.096691 
-## [194]	eval-rmse:0.132500	train-rmse:0.096222 
-## [195]	eval-rmse:0.132190	train-rmse:0.095725 
-## [196]	eval-rmse:0.131938	train-rmse:0.095303 
-## [197]	eval-rmse:0.131612	train-rmse:0.094883 
-## [198]	eval-rmse:0.131358	train-rmse:0.094440 
-## [199]	eval-rmse:0.131160	train-rmse:0.094012 
-## [200]	eval-rmse:0.130773	train-rmse:0.093560 
-## [201]	eval-rmse:0.130392	train-rmse:0.093120 
-## [202]	eval-rmse:0.130193	train-rmse:0.092782 
-## [203]	eval-rmse:0.130018	train-rmse:0.092456 
-## [204]	eval-rmse:0.129709	train-rmse:0.092056 
-## [205]	eval-rmse:0.129464	train-rmse:0.091781 
-## [206]	eval-rmse:0.129370	train-rmse:0.091516 
-## [207]	eval-rmse:0.129279	train-rmse:0.091226 
-## [208]	eval-rmse:0.129123	train-rmse:0.090931 
-## [209]	eval-rmse:0.128873	train-rmse:0.090689 
-## [210]	eval-rmse:0.128592	train-rmse:0.090422 
-## [211]	eval-rmse:0.128390	train-rmse:0.090174 
-## [212]	eval-rmse:0.128191	train-rmse:0.089976 
-## [213]	eval-rmse:0.128042	train-rmse:0.089730 
-## [214]	eval-rmse:0.127812	train-rmse:0.089486 
-## [215]	eval-rmse:0.127772	train-rmse:0.089292 
-## [216]	eval-rmse:0.127696	train-rmse:0.089040 
-## [217]	eval-rmse:0.127402	train-rmse:0.088843 
-## [218]	eval-rmse:0.127250	train-rmse:0.088664 
-## [219]	eval-rmse:0.127196	train-rmse:0.088456 
-## [220]	eval-rmse:0.127058	train-rmse:0.088213 
-## [221]	eval-rmse:0.126928	train-rmse:0.088038 
-## [222]	eval-rmse:0.126807	train-rmse:0.087839 
-## [223]	eval-rmse:0.126666	train-rmse:0.087630 
-## [224]	eval-rmse:0.126576	train-rmse:0.087455 
-## [225]	eval-rmse:0.126575	train-rmse:0.087251 
-## [226]	eval-rmse:0.126453	train-rmse:0.087012 
-## [227]	eval-rmse:0.126407	train-rmse:0.086894 
-## [228]	eval-rmse:0.126212	train-rmse:0.086739 
-## [229]	eval-rmse:0.126148	train-rmse:0.086609 
-## [230]	eval-rmse:0.126112	train-rmse:0.086461 
-## [231]	eval-rmse:0.125999	train-rmse:0.086229 
-## [232]	eval-rmse:0.125916	train-rmse:0.086092 
-## [233]	eval-rmse:0.125750	train-rmse:0.085931 
-## [234]	eval-rmse:0.125652	train-rmse:0.085789 
-## [235]	eval-rmse:0.125581	train-rmse:0.085694 
-## [236]	eval-rmse:0.125477	train-rmse:0.085538 
-## [237]	eval-rmse:0.125323	train-rmse:0.085363 
-## [238]	eval-rmse:0.125244	train-rmse:0.085206 
-## [239]	eval-rmse:0.125103	train-rmse:0.085010 
-## [240]	eval-rmse:0.125059	train-rmse:0.084839 
-## [241]	eval-rmse:0.124946	train-rmse:0.084698 
-## [242]	eval-rmse:0.124922	train-rmse:0.084563 
-## [243]	eval-rmse:0.124864	train-rmse:0.084399 
-## [244]	eval-rmse:0.124706	train-rmse:0.084260 
-## [245]	eval-rmse:0.124561	train-rmse:0.084146 
-## [246]	eval-rmse:0.124534	train-rmse:0.083968 
-## [247]	eval-rmse:0.124403	train-rmse:0.083835 
-## [248]	eval-rmse:0.124417	train-rmse:0.083757 
-## [249]	eval-rmse:0.124360	train-rmse:0.083682 
-## [250]	eval-rmse:0.124340	train-rmse:0.083557 
-## [251]	eval-rmse:0.124387	train-rmse:0.083407 
-## [252]	eval-rmse:0.124273	train-rmse:0.083294 
-## [253]	eval-rmse:0.124222	train-rmse:0.083200 
-## [254]	eval-rmse:0.124216	train-rmse:0.083046 
-## [255]	eval-rmse:0.124099	train-rmse:0.082856 
-## [256]	eval-rmse:0.124086	train-rmse:0.082729 
-## [257]	eval-rmse:0.124024	train-rmse:0.082578 
-## [258]	eval-rmse:0.123934	train-rmse:0.082505 
-## [259]	eval-rmse:0.123849	train-rmse:0.082396 
-## [260]	eval-rmse:0.123901	train-rmse:0.082174 
-## [261]	eval-rmse:0.123829	train-rmse:0.082047 
-## [262]	eval-rmse:0.123696	train-rmse:0.081944 
-## [263]	eval-rmse:0.123771	train-rmse:0.081764 
-## [264]	eval-rmse:0.123661	train-rmse:0.081604 
-## [265]	eval-rmse:0.123723	train-rmse:0.081512 
-## [266]	eval-rmse:0.123765	train-rmse:0.081384 
-## [267]	eval-rmse:0.123766	train-rmse:0.081230 
-## [268]	eval-rmse:0.123731	train-rmse:0.081143 
-## [269]	eval-rmse:0.123706	train-rmse:0.081044 
-## [270]	eval-rmse:0.123638	train-rmse:0.080949 
-## [271]	eval-rmse:0.123564	train-rmse:0.080852 
-## [272]	eval-rmse:0.123561	train-rmse:0.080704 
-## [273]	eval-rmse:0.123515	train-rmse:0.080591 
-## [274]	eval-rmse:0.123490	train-rmse:0.080461 
-## [275]	eval-rmse:0.123514	train-rmse:0.080345 
-## [276]	eval-rmse:0.123421	train-rmse:0.080258 
-## [277]	eval-rmse:0.123351	train-rmse:0.080180 
-## [278]	eval-rmse:0.123233	train-rmse:0.080123 
-## [279]	eval-rmse:0.123240	train-rmse:0.079971 
-## [280]	eval-rmse:0.123177	train-rmse:0.079863 
-## [281]	eval-rmse:0.123153	train-rmse:0.079803 
-## [282]	eval-rmse:0.123134	train-rmse:0.079740 
-## [283]	eval-rmse:0.123115	train-rmse:0.079607 
-## [284]	eval-rmse:0.123001	train-rmse:0.079496 
-## [285]	eval-rmse:0.123009	train-rmse:0.079360 
-## [286]	eval-rmse:0.122994	train-rmse:0.079154 
-## [287]	eval-rmse:0.122864	train-rmse:0.079067 
-## [288]	eval-rmse:0.122789	train-rmse:0.078955 
-## [289]	eval-rmse:0.122765	train-rmse:0.078871 
-## [290]	eval-rmse:0.122724	train-rmse:0.078797 
-## [291]	eval-rmse:0.122792	train-rmse:0.078655 
-## [292]	eval-rmse:0.122767	train-rmse:0.078552 
-## [293]	eval-rmse:0.122722	train-rmse:0.078462 
-## [294]	eval-rmse:0.122704	train-rmse:0.078383 
-## [295]	eval-rmse:0.122601	train-rmse:0.078297 
-## [296]	eval-rmse:0.122605	train-rmse:0.078228 
-## [297]	eval-rmse:0.122586	train-rmse:0.078139 
-## [298]	eval-rmse:0.122567	train-rmse:0.078061 
-## [299]	eval-rmse:0.122582	train-rmse:0.078019 
-## [300]	eval-rmse:0.122533	train-rmse:0.077904 
-## [301]	eval-rmse:0.122433	train-rmse:0.077847 
-## [302]	eval-rmse:0.122423	train-rmse:0.077783 
-## [303]	eval-rmse:0.122366	train-rmse:0.077723 
-## [304]	eval-rmse:0.122399	train-rmse:0.077579 
-## [305]	eval-rmse:0.122250	train-rmse:0.077434 
-## [306]	eval-rmse:0.122253	train-rmse:0.077337 
-## [307]	eval-rmse:0.122209	train-rmse:0.077224 
-## [308]	eval-rmse:0.122113	train-rmse:0.077034 
-## [309]	eval-rmse:0.122148	train-rmse:0.076988 
-## [310]	eval-rmse:0.122094	train-rmse:0.076833 
-## [311]	eval-rmse:0.122133	train-rmse:0.076676 
-## [312]	eval-rmse:0.122019	train-rmse:0.076605 
-## [313]	eval-rmse:0.122084	train-rmse:0.076458 
-## [314]	eval-rmse:0.122090	train-rmse:0.076424 
-## [315]	eval-rmse:0.122117	train-rmse:0.076371 
-## [316]	eval-rmse:0.122070	train-rmse:0.076279 
-## [317]	eval-rmse:0.122019	train-rmse:0.076147 
-## [318]	eval-rmse:0.121993	train-rmse:0.076030 
-## [319]	eval-rmse:0.122035	train-rmse:0.075942 
-## [320]	eval-rmse:0.121964	train-rmse:0.075850 
-## [321]	eval-rmse:0.121940	train-rmse:0.075687 
-## [322]	eval-rmse:0.121860	train-rmse:0.075602 
-## [323]	eval-rmse:0.121853	train-rmse:0.075555 
-## [324]	eval-rmse:0.121803	train-rmse:0.075502 
-## [325]	eval-rmse:0.121752	train-rmse:0.075335 
-## [326]	eval-rmse:0.121736	train-rmse:0.075250 
-## [327]	eval-rmse:0.121738	train-rmse:0.075189 
-## [328]	eval-rmse:0.121717	train-rmse:0.075117 
-## [329]	eval-rmse:0.121633	train-rmse:0.075041 
-## [330]	eval-rmse:0.121628	train-rmse:0.074992 
-## [331]	eval-rmse:0.121646	train-rmse:0.074922 
-## [332]	eval-rmse:0.121563	train-rmse:0.074865 
-## [333]	eval-rmse:0.121499	train-rmse:0.074779 
-## [334]	eval-rmse:0.121496	train-rmse:0.074722 
-## [335]	eval-rmse:0.121473	train-rmse:0.074687 
-## [336]	eval-rmse:0.121445	train-rmse:0.074597 
-## [337]	eval-rmse:0.121461	train-rmse:0.074565 
-## [338]	eval-rmse:0.121492	train-rmse:0.074494 
-## [339]	eval-rmse:0.121397	train-rmse:0.074431 
-## [340]	eval-rmse:0.121353	train-rmse:0.074378 
-## [341]	eval-rmse:0.121402	train-rmse:0.074337 
-## [342]	eval-rmse:0.121354	train-rmse:0.074212 
-## [343]	eval-rmse:0.121266	train-rmse:0.074134 
-## [344]	eval-rmse:0.121218	train-rmse:0.074059 
-## [345]	eval-rmse:0.121213	train-rmse:0.073919 
-## [346]	eval-rmse:0.121197	train-rmse:0.073782 
-## [347]	eval-rmse:0.121169	train-rmse:0.073707 
-## [348]	eval-rmse:0.121110	train-rmse:0.073593 
-## [349]	eval-rmse:0.120970	train-rmse:0.073566 
-## [350]	eval-rmse:0.120959	train-rmse:0.073479 
-## [351]	eval-rmse:0.120916	train-rmse:0.073416 
-## [352]	eval-rmse:0.120953	train-rmse:0.073364 
-## [353]	eval-rmse:0.120933	train-rmse:0.073320 
-## [354]	eval-rmse:0.120906	train-rmse:0.073206 
-## [355]	eval-rmse:0.120859	train-rmse:0.073055 
-## [356]	eval-rmse:0.120814	train-rmse:0.072954 
-## [357]	eval-rmse:0.120791	train-rmse:0.072881 
-## [358]	eval-rmse:0.120797	train-rmse:0.072791 
-## [359]	eval-rmse:0.120785	train-rmse:0.072672 
-## [360]	eval-rmse:0.120648	train-rmse:0.072599 
-## [361]	eval-rmse:0.120640	train-rmse:0.072511 
-## [362]	eval-rmse:0.120631	train-rmse:0.072433 
-## [363]	eval-rmse:0.120640	train-rmse:0.072374 
-## [364]	eval-rmse:0.120591	train-rmse:0.072320 
-## [365]	eval-rmse:0.120649	train-rmse:0.072254 
-## [366]	eval-rmse:0.120623	train-rmse:0.072196 
-## [367]	eval-rmse:0.120624	train-rmse:0.072106 
-## [368]	eval-rmse:0.120690	train-rmse:0.072027 
-## [369]	eval-rmse:0.120698	train-rmse:0.071934 
-## [370]	eval-rmse:0.120690	train-rmse:0.071884 
-## [371]	eval-rmse:0.120683	train-rmse:0.071799 
-## [372]	eval-rmse:0.120573	train-rmse:0.071709 
-## [373]	eval-rmse:0.120569	train-rmse:0.071582 
-## [374]	eval-rmse:0.120548	train-rmse:0.071523 
-## [375]	eval-rmse:0.120563	train-rmse:0.071455 
-## [376]	eval-rmse:0.120438	train-rmse:0.071371 
-## [377]	eval-rmse:0.120439	train-rmse:0.071304 
-## [378]	eval-rmse:0.120379	train-rmse:0.071237 
-## [379]	eval-rmse:0.120389	train-rmse:0.071135 
-## [380]	eval-rmse:0.120390	train-rmse:0.071085 
-## [381]	eval-rmse:0.120313	train-rmse:0.071015 
-## [382]	eval-rmse:0.120285	train-rmse:0.070960 
-## [383]	eval-rmse:0.120225	train-rmse:0.070905 
-## [384]	eval-rmse:0.120224	train-rmse:0.070794 
-## [385]	eval-rmse:0.120200	train-rmse:0.070695 
-## [386]	eval-rmse:0.120113	train-rmse:0.070638 
-## [387]	eval-rmse:0.120049	train-rmse:0.070614 
-## [388]	eval-rmse:0.120076	train-rmse:0.070502 
-## [389]	eval-rmse:0.120052	train-rmse:0.070460 
-## [390]	eval-rmse:0.120081	train-rmse:0.070360 
-## [391]	eval-rmse:0.120054	train-rmse:0.070329 
-## [392]	eval-rmse:0.119985	train-rmse:0.070212 
-## [393]	eval-rmse:0.120111	train-rmse:0.070136 
-## [394]	eval-rmse:0.120068	train-rmse:0.070077 
-## [395]	eval-rmse:0.120064	train-rmse:0.069998 
-## [396]	eval-rmse:0.120084	train-rmse:0.069939 
-## [397]	eval-rmse:0.120096	train-rmse:0.069883 
-## [398]	eval-rmse:0.120046	train-rmse:0.069825 
-## [399]	eval-rmse:0.120078	train-rmse:0.069789 
-## [400]	eval-rmse:0.120143	train-rmse:0.069707 
-## [401]	eval-rmse:0.120135	train-rmse:0.069651 
-## [402]	eval-rmse:0.120235	train-rmse:0.069563 
-## [403]	eval-rmse:0.120228	train-rmse:0.069473 
-## [404]	eval-rmse:0.120210	train-rmse:0.069368 
-## [405]	eval-rmse:0.120142	train-rmse:0.069347 
-## [406]	eval-rmse:0.120203	train-rmse:0.069248 
-## [407]	eval-rmse:0.120252	train-rmse:0.069166 
-## [408]	eval-rmse:0.120307	train-rmse:0.069091 
-## [409]	eval-rmse:0.120271	train-rmse:0.069025 
-## [410]	eval-rmse:0.120240	train-rmse:0.068916 
-## [411]	eval-rmse:0.120308	train-rmse:0.068826 
-## [412]	eval-rmse:0.120244	train-rmse:0.068742 
-## [413]	eval-rmse:0.120219	train-rmse:0.068670 
-## [414]	eval-rmse:0.120242	train-rmse:0.068632 
-## [415]	eval-rmse:0.120219	train-rmse:0.068606 
-## [416]	eval-rmse:0.120195	train-rmse:0.068559 
-## [417]	eval-rmse:0.120173	train-rmse:0.068503 
-## [418]	eval-rmse:0.120201	train-rmse:0.068420 
-## [419]	eval-rmse:0.120228	train-rmse:0.068372 
-## [420]	eval-rmse:0.120262	train-rmse:0.068329 
-## [421]	eval-rmse:0.120197	train-rmse:0.068264 
-## [422]	eval-rmse:0.120151	train-rmse:0.068171 
-## [423]	eval-rmse:0.120147	train-rmse:0.068085 
-## [424]	eval-rmse:0.120185	train-rmse:0.068000 
-## [425]	eval-rmse:0.120143	train-rmse:0.067926 
-## [426]	eval-rmse:0.120179	train-rmse:0.067883 
-## [427]	eval-rmse:0.120118	train-rmse:0.067845 
-## [428]	eval-rmse:0.120235	train-rmse:0.067781 
-## [429]	eval-rmse:0.120233	train-rmse:0.067710 
-## [430]	eval-rmse:0.120219	train-rmse:0.067667 
-## [431]	eval-rmse:0.120148	train-rmse:0.067587 
-## [432]	eval-rmse:0.120132	train-rmse:0.067521 
-## [433]	eval-rmse:0.120151	train-rmse:0.067448 
-## [434]	eval-rmse:0.120039	train-rmse:0.067387 
-## [435]	eval-rmse:0.120066	train-rmse:0.067346 
-## [436]	eval-rmse:0.120045	train-rmse:0.067312 
-## [437]	eval-rmse:0.120045	train-rmse:0.067240 
-## [438]	eval-rmse:0.120052	train-rmse:0.067180 
-## [439]	eval-rmse:0.119990	train-rmse:0.067064 
-## [440]	eval-rmse:0.119973	train-rmse:0.066980 
-## [441]	eval-rmse:0.119889	train-rmse:0.066878 
-## [442]	eval-rmse:0.119852	train-rmse:0.066841 
-## [443]	eval-rmse:0.119835	train-rmse:0.066788 
-## [444]	eval-rmse:0.119773	train-rmse:0.066747 
-## [445]	eval-rmse:0.119830	train-rmse:0.066701 
-## [446]	eval-rmse:0.119778	train-rmse:0.066647 
-## [447]	eval-rmse:0.119784	train-rmse:0.066599 
-## [448]	eval-rmse:0.119775	train-rmse:0.066509 
-## [449]	eval-rmse:0.119807	train-rmse:0.066440 
-## [450]	eval-rmse:0.119806	train-rmse:0.066383 
-## [451]	eval-rmse:0.119865	train-rmse:0.066342 
-## [452]	eval-rmse:0.119848	train-rmse:0.066277 
-## [453]	eval-rmse:0.119796	train-rmse:0.066188 
-## [454]	eval-rmse:0.119850	train-rmse:0.066084 
-## [455]	eval-rmse:0.119840	train-rmse:0.065997 
-## [456]	eval-rmse:0.119785	train-rmse:0.065925 
-## [457]	eval-rmse:0.119741	train-rmse:0.065843 
-## [458]	eval-rmse:0.119765	train-rmse:0.065792 
-## [459]	eval-rmse:0.119755	train-rmse:0.065730 
-## [460]	eval-rmse:0.119741	train-rmse:0.065662 
-## [461]	eval-rmse:0.119725	train-rmse:0.065609 
-## [462]	eval-rmse:0.119734	train-rmse:0.065561 
-## [463]	eval-rmse:0.119710	train-rmse:0.065514 
-## [464]	eval-rmse:0.119688	train-rmse:0.065436 
-## [465]	eval-rmse:0.119664	train-rmse:0.065383 
-## [466]	eval-rmse:0.119630	train-rmse:0.065288 
-## [467]	eval-rmse:0.119618	train-rmse:0.065198 
-## [468]	eval-rmse:0.119555	train-rmse:0.065158 
-## [469]	eval-rmse:0.119534	train-rmse:0.065097 
-## [470]	eval-rmse:0.119499	train-rmse:0.065047 
-## [471]	eval-rmse:0.119471	train-rmse:0.065005 
-## [472]	eval-rmse:0.119515	train-rmse:0.064898 
-## [473]	eval-rmse:0.119475	train-rmse:0.064843 
-## [474]	eval-rmse:0.119444	train-rmse:0.064804 
-## [475]	eval-rmse:0.119513	train-rmse:0.064734 
-## [476]	eval-rmse:0.119541	train-rmse:0.064697 
-## [477]	eval-rmse:0.119512	train-rmse:0.064626 
-## [478]	eval-rmse:0.119459	train-rmse:0.064566 
-## [479]	eval-rmse:0.119431	train-rmse:0.064519 
-## [480]	eval-rmse:0.119414	train-rmse:0.064446 
-## [481]	eval-rmse:0.119459	train-rmse:0.064396 
-## [482]	eval-rmse:0.119469	train-rmse:0.064348 
-## [483]	eval-rmse:0.119440	train-rmse:0.064313 
-## [484]	eval-rmse:0.119419	train-rmse:0.064240 
-## [485]	eval-rmse:0.119422	train-rmse:0.064177 
-## [486]	eval-rmse:0.119457	train-rmse:0.064101 
-## [487]	eval-rmse:0.119428	train-rmse:0.064038 
-## [488]	eval-rmse:0.119406	train-rmse:0.063976 
-## [489]	eval-rmse:0.119392	train-rmse:0.063904 
-## [490]	eval-rmse:0.119401	train-rmse:0.063834 
-## [491]	eval-rmse:0.119395	train-rmse:0.063805 
-## [492]	eval-rmse:0.119376	train-rmse:0.063730 
-## [493]	eval-rmse:0.119365	train-rmse:0.063688 
-## [494]	eval-rmse:0.119368	train-rmse:0.063600 
-## [495]	eval-rmse:0.119387	train-rmse:0.063532 
-## [496]	eval-rmse:0.119421	train-rmse:0.063484 
-## [497]	eval-rmse:0.119466	train-rmse:0.063433 
-## [498]	eval-rmse:0.119462	train-rmse:0.063391 
-## [499]	eval-rmse:0.119413	train-rmse:0.063363 
-## [500]	eval-rmse:0.119421	train-rmse:0.063324 
-## [501]	eval-rmse:0.119401	train-rmse:0.063295 
-## [502]	eval-rmse:0.119394	train-rmse:0.063227 
-## [503]	eval-rmse:0.119338	train-rmse:0.063156 
-## [504]	eval-rmse:0.119320	train-rmse:0.063093 
-## [505]	eval-rmse:0.119336	train-rmse:0.063027 
-## [506]	eval-rmse:0.119319	train-rmse:0.062961 
-## [507]	eval-rmse:0.119278	train-rmse:0.062897 
-## [508]	eval-rmse:0.119300	train-rmse:0.062840 
-## [509]	eval-rmse:0.119255	train-rmse:0.062808 
-## [510]	eval-rmse:0.119256	train-rmse:0.062759 
-## [511]	eval-rmse:0.119249	train-rmse:0.062702 
-## [512]	eval-rmse:0.119302	train-rmse:0.062653 
-## [513]	eval-rmse:0.119326	train-rmse:0.062540 
-## [514]	eval-rmse:0.119336	train-rmse:0.062477 
-## [515]	eval-rmse:0.119320	train-rmse:0.062452 
-## [516]	eval-rmse:0.119298	train-rmse:0.062357 
-## [517]	eval-rmse:0.119332	train-rmse:0.062284 
-## [518]	eval-rmse:0.119452	train-rmse:0.062226 
-## [519]	eval-rmse:0.119462	train-rmse:0.062201 
-## [520]	eval-rmse:0.119471	train-rmse:0.062128 
-## [521]	eval-rmse:0.119514	train-rmse:0.062075 
-## [522]	eval-rmse:0.119515	train-rmse:0.062056 
-## [523]	eval-rmse:0.119479	train-rmse:0.061963 
-## [524]	eval-rmse:0.119484	train-rmse:0.061865 
-## [525]	eval-rmse:0.119483	train-rmse:0.061789 
-## [526]	eval-rmse:0.119456	train-rmse:0.061727 
-## [527]	eval-rmse:0.119450	train-rmse:0.061676 
-## [528]	eval-rmse:0.119446	train-rmse:0.061625 
-## [529]	eval-rmse:0.119489	train-rmse:0.061572 
-## [530]	eval-rmse:0.119480	train-rmse:0.061549 
-## [531]	eval-rmse:0.119471	train-rmse:0.061490 
-## [532]	eval-rmse:0.119489	train-rmse:0.061405 
-## [533]	eval-rmse:0.119501	train-rmse:0.061346 
-## [534]	eval-rmse:0.119672	train-rmse:0.061270 
-## [535]	eval-rmse:0.119665	train-rmse:0.061186 
-## [536]	eval-rmse:0.119566	train-rmse:0.061126 
-## [537]	eval-rmse:0.119592	train-rmse:0.061090 
-## [538]	eval-rmse:0.119542	train-rmse:0.061020 
-## [539]	eval-rmse:0.119515	train-rmse:0.060941 
-## [540]	eval-rmse:0.119524	train-rmse:0.060909 
-## [541]	eval-rmse:0.119646	train-rmse:0.060873 
-## [542]	eval-rmse:0.119654	train-rmse:0.060842 
-## [543]	eval-rmse:0.119672	train-rmse:0.060740 
-## [544]	eval-rmse:0.119655	train-rmse:0.060684 
-## [545]	eval-rmse:0.119646	train-rmse:0.060624 
-## [546]	eval-rmse:0.119605	train-rmse:0.060566 
-## [547]	eval-rmse:0.119578	train-rmse:0.060524 
-## [548]	eval-rmse:0.119572	train-rmse:0.060451 
-## [549]	eval-rmse:0.119583	train-rmse:0.060401 
-## [550]	eval-rmse:0.119566	train-rmse:0.060363 
-## [551]	eval-rmse:0.119549	train-rmse:0.060324 
-## [552]	eval-rmse:0.119528	train-rmse:0.060270 
-## [553]	eval-rmse:0.119511	train-rmse:0.060187 
-## [554]	eval-rmse:0.119515	train-rmse:0.060134 
-## [555]	eval-rmse:0.119474	train-rmse:0.060095 
-## [556]	eval-rmse:0.119488	train-rmse:0.060059 
-## [557]	eval-rmse:0.119492	train-rmse:0.059988 
-## [558]	eval-rmse:0.119507	train-rmse:0.059932 
-## [559]	eval-rmse:0.119567	train-rmse:0.059876 
-## [560]	eval-rmse:0.119552	train-rmse:0.059840 
-## [561]	eval-rmse:0.119539	train-rmse:0.059761 
-## [562]	eval-rmse:0.119513	train-rmse:0.059726 
-## [563]	eval-rmse:0.119553	train-rmse:0.059688 
-## [564]	eval-rmse:0.119597	train-rmse:0.059655 
-## [565]	eval-rmse:0.119595	train-rmse:0.059636 
-## [566]	eval-rmse:0.119617	train-rmse:0.059543 
-## [567]	eval-rmse:0.119739	train-rmse:0.059491 
-## [568]	eval-rmse:0.119736	train-rmse:0.059441 
-## [569]	eval-rmse:0.119731	train-rmse:0.059355 
-## [570]	eval-rmse:0.119677	train-rmse:0.059330 
-## [571]	eval-rmse:0.119743	train-rmse:0.059270 
-## [572]	eval-rmse:0.119802	train-rmse:0.059205 
-## [573]	eval-rmse:0.119794	train-rmse:0.059164 
-## [574]	eval-rmse:0.119830	train-rmse:0.059114 
-## [575]	eval-rmse:0.119805	train-rmse:0.059064 
-## [576]	eval-rmse:0.119801	train-rmse:0.059027 
-## [577]	eval-rmse:0.119758	train-rmse:0.058982 
-## [578]	eval-rmse:0.119747	train-rmse:0.058942 
-## [579]	eval-rmse:0.119723	train-rmse:0.058914 
-## [580]	eval-rmse:0.119751	train-rmse:0.058863 
-## [581]	eval-rmse:0.119803	train-rmse:0.058799 
-## [582]	eval-rmse:0.119811	train-rmse:0.058745 
-## [583]	eval-rmse:0.119840	train-rmse:0.058674 
-## [584]	eval-rmse:0.119826	train-rmse:0.058634 
-## [585]	eval-rmse:0.119812	train-rmse:0.058593 
-## [586]	eval-rmse:0.119794	train-rmse:0.058535 
-## [587]	eval-rmse:0.119780	train-rmse:0.058492 
-## [588]	eval-rmse:0.119820	train-rmse:0.058462 
-## [589]	eval-rmse:0.119833	train-rmse:0.058420 
-## [590]	eval-rmse:0.119801	train-rmse:0.058371 
-## [591]	eval-rmse:0.119802	train-rmse:0.058341 
-## [592]	eval-rmse:0.119783	train-rmse:0.058300 
-## [593]	eval-rmse:0.119765	train-rmse:0.058263 
-## [594]	eval-rmse:0.119728	train-rmse:0.058247 
-## [595]	eval-rmse:0.119748	train-rmse:0.058185 
-## [596]	eval-rmse:0.119764	train-rmse:0.058165 
-## [597]	eval-rmse:0.119786	train-rmse:0.058123 
-## [598]	eval-rmse:0.119829	train-rmse:0.058079 
-## [599]	eval-rmse:0.119812	train-rmse:0.058013 
-## [600]	eval-rmse:0.119787	train-rmse:0.057969 
-## [601]	eval-rmse:0.119771	train-rmse:0.057929 
-## [602]	eval-rmse:0.119761	train-rmse:0.057859 
-## [603]	eval-rmse:0.119776	train-rmse:0.057803 
-## [604]	eval-rmse:0.119719	train-rmse:0.057770 
-## [605]	eval-rmse:0.119669	train-rmse:0.057736 
-## [606]	eval-rmse:0.119673	train-rmse:0.057671 
-## [607]	eval-rmse:0.119709	train-rmse:0.057600 
-## [608]	eval-rmse:0.119706	train-rmse:0.057541 
-## [609]	eval-rmse:0.119661	train-rmse:0.057512 
-## [610]	eval-rmse:0.119355	train-rmse:0.057484 
-## [611]	eval-rmse:0.119310	train-rmse:0.057422 
-## [612]	eval-rmse:0.119310	train-rmse:0.057360 
-## [613]	eval-rmse:0.119328	train-rmse:0.057331 
-## [614]	eval-rmse:0.119296	train-rmse:0.057272 
-## [615]	eval-rmse:0.119282	train-rmse:0.057250 
-## [616]	eval-rmse:0.119289	train-rmse:0.057170 
-## [617]	eval-rmse:0.119278	train-rmse:0.057117 
-## [618]	eval-rmse:0.119297	train-rmse:0.057054 
-## [619]	eval-rmse:0.119268	train-rmse:0.057005 
-## [620]	eval-rmse:0.119277	train-rmse:0.056955 
-## [621]	eval-rmse:0.119313	train-rmse:0.056888 
-## [622]	eval-rmse:0.119351	train-rmse:0.056846 
-## [623]	eval-rmse:0.119392	train-rmse:0.056811 
-## [624]	eval-rmse:0.119368	train-rmse:0.056731 
-## [625]	eval-rmse:0.119282	train-rmse:0.056671 
-## [626]	eval-rmse:0.119265	train-rmse:0.056625 
-## [627]	eval-rmse:0.119246	train-rmse:0.056559 
-## [628]	eval-rmse:0.119057	train-rmse:0.056540 
-## [629]	eval-rmse:0.119084	train-rmse:0.056507 
-## [630]	eval-rmse:0.119088	train-rmse:0.056461 
-## [631]	eval-rmse:0.119067	train-rmse:0.056389 
-## [632]	eval-rmse:0.119101	train-rmse:0.056362 
-## [633]	eval-rmse:0.119105	train-rmse:0.056298 
-## [634]	eval-rmse:0.119114	train-rmse:0.056242 
-## [635]	eval-rmse:0.119117	train-rmse:0.056226 
-## [636]	eval-rmse:0.119071	train-rmse:0.056196 
-## [637]	eval-rmse:0.119064	train-rmse:0.056177 
-## [638]	eval-rmse:0.119013	train-rmse:0.056135 
-## [639]	eval-rmse:0.118999	train-rmse:0.056096 
-## [640]	eval-rmse:0.119005	train-rmse:0.056061 
-## [641]	eval-rmse:0.118980	train-rmse:0.055993 
-## [642]	eval-rmse:0.118993	train-rmse:0.055958 
-## [643]	eval-rmse:0.119034	train-rmse:0.055909 
-## [644]	eval-rmse:0.119050	train-rmse:0.055856 
-## [645]	eval-rmse:0.118991	train-rmse:0.055804 
-## [646]	eval-rmse:0.118942	train-rmse:0.055738 
-## [647]	eval-rmse:0.118926	train-rmse:0.055677 
-## [648]	eval-rmse:0.118904	train-rmse:0.055655 
-## [649]	eval-rmse:0.118938	train-rmse:0.055647 
-## [650]	eval-rmse:0.118903	train-rmse:0.055596 
-## [651]	eval-rmse:0.118931	train-rmse:0.055538 
-## [652]	eval-rmse:0.118942	train-rmse:0.055477 
-## [653]	eval-rmse:0.119069	train-rmse:0.055414 
-## [654]	eval-rmse:0.119057	train-rmse:0.055361 
-## [655]	eval-rmse:0.119032	train-rmse:0.055350 
-## [656]	eval-rmse:0.118992	train-rmse:0.055290 
-## [657]	eval-rmse:0.118975	train-rmse:0.055249 
-## [658]	eval-rmse:0.119033	train-rmse:0.055174 
-## [659]	eval-rmse:0.118997	train-rmse:0.055151 
-## [660]	eval-rmse:0.119130	train-rmse:0.055118 
-## [661]	eval-rmse:0.119093	train-rmse:0.055067 
-## [662]	eval-rmse:0.119101	train-rmse:0.055009 
-## [663]	eval-rmse:0.119103	train-rmse:0.054939 
-## [664]	eval-rmse:0.119124	train-rmse:0.054913 
-## [665]	eval-rmse:0.119108	train-rmse:0.054898 
-## [666]	eval-rmse:0.119149	train-rmse:0.054847 
-## [667]	eval-rmse:0.119149	train-rmse:0.054795 
-## [668]	eval-rmse:0.119143	train-rmse:0.054769 
-## [669]	eval-rmse:0.119144	train-rmse:0.054717 
-## [670]	eval-rmse:0.119160	train-rmse:0.054666 
-## [671]	eval-rmse:0.119146	train-rmse:0.054633 
-## [672]	eval-rmse:0.119176	train-rmse:0.054580 
-## [673]	eval-rmse:0.119173	train-rmse:0.054525 
-## [674]	eval-rmse:0.119153	train-rmse:0.054490 
-## [675]	eval-rmse:0.119166	train-rmse:0.054460 
-## [676]	eval-rmse:0.119118	train-rmse:0.054425 
-## [677]	eval-rmse:0.119112	train-rmse:0.054401 
-## [678]	eval-rmse:0.118957	train-rmse:0.054388 
-## [679]	eval-rmse:0.118943	train-rmse:0.054340 
-## [680]	eval-rmse:0.118944	train-rmse:0.054324 
-## [681]	eval-rmse:0.118898	train-rmse:0.054271 
-## [682]	eval-rmse:0.118893	train-rmse:0.054224 
-## [683]	eval-rmse:0.118895	train-rmse:0.054164 
-## [684]	eval-rmse:0.118880	train-rmse:0.054135 
-## [685]	eval-rmse:0.118854	train-rmse:0.054082 
-## [686]	eval-rmse:0.118849	train-rmse:0.054066 
-## [687]	eval-rmse:0.118842	train-rmse:0.054029 
-## [688]	eval-rmse:0.118880	train-rmse:0.053957 
-## [689]	eval-rmse:0.118901	train-rmse:0.053879 
-## [690]	eval-rmse:0.118870	train-rmse:0.053837 
-## [691]	eval-rmse:0.118933	train-rmse:0.053799 
-## [692]	eval-rmse:0.118912	train-rmse:0.053779 
-## [693]	eval-rmse:0.118853	train-rmse:0.053728 
-## [694]	eval-rmse:0.118866	train-rmse:0.053708 
-## [695]	eval-rmse:0.118842	train-rmse:0.053641 
-## [696]	eval-rmse:0.118831	train-rmse:0.053607 
-## [697]	eval-rmse:0.118822	train-rmse:0.053564 
-## [698]	eval-rmse:0.118824	train-rmse:0.053536 
-## [699]	eval-rmse:0.118801	train-rmse:0.053472 
-## [700]	eval-rmse:0.118789	train-rmse:0.053404 
-## [701]	eval-rmse:0.118837	train-rmse:0.053357 
-## [702]	eval-rmse:0.118842	train-rmse:0.053320 
-## [703]	eval-rmse:0.118837	train-rmse:0.053278 
-## [704]	eval-rmse:0.118837	train-rmse:0.053225 
-## [705]	eval-rmse:0.118829	train-rmse:0.053199 
-## [706]	eval-rmse:0.118871	train-rmse:0.053156 
-## [707]	eval-rmse:0.118848	train-rmse:0.053105 
-## [708]	eval-rmse:0.118849	train-rmse:0.053068 
-## [709]	eval-rmse:0.118865	train-rmse:0.053049 
-## [710]	eval-rmse:0.118862	train-rmse:0.053022 
-## [711]	eval-rmse:0.118842	train-rmse:0.052971 
-## [712]	eval-rmse:0.118884	train-rmse:0.052939 
-## [713]	eval-rmse:0.118874	train-rmse:0.052873 
-## [714]	eval-rmse:0.118841	train-rmse:0.052848 
-## [715]	eval-rmse:0.118822	train-rmse:0.052810 
-## [716]	eval-rmse:0.118788	train-rmse:0.052746 
-## [717]	eval-rmse:0.118768	train-rmse:0.052699 
-## [718]	eval-rmse:0.118766	train-rmse:0.052686 
-## [719]	eval-rmse:0.118749	train-rmse:0.052635 
-## [720]	eval-rmse:0.118758	train-rmse:0.052589 
-## [721]	eval-rmse:0.118706	train-rmse:0.052545 
-## [722]	eval-rmse:0.118704	train-rmse:0.052503 
-## [723]	eval-rmse:0.118732	train-rmse:0.052468 
-## [724]	eval-rmse:0.118699	train-rmse:0.052430 
-## [725]	eval-rmse:0.118737	train-rmse:0.052372 
-## [726]	eval-rmse:0.118760	train-rmse:0.052344 
-## [727]	eval-rmse:0.118776	train-rmse:0.052299 
-## [728]	eval-rmse:0.118759	train-rmse:0.052263 
-## [729]	eval-rmse:0.118712	train-rmse:0.052226 
-## [730]	eval-rmse:0.118722	train-rmse:0.052196 
-## [731]	eval-rmse:0.118688	train-rmse:0.052153 
-## [732]	eval-rmse:0.118656	train-rmse:0.052109 
-## [733]	eval-rmse:0.118656	train-rmse:0.052076 
-## [734]	eval-rmse:0.118694	train-rmse:0.052030 
-## [735]	eval-rmse:0.118694	train-rmse:0.051994 
-## [736]	eval-rmse:0.118674	train-rmse:0.051969 
-## [737]	eval-rmse:0.118667	train-rmse:0.051921 
-## [738]	eval-rmse:0.118630	train-rmse:0.051878 
-## [739]	eval-rmse:0.118614	train-rmse:0.051831 
-## [740]	eval-rmse:0.118573	train-rmse:0.051813 
-## [741]	eval-rmse:0.118567	train-rmse:0.051759 
-## [742]	eval-rmse:0.118557	train-rmse:0.051707 
-## [743]	eval-rmse:0.118557	train-rmse:0.051655 
-## [744]	eval-rmse:0.118546	train-rmse:0.051598 
-## [745]	eval-rmse:0.118579	train-rmse:0.051581 
-## [746]	eval-rmse:0.118567	train-rmse:0.051540 
-## [747]	eval-rmse:0.118580	train-rmse:0.051485 
-## [748]	eval-rmse:0.118611	train-rmse:0.051448 
-## [749]	eval-rmse:0.118621	train-rmse:0.051402 
-## [750]	eval-rmse:0.118590	train-rmse:0.051359 
-## [751]	eval-rmse:0.118577	train-rmse:0.051342 
-## [752]	eval-rmse:0.118599	train-rmse:0.051315 
-## [753]	eval-rmse:0.118619	train-rmse:0.051274 
-## [754]	eval-rmse:0.118619	train-rmse:0.051244 
-## [755]	eval-rmse:0.118655	train-rmse:0.051213 
-## [756]	eval-rmse:0.118654	train-rmse:0.051161 
-## [757]	eval-rmse:0.118650	train-rmse:0.051123 
-## [758]	eval-rmse:0.118666	train-rmse:0.051092 
-## [759]	eval-rmse:0.118639	train-rmse:0.051049 
-## [760]	eval-rmse:0.118634	train-rmse:0.050959 
-## [761]	eval-rmse:0.118630	train-rmse:0.050884 
-## [762]	eval-rmse:0.118616	train-rmse:0.050846 
-## [763]	eval-rmse:0.118593	train-rmse:0.050793 
-## [764]	eval-rmse:0.118607	train-rmse:0.050774 
-## [765]	eval-rmse:0.118557	train-rmse:0.050740 
-## [766]	eval-rmse:0.118564	train-rmse:0.050718 
-## [767]	eval-rmse:0.118518	train-rmse:0.050676 
-## [768]	eval-rmse:0.118493	train-rmse:0.050658 
-## [769]	eval-rmse:0.118477	train-rmse:0.050622 
-## [770]	eval-rmse:0.118463	train-rmse:0.050575 
-## [771]	eval-rmse:0.118467	train-rmse:0.050546 
-## [772]	eval-rmse:0.118430	train-rmse:0.050517 
-## [773]	eval-rmse:0.118437	train-rmse:0.050503 
-## [774]	eval-rmse:0.118443	train-rmse:0.050440 
-## [775]	eval-rmse:0.118433	train-rmse:0.050400 
-## [776]	eval-rmse:0.118534	train-rmse:0.050355 
-## [777]	eval-rmse:0.118537	train-rmse:0.050329 
-## [778]	eval-rmse:0.118553	train-rmse:0.050299 
-## [779]	eval-rmse:0.118546	train-rmse:0.050254 
-## [780]	eval-rmse:0.118515	train-rmse:0.050202 
-## [781]	eval-rmse:0.118506	train-rmse:0.050175 
-## [782]	eval-rmse:0.118494	train-rmse:0.050154 
-## [783]	eval-rmse:0.118512	train-rmse:0.050108 
-## [784]	eval-rmse:0.118493	train-rmse:0.050086 
-## [785]	eval-rmse:0.118517	train-rmse:0.050018 
-## [786]	eval-rmse:0.118546	train-rmse:0.049973 
-## [787]	eval-rmse:0.118535	train-rmse:0.049937 
-## [788]	eval-rmse:0.118538	train-rmse:0.049874 
-## [789]	eval-rmse:0.118546	train-rmse:0.049860 
-## [790]	eval-rmse:0.118559	train-rmse:0.049811 
-## [791]	eval-rmse:0.118524	train-rmse:0.049758 
-## [792]	eval-rmse:0.118483	train-rmse:0.049717 
-## [793]	eval-rmse:0.118484	train-rmse:0.049690 
-## [794]	eval-rmse:0.118465	train-rmse:0.049649 
-## [795]	eval-rmse:0.118452	train-rmse:0.049618 
-## [796]	eval-rmse:0.118491	train-rmse:0.049576 
-## [797]	eval-rmse:0.118500	train-rmse:0.049560 
-## [798]	eval-rmse:0.118496	train-rmse:0.049514 
-## [799]	eval-rmse:0.118513	train-rmse:0.049470 
-## [800]	eval-rmse:0.118488	train-rmse:0.049427 
-## [801]	eval-rmse:0.118451	train-rmse:0.049381 
-## [802]	eval-rmse:0.118451	train-rmse:0.049354 
-## [803]	eval-rmse:0.118431	train-rmse:0.049336 
-## [804]	eval-rmse:0.118458	train-rmse:0.049301 
-## [805]	eval-rmse:0.118447	train-rmse:0.049290 
-## [806]	eval-rmse:0.118520	train-rmse:0.049221 
-## [807]	eval-rmse:0.118480	train-rmse:0.049169 
-## [808]	eval-rmse:0.118481	train-rmse:0.049104 
-## [809]	eval-rmse:0.118487	train-rmse:0.049039 
-## [810]	eval-rmse:0.118497	train-rmse:0.048990 
-## [811]	eval-rmse:0.118484	train-rmse:0.048954 
-## [812]	eval-rmse:0.118541	train-rmse:0.048918 
-## [813]	eval-rmse:0.118548	train-rmse:0.048881 
-## [814]	eval-rmse:0.118530	train-rmse:0.048813 
-## [815]	eval-rmse:0.118524	train-rmse:0.048770 
-## [816]	eval-rmse:0.118495	train-rmse:0.048756 
-## [817]	eval-rmse:0.118514	train-rmse:0.048744 
-## [818]	eval-rmse:0.118493	train-rmse:0.048693 
-## [819]	eval-rmse:0.118478	train-rmse:0.048660 
-## [820]	eval-rmse:0.118465	train-rmse:0.048645 
-## [821]	eval-rmse:0.118473	train-rmse:0.048595 
-## [822]	eval-rmse:0.118434	train-rmse:0.048547 
-## [823]	eval-rmse:0.118479	train-rmse:0.048525 
-## [824]	eval-rmse:0.118483	train-rmse:0.048515 
-## [825]	eval-rmse:0.118483	train-rmse:0.048457 
-## [826]	eval-rmse:0.118520	train-rmse:0.048442 
-## [827]	eval-rmse:0.118551	train-rmse:0.048397 
-## [828]	eval-rmse:0.118569	train-rmse:0.048356 
-## [829]	eval-rmse:0.118579	train-rmse:0.048336 
-## [830]	eval-rmse:0.118577	train-rmse:0.048309 
-## [831]	eval-rmse:0.118587	train-rmse:0.048269 
-## [832]	eval-rmse:0.118541	train-rmse:0.048253 
-## [833]	eval-rmse:0.118564	train-rmse:0.048204 
-## [834]	eval-rmse:0.118542	train-rmse:0.048180 
-## [835]	eval-rmse:0.118525	train-rmse:0.048117 
-## [836]	eval-rmse:0.118516	train-rmse:0.048083 
-## [837]	eval-rmse:0.118529	train-rmse:0.048042 
-## [838]	eval-rmse:0.118496	train-rmse:0.048007 
-## [839]	eval-rmse:0.118461	train-rmse:0.047939 
-## [840]	eval-rmse:0.118456	train-rmse:0.047898 
-## [841]	eval-rmse:0.118439	train-rmse:0.047849 
-## [842]	eval-rmse:0.118397	train-rmse:0.047819 
-## [843]	eval-rmse:0.118387	train-rmse:0.047784 
-## [844]	eval-rmse:0.118402	train-rmse:0.047769 
-## [845]	eval-rmse:0.118403	train-rmse:0.047750 
-## [846]	eval-rmse:0.118388	train-rmse:0.047709 
-## [847]	eval-rmse:0.118407	train-rmse:0.047673 
-## [848]	eval-rmse:0.118408	train-rmse:0.047638 
-## [849]	eval-rmse:0.118414	train-rmse:0.047606 
-## [850]	eval-rmse:0.118409	train-rmse:0.047595 
-## [851]	eval-rmse:0.118418	train-rmse:0.047538 
-## [852]	eval-rmse:0.118411	train-rmse:0.047504 
-## [853]	eval-rmse:0.118416	train-rmse:0.047479 
-## [854]	eval-rmse:0.118413	train-rmse:0.047431 
-## [855]	eval-rmse:0.118433	train-rmse:0.047399 
-## [856]	eval-rmse:0.118424	train-rmse:0.047361 
-## [857]	eval-rmse:0.118475	train-rmse:0.047316 
-## [858]	eval-rmse:0.118505	train-rmse:0.047286 
-## [859]	eval-rmse:0.118496	train-rmse:0.047262 
-## [860]	eval-rmse:0.118527	train-rmse:0.047212 
-## [861]	eval-rmse:0.118589	train-rmse:0.047178 
-## [862]	eval-rmse:0.118569	train-rmse:0.047126 
-## [863]	eval-rmse:0.118559	train-rmse:0.047086 
-## [864]	eval-rmse:0.118561	train-rmse:0.047047 
-## [865]	eval-rmse:0.118653	train-rmse:0.047021 
-## [866]	eval-rmse:0.118644	train-rmse:0.046993 
-## [867]	eval-rmse:0.118649	train-rmse:0.046942 
-## [868]	eval-rmse:0.118636	train-rmse:0.046893 
-## [869]	eval-rmse:0.118641	train-rmse:0.046841 
-## [870]	eval-rmse:0.118608	train-rmse:0.046784 
-## [871]	eval-rmse:0.118604	train-rmse:0.046766 
-## [872]	eval-rmse:0.118590	train-rmse:0.046711 
-## [873]	eval-rmse:0.118589	train-rmse:0.046671 
-## [874]	eval-rmse:0.118579	train-rmse:0.046638 
-## [875]	eval-rmse:0.118566	train-rmse:0.046631 
-## [876]	eval-rmse:0.118581	train-rmse:0.046588 
-## [877]	eval-rmse:0.118584	train-rmse:0.046542 
-## [878]	eval-rmse:0.118581	train-rmse:0.046502 
-## [879]	eval-rmse:0.118615	train-rmse:0.046456 
-## [880]	eval-rmse:0.118635	train-rmse:0.046426 
-## [881]	eval-rmse:0.118648	train-rmse:0.046383 
-## [882]	eval-rmse:0.118648	train-rmse:0.046337 
-## [883]	eval-rmse:0.118643	train-rmse:0.046310 
-## [884]	eval-rmse:0.118637	train-rmse:0.046303 
-## [885]	eval-rmse:0.118612	train-rmse:0.046272 
-## [886]	eval-rmse:0.118566	train-rmse:0.046221 
-## [887]	eval-rmse:0.118562	train-rmse:0.046175 
-## [888]	eval-rmse:0.118562	train-rmse:0.046137 
-## [889]	eval-rmse:0.118581	train-rmse:0.046125 
-## [890]	eval-rmse:0.118544	train-rmse:0.046076 
-## [891]	eval-rmse:0.118568	train-rmse:0.046018 
-## [892]	eval-rmse:0.118578	train-rmse:0.045990 
-## [893]	eval-rmse:0.118599	train-rmse:0.045942 
-## [894]	eval-rmse:0.118601	train-rmse:0.045917 
-## [895]	eval-rmse:0.118593	train-rmse:0.045877 
-## [896]	eval-rmse:0.118595	train-rmse:0.045818 
-## [897]	eval-rmse:0.118583	train-rmse:0.045798 
-## [898]	eval-rmse:0.118575	train-rmse:0.045758 
-## [899]	eval-rmse:0.118580	train-rmse:0.045715 
-## [900]	eval-rmse:0.118593	train-rmse:0.045685 
-## [901]	eval-rmse:0.118577	train-rmse:0.045658 
-## [902]	eval-rmse:0.118582	train-rmse:0.045605 
-## [903]	eval-rmse:0.118578	train-rmse:0.045557 
-## [904]	eval-rmse:0.118547	train-rmse:0.045524 
-## [905]	eval-rmse:0.118528	train-rmse:0.045507 
-## [906]	eval-rmse:0.118551	train-rmse:0.045488 
-## [907]	eval-rmse:0.118647	train-rmse:0.045463 
-## [908]	eval-rmse:0.118670	train-rmse:0.045405 
-## [909]	eval-rmse:0.118698	train-rmse:0.045347 
-## [910]	eval-rmse:0.118702	train-rmse:0.045322 
-## [911]	eval-rmse:0.118706	train-rmse:0.045281 
-## [912]	eval-rmse:0.118657	train-rmse:0.045255 
-## [913]	eval-rmse:0.118675	train-rmse:0.045232 
-## [914]	eval-rmse:0.118665	train-rmse:0.045206 
-## [915]	eval-rmse:0.118668	train-rmse:0.045162 
-## [916]	eval-rmse:0.118646	train-rmse:0.045132 
-## [917]	eval-rmse:0.118657	train-rmse:0.045105 
-## [918]	eval-rmse:0.118714	train-rmse:0.045090 
-## [919]	eval-rmse:0.118683	train-rmse:0.045051 
-## [920]	eval-rmse:0.118699	train-rmse:0.044985 
-## [921]	eval-rmse:0.118685	train-rmse:0.044948 
-## [922]	eval-rmse:0.118689	train-rmse:0.044897 
-## [923]	eval-rmse:0.118665	train-rmse:0.044860 
-## [924]	eval-rmse:0.118657	train-rmse:0.044835 
-## [925]	eval-rmse:0.118651	train-rmse:0.044792 
-## [926]	eval-rmse:0.118631	train-rmse:0.044741 
-## [927]	eval-rmse:0.118626	train-rmse:0.044696 
-## [928]	eval-rmse:0.118609	train-rmse:0.044677 
-## [929]	eval-rmse:0.118615	train-rmse:0.044658 
-## [930]	eval-rmse:0.118615	train-rmse:0.044611 
-## [931]	eval-rmse:0.118653	train-rmse:0.044581 
-## [932]	eval-rmse:0.118697	train-rmse:0.044541 
-## [933]	eval-rmse:0.118683	train-rmse:0.044519 
-## [934]	eval-rmse:0.118707	train-rmse:0.044480 
-## [935]	eval-rmse:0.118698	train-rmse:0.044436 
-## [936]	eval-rmse:0.118712	train-rmse:0.044393 
-## [937]	eval-rmse:0.118739	train-rmse:0.044341 
-## [938]	eval-rmse:0.118756	train-rmse:0.044301 
-## [939]	eval-rmse:0.118759	train-rmse:0.044279 
-## [940]	eval-rmse:0.118766	train-rmse:0.044230 
-## [941]	eval-rmse:0.118745	train-rmse:0.044206 
-## [942]	eval-rmse:0.118720	train-rmse:0.044169 
-## [943]	eval-rmse:0.118710	train-rmse:0.044127 
-## [944]	eval-rmse:0.118720	train-rmse:0.044123 
-## [945]	eval-rmse:0.118731	train-rmse:0.044106 
-## [946]	eval-rmse:0.118717	train-rmse:0.044073 
-## [947]	eval-rmse:0.118698	train-rmse:0.044011 
-## [948]	eval-rmse:0.118705	train-rmse:0.043969 
-## [949]	eval-rmse:0.118702	train-rmse:0.043914 
-## [950]	eval-rmse:0.118721	train-rmse:0.043892 
-## [951]	eval-rmse:0.118730	train-rmse:0.043861 
-## [952]	eval-rmse:0.118725	train-rmse:0.043838 
-## [953]	eval-rmse:0.118726	train-rmse:0.043829 
-## [954]	eval-rmse:0.118730	train-rmse:0.043805 
-## [955]	eval-rmse:0.118726	train-rmse:0.043758 
-## [956]	eval-rmse:0.118750	train-rmse:0.043717 
-## [957]	eval-rmse:0.118738	train-rmse:0.043693 
-## [958]	eval-rmse:0.118722	train-rmse:0.043660 
-## [959]	eval-rmse:0.118712	train-rmse:0.043634 
-## [960]	eval-rmse:0.118722	train-rmse:0.043616 
-## [961]	eval-rmse:0.118718	train-rmse:0.043582 
-## [962]	eval-rmse:0.118706	train-rmse:0.043562 
-## [963]	eval-rmse:0.118715	train-rmse:0.043552 
-## [964]	eval-rmse:0.118699	train-rmse:0.043512 
-## [965]	eval-rmse:0.118676	train-rmse:0.043493 
-## [966]	eval-rmse:0.118722	train-rmse:0.043471 
-## [967]	eval-rmse:0.118739	train-rmse:0.043439 
-## [968]	eval-rmse:0.118727	train-rmse:0.043427 
-## [969]	eval-rmse:0.118724	train-rmse:0.043397 
-## [970]	eval-rmse:0.118727	train-rmse:0.043360 
-## [971]	eval-rmse:0.118731	train-rmse:0.043333 
-## [972]	eval-rmse:0.118739	train-rmse:0.043304 
-## [973]	eval-rmse:0.118723	train-rmse:0.043294 
-## [974]	eval-rmse:0.118726	train-rmse:0.043260 
-## [975]	eval-rmse:0.118718	train-rmse:0.043212 
-## [976]	eval-rmse:0.118698	train-rmse:0.043185 
-## [977]	eval-rmse:0.118672	train-rmse:0.043151 
-## [978]	eval-rmse:0.118666	train-rmse:0.043127 
-## [979]	eval-rmse:0.118685	train-rmse:0.043107 
-## [980]	eval-rmse:0.118647	train-rmse:0.043073 
-## [981]	eval-rmse:0.118622	train-rmse:0.043029 
-## [982]	eval-rmse:0.118590	train-rmse:0.042989 
-## [983]	eval-rmse:0.118616	train-rmse:0.042973 
-## [984]	eval-rmse:0.118608	train-rmse:0.042952 
-## [985]	eval-rmse:0.118609	train-rmse:0.042934 
-## [986]	eval-rmse:0.118611	train-rmse:0.042919 
-## [987]	eval-rmse:0.118564	train-rmse:0.042890 
-## [988]	eval-rmse:0.118594	train-rmse:0.042867 
-## [989]	eval-rmse:0.118597	train-rmse:0.042856 
-## [990]	eval-rmse:0.118595	train-rmse:0.042835 
-## [991]	eval-rmse:0.118606	train-rmse:0.042778 
-## [992]	eval-rmse:0.118625	train-rmse:0.042735 
-## [993]	eval-rmse:0.118644	train-rmse:0.042725 
-## [994]	eval-rmse:0.118662	train-rmse:0.042676 
-## [995]	eval-rmse:0.118637	train-rmse:0.042642 
-## [996]	eval-rmse:0.118684	train-rmse:0.042610 
-## [997]	eval-rmse:0.118679	train-rmse:0.042580 
-## [998]	eval-rmse:0.118695	train-rmse:0.042545 
-## [999]	eval-rmse:0.118685	train-rmse:0.042508 
-## [1000]	eval-rmse:0.118696	train-rmse:0.042480
+## [1]	eval-mae:11.176984	train-mae:11.178999 
+## [2]	eval-mae:10.841721	train-mae:10.843556 
+## [3]	eval-mae:10.516091	train-mae:10.518085 
+## [4]	eval-mae:10.200583	train-mae:10.202491 
+## [5]	eval-mae:9.894920	train-mae:9.896530 
+## [6]	eval-mae:9.598317	train-mae:9.599773 
+## [7]	eval-mae:9.310502	train-mae:9.311866 
+## [8]	eval-mae:9.031566	train-mae:9.032389 
+## [9]	eval-mae:8.760724	train-mae:8.761462 
+## [10]	eval-mae:8.498172	train-mae:8.498637 
+## [11]	eval-mae:8.243278	train-mae:8.243702 
+## [12]	eval-mae:7.996028	train-mae:7.996329 
+## [13]	eval-mae:7.756287	train-mae:7.756411 
+## [14]	eval-mae:7.523738	train-mae:7.523695 
+## [15]	eval-mae:7.298147	train-mae:7.298057 
+## [16]	eval-mae:7.079457	train-mae:7.079143 
+## [17]	eval-mae:6.867540	train-mae:6.866744 
+## [18]	eval-mae:6.661871	train-mae:6.660701 
+## [19]	eval-mae:6.462197	train-mae:6.460776 
+## [20]	eval-mae:6.268476	train-mae:6.266927 
+## [21]	eval-mae:6.080146	train-mae:6.078687 
+## [22]	eval-mae:5.897626	train-mae:5.896358 
+## [23]	eval-mae:5.720685	train-mae:5.719357 
+## [24]	eval-mae:5.549398	train-mae:5.547802 
+## [25]	eval-mae:5.382868	train-mae:5.381410 
+## [26]	eval-mae:5.221207	train-mae:5.219763 
+## [27]	eval-mae:5.064470	train-mae:5.063203 
+## [28]	eval-mae:4.912503	train-mae:4.911200 
+## [29]	eval-mae:4.764926	train-mae:4.763807 
+## [30]	eval-mae:4.622063	train-mae:4.620884 
+## [31]	eval-mae:4.483413	train-mae:4.482223 
+## [32]	eval-mae:4.348776	train-mae:4.347674 
+## [33]	eval-mae:4.218169	train-mae:4.217224 
+## [34]	eval-mae:4.091733	train-mae:4.090778 
+## [35]	eval-mae:3.968975	train-mae:3.968010 
+## [36]	eval-mae:3.849841	train-mae:3.848888 
+## [37]	eval-mae:3.734298	train-mae:3.733345 
+## [38]	eval-mae:3.622312	train-mae:3.621352 
+## [39]	eval-mae:3.513997	train-mae:3.512828 
+## [40]	eval-mae:3.408348	train-mae:3.407215 
+## [41]	eval-mae:3.306162	train-mae:3.304984 
+## [42]	eval-mae:3.206973	train-mae:3.205757 
+## [43]	eval-mae:3.110841	train-mae:3.109580 
+## [44]	eval-mae:3.017576	train-mae:3.016211 
+## [45]	eval-mae:2.926954	train-mae:2.925621 
+## [46]	eval-mae:2.839241	train-mae:2.837812 
+## [47]	eval-mae:2.754123	train-mae:2.752701 
+## [48]	eval-mae:2.671518	train-mae:2.670100 
+## [49]	eval-mae:2.591545	train-mae:2.590034 
+## [50]	eval-mae:2.513927	train-mae:2.512405 
+## [51]	eval-mae:2.438531	train-mae:2.437090 
+## [52]	eval-mae:2.365263	train-mae:2.363928 
+## [53]	eval-mae:2.294239	train-mae:2.292855 
+## [54]	eval-mae:2.225363	train-mae:2.224102 
+## [55]	eval-mae:2.158767	train-mae:2.157321 
+## [56]	eval-mae:2.093980	train-mae:2.092589 
+## [57]	eval-mae:2.031284	train-mae:2.029821 
+## [58]	eval-mae:1.970396	train-mae:1.969090 
+## [59]	eval-mae:1.911263	train-mae:1.910023 
+## [60]	eval-mae:1.854034	train-mae:1.852790 
+## [61]	eval-mae:1.798455	train-mae:1.797090 
+## [62]	eval-mae:1.744618	train-mae:1.743325 
+## [63]	eval-mae:1.692358	train-mae:1.691019 
+## [64]	eval-mae:1.641327	train-mae:1.640058 
+## [65]	eval-mae:1.592239	train-mae:1.590907 
+## [66]	eval-mae:1.544698	train-mae:1.543235 
+## [67]	eval-mae:1.498477	train-mae:1.496958 
+## [68]	eval-mae:1.453635	train-mae:1.452130 
+## [69]	eval-mae:1.409772	train-mae:1.408428 
+## [70]	eval-mae:1.367715	train-mae:1.366239 
+## [71]	eval-mae:1.326800	train-mae:1.325253 
+## [72]	eval-mae:1.287248	train-mae:1.285523 
+## [73]	eval-mae:1.248763	train-mae:1.246932 
+## [74]	eval-mae:1.211261	train-mae:1.209524 
+## [75]	eval-mae:1.174987	train-mae:1.173262 
+## [76]	eval-mae:1.139906	train-mae:1.138175 
+## [77]	eval-mae:1.105752	train-mae:1.104045 
+## [78]	eval-mae:1.072770	train-mae:1.070972 
+## [79]	eval-mae:1.040598	train-mae:1.038826 
+## [80]	eval-mae:1.009650	train-mae:1.007721 
+## [81]	eval-mae:0.979265	train-mae:0.977407 
+## [82]	eval-mae:0.950001	train-mae:0.948159 
+## [83]	eval-mae:0.921491	train-mae:0.919640 
+## [84]	eval-mae:0.894094	train-mae:0.892078 
+## [85]	eval-mae:0.867323	train-mae:0.865286 
+## [86]	eval-mae:0.841607	train-mae:0.839350 
+## [87]	eval-mae:0.816515	train-mae:0.814126 
+## [88]	eval-mae:0.792066	train-mae:0.789763 
+## [89]	eval-mae:0.768292	train-mae:0.766059 
+## [90]	eval-mae:0.745335	train-mae:0.743182 
+## [91]	eval-mae:0.723135	train-mae:0.720921 
+## [92]	eval-mae:0.701431	train-mae:0.699273 
+## [93]	eval-mae:0.680305	train-mae:0.678268 
+## [94]	eval-mae:0.659951	train-mae:0.657979 
+## [95]	eval-mae:0.640289	train-mae:0.638384 
+## [96]	eval-mae:0.621096	train-mae:0.619237 
+## [97]	eval-mae:0.602619	train-mae:0.600687 
+## [98]	eval-mae:0.584839	train-mae:0.582761 
+## [99]	eval-mae:0.567640	train-mae:0.565343 
+## [100]	eval-mae:0.550959	train-mae:0.548542 
+## [101]	eval-mae:0.534757	train-mae:0.532259 
+## [102]	eval-mae:0.519005	train-mae:0.516405 
+## [103]	eval-mae:0.503871	train-mae:0.501128 
+## [104]	eval-mae:0.489255	train-mae:0.486071 
+## [105]	eval-mae:0.475083	train-mae:0.471560 
+## [106]	eval-mae:0.461362	train-mae:0.457412 
+## [107]	eval-mae:0.448123	train-mae:0.443822 
+## [108]	eval-mae:0.435431	train-mae:0.430689 
+## [109]	eval-mae:0.422947	train-mae:0.418007 
+## [110]	eval-mae:0.410675	train-mae:0.405594 
+## [111]	eval-mae:0.399015	train-mae:0.393689 
+## [112]	eval-mae:0.387629	train-mae:0.382120 
+## [113]	eval-mae:0.376682	train-mae:0.370912 
+## [114]	eval-mae:0.366002	train-mae:0.359868 
+## [115]	eval-mae:0.355613	train-mae:0.349159 
+## [116]	eval-mae:0.345714	train-mae:0.338928 
+## [117]	eval-mae:0.336081	train-mae:0.328886 
+## [118]	eval-mae:0.326819	train-mae:0.319230 
+## [119]	eval-mae:0.317691	train-mae:0.309853 
+## [120]	eval-mae:0.308935	train-mae:0.300856 
+## [121]	eval-mae:0.300444	train-mae:0.292126 
+## [122]	eval-mae:0.292296	train-mae:0.283533 
+## [123]	eval-mae:0.284549	train-mae:0.275342 
+## [124]	eval-mae:0.277110	train-mae:0.267480 
+## [125]	eval-mae:0.269827	train-mae:0.259787 
+## [126]	eval-mae:0.262780	train-mae:0.252439 
+## [127]	eval-mae:0.255950	train-mae:0.245250 
+## [128]	eval-mae:0.249369	train-mae:0.238362 
+## [129]	eval-mae:0.242996	train-mae:0.231782 
+## [130]	eval-mae:0.236763	train-mae:0.225267 
+## [131]	eval-mae:0.230745	train-mae:0.219100 
+## [132]	eval-mae:0.225008	train-mae:0.213131 
+## [133]	eval-mae:0.219477	train-mae:0.207348 
+## [134]	eval-mae:0.214161	train-mae:0.201821 
+## [135]	eval-mae:0.208863	train-mae:0.196452 
+## [136]	eval-mae:0.203891	train-mae:0.191283 
+## [137]	eval-mae:0.198914	train-mae:0.186304 
+## [138]	eval-mae:0.194195	train-mae:0.181375 
+## [139]	eval-mae:0.189724	train-mae:0.176576 
+## [140]	eval-mae:0.185307	train-mae:0.171958 
+## [141]	eval-mae:0.181102	train-mae:0.167600 
+## [142]	eval-mae:0.177018	train-mae:0.163403 
+## [143]	eval-mae:0.173138	train-mae:0.159351 
+## [144]	eval-mae:0.169522	train-mae:0.155450 
+## [145]	eval-mae:0.165944	train-mae:0.151665 
+## [146]	eval-mae:0.162522	train-mae:0.148044 
+## [147]	eval-mae:0.159126	train-mae:0.144454 
+## [148]	eval-mae:0.155916	train-mae:0.140983 
+## [149]	eval-mae:0.152798	train-mae:0.137733 
+## [150]	eval-mae:0.149890	train-mae:0.134611 
+## [151]	eval-mae:0.147011	train-mae:0.131581 
+## [152]	eval-mae:0.144343	train-mae:0.128727 
+## [153]	eval-mae:0.141851	train-mae:0.126030 
+## [154]	eval-mae:0.139432	train-mae:0.123388 
+## [155]	eval-mae:0.137020	train-mae:0.120825 
+## [156]	eval-mae:0.134766	train-mae:0.118328 
+## [157]	eval-mae:0.132575	train-mae:0.115898 
+## [158]	eval-mae:0.130664	train-mae:0.113702 
+## [159]	eval-mae:0.128784	train-mae:0.111465 
+## [160]	eval-mae:0.126796	train-mae:0.109349 
+## [161]	eval-mae:0.125017	train-mae:0.107313 
+## [162]	eval-mae:0.123313	train-mae:0.105365 
+## [163]	eval-mae:0.121812	train-mae:0.103522 
+## [164]	eval-mae:0.120360	train-mae:0.101748 
+## [165]	eval-mae:0.118789	train-mae:0.100075 
+## [166]	eval-mae:0.117342	train-mae:0.098434 
+## [167]	eval-mae:0.116027	train-mae:0.096974 
+## [168]	eval-mae:0.114808	train-mae:0.095542 
+## [169]	eval-mae:0.113652	train-mae:0.094151 
+## [170]	eval-mae:0.112540	train-mae:0.092748 
+## [171]	eval-mae:0.111490	train-mae:0.091464 
+## [172]	eval-mae:0.110391	train-mae:0.090240 
+## [173]	eval-mae:0.109336	train-mae:0.089060 
+## [174]	eval-mae:0.108291	train-mae:0.087905 
+## [175]	eval-mae:0.107341	train-mae:0.086859 
+## [176]	eval-mae:0.106423	train-mae:0.085829 
+## [177]	eval-mae:0.105520	train-mae:0.084811 
+## [178]	eval-mae:0.104731	train-mae:0.083838 
+## [179]	eval-mae:0.104073	train-mae:0.083000 
+## [180]	eval-mae:0.103307	train-mae:0.082091 
+## [181]	eval-mae:0.102615	train-mae:0.081298 
+## [182]	eval-mae:0.102002	train-mae:0.080498 
+## [183]	eval-mae:0.101427	train-mae:0.079755 
+## [184]	eval-mae:0.100969	train-mae:0.079049 
+## [185]	eval-mae:0.100446	train-mae:0.078360 
+## [186]	eval-mae:0.100050	train-mae:0.077707 
+## [187]	eval-mae:0.099440	train-mae:0.077120 
+## [188]	eval-mae:0.098967	train-mae:0.076555 
+## [189]	eval-mae:0.098478	train-mae:0.075945 
+## [190]	eval-mae:0.098064	train-mae:0.075435 
+## [191]	eval-mae:0.097584	train-mae:0.074891 
+## [192]	eval-mae:0.097268	train-mae:0.074412 
+## [193]	eval-mae:0.096946	train-mae:0.073957 
+## [194]	eval-mae:0.096569	train-mae:0.073517 
+## [195]	eval-mae:0.096221	train-mae:0.073024 
+## [196]	eval-mae:0.095884	train-mae:0.072631 
+## [197]	eval-mae:0.095583	train-mae:0.072257 
+## [198]	eval-mae:0.095326	train-mae:0.071892 
+## [199]	eval-mae:0.095087	train-mae:0.071487 
+## [200]	eval-mae:0.094727	train-mae:0.071093 
+## [201]	eval-mae:0.094426	train-mae:0.070704 
+## [202]	eval-mae:0.094213	train-mae:0.070354 
+## [203]	eval-mae:0.093980	train-mae:0.070053 
+## [204]	eval-mae:0.093653	train-mae:0.069705 
+## [205]	eval-mae:0.093427	train-mae:0.069476 
+## [206]	eval-mae:0.093285	train-mae:0.069242 
+## [207]	eval-mae:0.093102	train-mae:0.068947 
+## [208]	eval-mae:0.092898	train-mae:0.068708 
+## [209]	eval-mae:0.092622	train-mae:0.068512 
+## [210]	eval-mae:0.092443	train-mae:0.068279 
+## [211]	eval-mae:0.092221	train-mae:0.068082 
+## [212]	eval-mae:0.092098	train-mae:0.067902 
+## [213]	eval-mae:0.091922	train-mae:0.067684 
+## [214]	eval-mae:0.091705	train-mae:0.067478 
+## [215]	eval-mae:0.091618	train-mae:0.067311 
+## [216]	eval-mae:0.091529	train-mae:0.067056 
+## [217]	eval-mae:0.091330	train-mae:0.066887 
+## [218]	eval-mae:0.091146	train-mae:0.066725 
+## [219]	eval-mae:0.091042	train-mae:0.066575 
+## [220]	eval-mae:0.090911	train-mae:0.066396 
+## [221]	eval-mae:0.090879	train-mae:0.066248 
+## [222]	eval-mae:0.090784	train-mae:0.066083 
+## [223]	eval-mae:0.090649	train-mae:0.065939 
+## [224]	eval-mae:0.090566	train-mae:0.065818 
+## [225]	eval-mae:0.090553	train-mae:0.065679 
+## [226]	eval-mae:0.090387	train-mae:0.065510 
+## [227]	eval-mae:0.090297	train-mae:0.065415 
+## [228]	eval-mae:0.090133	train-mae:0.065294 
+## [229]	eval-mae:0.090028	train-mae:0.065166 
+## [230]	eval-mae:0.089975	train-mae:0.065034 
+## [231]	eval-mae:0.089858	train-mae:0.064864 
+## [232]	eval-mae:0.089758	train-mae:0.064732 
+## [233]	eval-mae:0.089635	train-mae:0.064615 
+## [234]	eval-mae:0.089514	train-mae:0.064502 
+## [235]	eval-mae:0.089433	train-mae:0.064429 
+## [236]	eval-mae:0.089307	train-mae:0.064289 
+## [237]	eval-mae:0.089243	train-mae:0.064163 
+## [238]	eval-mae:0.089158	train-mae:0.064053 
+## [239]	eval-mae:0.089103	train-mae:0.063912 
+## [240]	eval-mae:0.088984	train-mae:0.063769 
+## [241]	eval-mae:0.088899	train-mae:0.063658 
+## [242]	eval-mae:0.088844	train-mae:0.063538 
+## [243]	eval-mae:0.088773	train-mae:0.063402 
+## [244]	eval-mae:0.088694	train-mae:0.063309 
+## [245]	eval-mae:0.088552	train-mae:0.063216 
+## [246]	eval-mae:0.088483	train-mae:0.063079 
+## [247]	eval-mae:0.088426	train-mae:0.062929 
+## [248]	eval-mae:0.088428	train-mae:0.062880 
+## [249]	eval-mae:0.088324	train-mae:0.062803 
+## [250]	eval-mae:0.088255	train-mae:0.062691 
+## [251]	eval-mae:0.088286	train-mae:0.062589 
+## [252]	eval-mae:0.088173	train-mae:0.062481 
+## [253]	eval-mae:0.088107	train-mae:0.062389 
+## [254]	eval-mae:0.088114	train-mae:0.062245 
+## [255]	eval-mae:0.087986	train-mae:0.062171 
+## [256]	eval-mae:0.087940	train-mae:0.062072 
+## [257]	eval-mae:0.087850	train-mae:0.061937 
+## [258]	eval-mae:0.087858	train-mae:0.061872 
+## [259]	eval-mae:0.087836	train-mae:0.061784 
+## [260]	eval-mae:0.087886	train-mae:0.061682 
+## [261]	eval-mae:0.087875	train-mae:0.061586 
+## [262]	eval-mae:0.087792	train-mae:0.061518 
+## [263]	eval-mae:0.087855	train-mae:0.061449 
+## [264]	eval-mae:0.087852	train-mae:0.061385 
+## [265]	eval-mae:0.087874	train-mae:0.061345 
+## [266]	eval-mae:0.087845	train-mae:0.061241 
+## [267]	eval-mae:0.087827	train-mae:0.061160 
+## [268]	eval-mae:0.087786	train-mae:0.061073 
+## [269]	eval-mae:0.087769	train-mae:0.060986 
+## [270]	eval-mae:0.087661	train-mae:0.060906 
+## [271]	eval-mae:0.087615	train-mae:0.060839 
+## [272]	eval-mae:0.087578	train-mae:0.060745 
+## [273]	eval-mae:0.087529	train-mae:0.060659 
+## [274]	eval-mae:0.087554	train-mae:0.060569 
+## [275]	eval-mae:0.087489	train-mae:0.060491 
+## [276]	eval-mae:0.087411	train-mae:0.060398 
+## [277]	eval-mae:0.087333	train-mae:0.060327 
+## [278]	eval-mae:0.087272	train-mae:0.060290 
+## [279]	eval-mae:0.087254	train-mae:0.060206 
+## [280]	eval-mae:0.087197	train-mae:0.060154 
+## [281]	eval-mae:0.087200	train-mae:0.060103 
+## [282]	eval-mae:0.087172	train-mae:0.060053 
+## [283]	eval-mae:0.087125	train-mae:0.059954 
+## [284]	eval-mae:0.087026	train-mae:0.059857 
+## [285]	eval-mae:0.086999	train-mae:0.059762 
+## [286]	eval-mae:0.086915	train-mae:0.059643 
+## [287]	eval-mae:0.086855	train-mae:0.059590 
+## [288]	eval-mae:0.086838	train-mae:0.059497 
+## [289]	eval-mae:0.086809	train-mae:0.059417 
+## [290]	eval-mae:0.086732	train-mae:0.059345 
+## [291]	eval-mae:0.086776	train-mae:0.059269 
+## [292]	eval-mae:0.086760	train-mae:0.059201 
+## [293]	eval-mae:0.086720	train-mae:0.059145 
+## [294]	eval-mae:0.086673	train-mae:0.059100 
+## [295]	eval-mae:0.086609	train-mae:0.059041 
+## [296]	eval-mae:0.086595	train-mae:0.058986 
+## [297]	eval-mae:0.086593	train-mae:0.058957 
+## [298]	eval-mae:0.086586	train-mae:0.058895 
+## [299]	eval-mae:0.086577	train-mae:0.058870 
+## [300]	eval-mae:0.086516	train-mae:0.058809 
+## [301]	eval-mae:0.086485	train-mae:0.058778 
+## [302]	eval-mae:0.086479	train-mae:0.058720 
+## [303]	eval-mae:0.086427	train-mae:0.058670 
+## [304]	eval-mae:0.086438	train-mae:0.058585 
+## [305]	eval-mae:0.086284	train-mae:0.058460 
+## [306]	eval-mae:0.086287	train-mae:0.058395 
+## [307]	eval-mae:0.086234	train-mae:0.058296 
+## [308]	eval-mae:0.086151	train-mae:0.058170 
+## [309]	eval-mae:0.086172	train-mae:0.058146 
+## [310]	eval-mae:0.086082	train-mae:0.058028 
+## [311]	eval-mae:0.086119	train-mae:0.057975 
+## [312]	eval-mae:0.085976	train-mae:0.057914 
+## [313]	eval-mae:0.086000	train-mae:0.057830 
+## [314]	eval-mae:0.085938	train-mae:0.057790 
+## [315]	eval-mae:0.085945	train-mae:0.057748 
+## [316]	eval-mae:0.085901	train-mae:0.057673 
+## [317]	eval-mae:0.085880	train-mae:0.057618 
+## [318]	eval-mae:0.085865	train-mae:0.057565 
+## [319]	eval-mae:0.085865	train-mae:0.057540 
+## [320]	eval-mae:0.085835	train-mae:0.057481 
+## [321]	eval-mae:0.085732	train-mae:0.057387 
+## [322]	eval-mae:0.085633	train-mae:0.057302 
+## [323]	eval-mae:0.085625	train-mae:0.057261 
+## [324]	eval-mae:0.085565	train-mae:0.057225 
+## [325]	eval-mae:0.085518	train-mae:0.057109 
+## [326]	eval-mae:0.085518	train-mae:0.057035 
+## [327]	eval-mae:0.085509	train-mae:0.056989 
+## [328]	eval-mae:0.085450	train-mae:0.056925 
+## [329]	eval-mae:0.085354	train-mae:0.056854 
+## [330]	eval-mae:0.085405	train-mae:0.056818 
+## [331]	eval-mae:0.085403	train-mae:0.056759 
+## [332]	eval-mae:0.085380	train-mae:0.056720 
+## [333]	eval-mae:0.085301	train-mae:0.056663 
+## [334]	eval-mae:0.085302	train-mae:0.056629 
+## [335]	eval-mae:0.085303	train-mae:0.056604 
+## [336]	eval-mae:0.085306	train-mae:0.056546 
+## [337]	eval-mae:0.085299	train-mae:0.056521 
+## [338]	eval-mae:0.085303	train-mae:0.056471 
+## [339]	eval-mae:0.085293	train-mae:0.056430 
+## [340]	eval-mae:0.085250	train-mae:0.056383 
+## [341]	eval-mae:0.085262	train-mae:0.056357 
+## [342]	eval-mae:0.085198	train-mae:0.056260 
+## [343]	eval-mae:0.085143	train-mae:0.056180 
+## [344]	eval-mae:0.085119	train-mae:0.056119 
+## [345]	eval-mae:0.085114	train-mae:0.056049 
+## [346]	eval-mae:0.085076	train-mae:0.055955 
+## [347]	eval-mae:0.085052	train-mae:0.055891 
+## [348]	eval-mae:0.084995	train-mae:0.055784 
+## [349]	eval-mae:0.084884	train-mae:0.055763 
+## [350]	eval-mae:0.084881	train-mae:0.055723 
+## [351]	eval-mae:0.084850	train-mae:0.055677 
+## [352]	eval-mae:0.084835	train-mae:0.055634 
+## [353]	eval-mae:0.084813	train-mae:0.055604 
+## [354]	eval-mae:0.084814	train-mae:0.055518 
+## [355]	eval-mae:0.084729	train-mae:0.055429 
+## [356]	eval-mae:0.084664	train-mae:0.055366 
+## [357]	eval-mae:0.084641	train-mae:0.055308 
+## [358]	eval-mae:0.084652	train-mae:0.055266 
+## [359]	eval-mae:0.084666	train-mae:0.055200 
+## [360]	eval-mae:0.084570	train-mae:0.055146 
+## [361]	eval-mae:0.084525	train-mae:0.055081 
+## [362]	eval-mae:0.084480	train-mae:0.055013 
+## [363]	eval-mae:0.084481	train-mae:0.054947 
+## [364]	eval-mae:0.084424	train-mae:0.054909 
+## [365]	eval-mae:0.084447	train-mae:0.054874 
+## [366]	eval-mae:0.084462	train-mae:0.054830 
+## [367]	eval-mae:0.084453	train-mae:0.054784 
+## [368]	eval-mae:0.084497	train-mae:0.054713 
+## [369]	eval-mae:0.084524	train-mae:0.054628 
+## [370]	eval-mae:0.084564	train-mae:0.054578 
+## [371]	eval-mae:0.084652	train-mae:0.054503 
+## [372]	eval-mae:0.084584	train-mae:0.054418 
+## [373]	eval-mae:0.084584	train-mae:0.054359 
+## [374]	eval-mae:0.084543	train-mae:0.054309 
+## [375]	eval-mae:0.084549	train-mae:0.054245 
+## [376]	eval-mae:0.084527	train-mae:0.054191 
+## [377]	eval-mae:0.084571	train-mae:0.054131 
+## [378]	eval-mae:0.084512	train-mae:0.054093 
+## [379]	eval-mae:0.084489	train-mae:0.054033 
+## [380]	eval-mae:0.084500	train-mae:0.053985 
+## [381]	eval-mae:0.084476	train-mae:0.053950 
+## [382]	eval-mae:0.084487	train-mae:0.053913 
+## [383]	eval-mae:0.084448	train-mae:0.053867 
+## [384]	eval-mae:0.084456	train-mae:0.053785 
+## [385]	eval-mae:0.084410	train-mae:0.053715 
+## [386]	eval-mae:0.084386	train-mae:0.053668 
+## [387]	eval-mae:0.084407	train-mae:0.053649 
+## [388]	eval-mae:0.084424	train-mae:0.053626 
+## [389]	eval-mae:0.084410	train-mae:0.053594 
+## [390]	eval-mae:0.084467	train-mae:0.053542 
+## [391]	eval-mae:0.084463	train-mae:0.053521 
+## [392]	eval-mae:0.084370	train-mae:0.053448 
+## [393]	eval-mae:0.084482	train-mae:0.053389 
+## [394]	eval-mae:0.084497	train-mae:0.053355 
+## [395]	eval-mae:0.084482	train-mae:0.053313 
+## [396]	eval-mae:0.084498	train-mae:0.053266 
+## [397]	eval-mae:0.084478	train-mae:0.053233 
+## [398]	eval-mae:0.084425	train-mae:0.053193 
+## [399]	eval-mae:0.084415	train-mae:0.053149 
+## [400]	eval-mae:0.084407	train-mae:0.053104 
+## [401]	eval-mae:0.084395	train-mae:0.053061 
+## [402]	eval-mae:0.084426	train-mae:0.053023 
+## [403]	eval-mae:0.084408	train-mae:0.052971 
+## [404]	eval-mae:0.084358	train-mae:0.052871 
+## [405]	eval-mae:0.084301	train-mae:0.052844 
+## [406]	eval-mae:0.084331	train-mae:0.052780 
+## [407]	eval-mae:0.084369	train-mae:0.052714 
+## [408]	eval-mae:0.084420	train-mae:0.052650 
+## [409]	eval-mae:0.084449	train-mae:0.052608 
+## [410]	eval-mae:0.084383	train-mae:0.052540 
+## [411]	eval-mae:0.084424	train-mae:0.052486 
+## [412]	eval-mae:0.084369	train-mae:0.052419 
+## [413]	eval-mae:0.084357	train-mae:0.052369 
+## [414]	eval-mae:0.084351	train-mae:0.052343 
+## [415]	eval-mae:0.084340	train-mae:0.052329 
+## [416]	eval-mae:0.084311	train-mae:0.052281 
+## [417]	eval-mae:0.084291	train-mae:0.052225 
+## [418]	eval-mae:0.084283	train-mae:0.052165 
+## [419]	eval-mae:0.084310	train-mae:0.052132 
+## [420]	eval-mae:0.084325	train-mae:0.052103 
+## [421]	eval-mae:0.084254	train-mae:0.052044 
+## [422]	eval-mae:0.084209	train-mae:0.051979 
+## [423]	eval-mae:0.084190	train-mae:0.051961 
+## [424]	eval-mae:0.084179	train-mae:0.051901 
+## [425]	eval-mae:0.084110	train-mae:0.051819 
+## [426]	eval-mae:0.084115	train-mae:0.051767 
+## [427]	eval-mae:0.084119	train-mae:0.051744 
+## [428]	eval-mae:0.084201	train-mae:0.051716 
+## [429]	eval-mae:0.084185	train-mae:0.051659 
+## [430]	eval-mae:0.084138	train-mae:0.051643 
+## [431]	eval-mae:0.084084	train-mae:0.051593 
+## [432]	eval-mae:0.084070	train-mae:0.051544 
+## [433]	eval-mae:0.084097	train-mae:0.051488 
+## [434]	eval-mae:0.084022	train-mae:0.051436 
+## [435]	eval-mae:0.084042	train-mae:0.051411 
+## [436]	eval-mae:0.084057	train-mae:0.051396 
+## [437]	eval-mae:0.084068	train-mae:0.051339 
+## [438]	eval-mae:0.084071	train-mae:0.051288 
+## [439]	eval-mae:0.084004	train-mae:0.051223 
+## [440]	eval-mae:0.083965	train-mae:0.051140 
+## [441]	eval-mae:0.083886	train-mae:0.051050 
+## [442]	eval-mae:0.083863	train-mae:0.051024 
+## [443]	eval-mae:0.083845	train-mae:0.050989 
+## [444]	eval-mae:0.083819	train-mae:0.050962 
+## [445]	eval-mae:0.083856	train-mae:0.050925 
+## [446]	eval-mae:0.083814	train-mae:0.050879 
+## [447]	eval-mae:0.083765	train-mae:0.050836 
+## [448]	eval-mae:0.083769	train-mae:0.050787 
+## [449]	eval-mae:0.083775	train-mae:0.050745 
+## [450]	eval-mae:0.083750	train-mae:0.050700 
+## [451]	eval-mae:0.083791	train-mae:0.050674 
+## [452]	eval-mae:0.083776	train-mae:0.050637 
+## [453]	eval-mae:0.083723	train-mae:0.050550 
+## [454]	eval-mae:0.083803	train-mae:0.050513 
+## [455]	eval-mae:0.083859	train-mae:0.050460 
+## [456]	eval-mae:0.083814	train-mae:0.050408 
+## [457]	eval-mae:0.083767	train-mae:0.050340 
+## [458]	eval-mae:0.083771	train-mae:0.050287 
+## [459]	eval-mae:0.083755	train-mae:0.050240 
+## [460]	eval-mae:0.083750	train-mae:0.050189 
+## [461]	eval-mae:0.083720	train-mae:0.050142 
+## [462]	eval-mae:0.083717	train-mae:0.050106 
+## [463]	eval-mae:0.083710	train-mae:0.050061 
+## [464]	eval-mae:0.083683	train-mae:0.050015 
+## [465]	eval-mae:0.083689	train-mae:0.049983 
+## [466]	eval-mae:0.083666	train-mae:0.049909 
+## [467]	eval-mae:0.083639	train-mae:0.049852 
+## [468]	eval-mae:0.083617	train-mae:0.049820 
+## [469]	eval-mae:0.083591	train-mae:0.049770 
+## [470]	eval-mae:0.083577	train-mae:0.049716 
+## [471]	eval-mae:0.083554	train-mae:0.049673 
+## [472]	eval-mae:0.083583	train-mae:0.049596 
+## [473]	eval-mae:0.083558	train-mae:0.049555 
+## [474]	eval-mae:0.083495	train-mae:0.049509 
+## [475]	eval-mae:0.083587	train-mae:0.049473 
+## [476]	eval-mae:0.083601	train-mae:0.049437 
+## [477]	eval-mae:0.083587	train-mae:0.049383 
+## [478]	eval-mae:0.083559	train-mae:0.049347 
+## [479]	eval-mae:0.083517	train-mae:0.049307 
+## [480]	eval-mae:0.083496	train-mae:0.049250 
+## [481]	eval-mae:0.083533	train-mae:0.049206 
+## [482]	eval-mae:0.083537	train-mae:0.049162 
+## [483]	eval-mae:0.083506	train-mae:0.049146 
+## [484]	eval-mae:0.083505	train-mae:0.049081 
+## [485]	eval-mae:0.083484	train-mae:0.049040 
+## [486]	eval-mae:0.083516	train-mae:0.048998 
+## [487]	eval-mae:0.083491	train-mae:0.048962 
+## [488]	eval-mae:0.083445	train-mae:0.048926 
+## [489]	eval-mae:0.083446	train-mae:0.048881 
+## [490]	eval-mae:0.083456	train-mae:0.048840 
+## [491]	eval-mae:0.083439	train-mae:0.048826 
+## [492]	eval-mae:0.083419	train-mae:0.048768 
+## [493]	eval-mae:0.083413	train-mae:0.048739 
+## [494]	eval-mae:0.083410	train-mae:0.048667 
+## [495]	eval-mae:0.083395	train-mae:0.048628 
+## [496]	eval-mae:0.083412	train-mae:0.048589 
+## [497]	eval-mae:0.083414	train-mae:0.048558 
+## [498]	eval-mae:0.083424	train-mae:0.048521 
+## [499]	eval-mae:0.083406	train-mae:0.048495 
+## [500]	eval-mae:0.083423	train-mae:0.048462 
+## [501]	eval-mae:0.083402	train-mae:0.048429 
+## [502]	eval-mae:0.083383	train-mae:0.048368 
+## [503]	eval-mae:0.083338	train-mae:0.048326 
+## [504]	eval-mae:0.083347	train-mae:0.048276 
+## [505]	eval-mae:0.083347	train-mae:0.048219 
+## [506]	eval-mae:0.083345	train-mae:0.048153 
+## [507]	eval-mae:0.083294	train-mae:0.048102 
+## [508]	eval-mae:0.083321	train-mae:0.048060 
+## [509]	eval-mae:0.083434	train-mae:0.048037 
+## [510]	eval-mae:0.083403	train-mae:0.047984 
+## [511]	eval-mae:0.083413	train-mae:0.047944 
+## [512]	eval-mae:0.083429	train-mae:0.047920 
+## [513]	eval-mae:0.083422	train-mae:0.047848 
+## [514]	eval-mae:0.083424	train-mae:0.047797 
+## [515]	eval-mae:0.083417	train-mae:0.047785 
+## [516]	eval-mae:0.083381	train-mae:0.047721 
+## [517]	eval-mae:0.083367	train-mae:0.047657 
+## [518]	eval-mae:0.083448	train-mae:0.047613 
+## [519]	eval-mae:0.083447	train-mae:0.047596 
+## [520]	eval-mae:0.083448	train-mae:0.047582 
+## [521]	eval-mae:0.083486	train-mae:0.047549 
+## [522]	eval-mae:0.083497	train-mae:0.047541 
+## [523]	eval-mae:0.083452	train-mae:0.047492 
+## [524]	eval-mae:0.083480	train-mae:0.047451 
+## [525]	eval-mae:0.083466	train-mae:0.047403 
+## [526]	eval-mae:0.083412	train-mae:0.047376 
+## [527]	eval-mae:0.083386	train-mae:0.047350 
+## [528]	eval-mae:0.083379	train-mae:0.047307 
+## [529]	eval-mae:0.083400	train-mae:0.047270 
+## [530]	eval-mae:0.083399	train-mae:0.047251 
+## [531]	eval-mae:0.083375	train-mae:0.047216 
+## [532]	eval-mae:0.083389	train-mae:0.047145 
+## [533]	eval-mae:0.083398	train-mae:0.047097 
+## [534]	eval-mae:0.083554	train-mae:0.047045 
+## [535]	eval-mae:0.083531	train-mae:0.046996 
+## [536]	eval-mae:0.083492	train-mae:0.046947 
+## [537]	eval-mae:0.083512	train-mae:0.046911 
+## [538]	eval-mae:0.083471	train-mae:0.046876 
+## [539]	eval-mae:0.083465	train-mae:0.046823 
+## [540]	eval-mae:0.083473	train-mae:0.046812 
+## [541]	eval-mae:0.083713	train-mae:0.046781 
+## [542]	eval-mae:0.083704	train-mae:0.046763 
+## [543]	eval-mae:0.083721	train-mae:0.046713 
+## [544]	eval-mae:0.083725	train-mae:0.046696 
+## [545]	eval-mae:0.083722	train-mae:0.046662 
+## [546]	eval-mae:0.083720	train-mae:0.046620 
+## [547]	eval-mae:0.083701	train-mae:0.046592 
+## [548]	eval-mae:0.083718	train-mae:0.046556 
+## [549]	eval-mae:0.083690	train-mae:0.046525 
+## [550]	eval-mae:0.083672	train-mae:0.046515 
+## [551]	eval-mae:0.083683	train-mae:0.046481 
+## [552]	eval-mae:0.083655	train-mae:0.046449 
+## [553]	eval-mae:0.083640	train-mae:0.046404 
+## [554]	eval-mae:0.083666	train-mae:0.046354 
+## [555]	eval-mae:0.083599	train-mae:0.046326 
+## [556]	eval-mae:0.083763	train-mae:0.046306 
+## [557]	eval-mae:0.083761	train-mae:0.046247 
+## [558]	eval-mae:0.083770	train-mae:0.046206 
+## [559]	eval-mae:0.083779	train-mae:0.046170 
+## [560]	eval-mae:0.083762	train-mae:0.046133 
+## [561]	eval-mae:0.083762	train-mae:0.046083 
+## [562]	eval-mae:0.083710	train-mae:0.046065 
+## [563]	eval-mae:0.083731	train-mae:0.046022 
+## [564]	eval-mae:0.083765	train-mae:0.045998 
+## [565]	eval-mae:0.083778	train-mae:0.045987 
+## [566]	eval-mae:0.083797	train-mae:0.045909 
+## [567]	eval-mae:0.083871	train-mae:0.045876 
+## [568]	eval-mae:0.083859	train-mae:0.045829 
+## [569]	eval-mae:0.083843	train-mae:0.045788 
+## [570]	eval-mae:0.083819	train-mae:0.045774 
+## [571]	eval-mae:0.083869	train-mae:0.045727 
+## [572]	eval-mae:0.083920	train-mae:0.045674 
+## [573]	eval-mae:0.083919	train-mae:0.045650 
+## [574]	eval-mae:0.083938	train-mae:0.045619 
+## [575]	eval-mae:0.083917	train-mae:0.045581 
+## [576]	eval-mae:0.083931	train-mae:0.045545 
+## [577]	eval-mae:0.083879	train-mae:0.045508 
+## [578]	eval-mae:0.083853	train-mae:0.045480 
+## [579]	eval-mae:0.083834	train-mae:0.045453 
+## [580]	eval-mae:0.083861	train-mae:0.045425 
+## [581]	eval-mae:0.083882	train-mae:0.045386 
+## [582]	eval-mae:0.083881	train-mae:0.045353 
+## [583]	eval-mae:0.083884	train-mae:0.045307 
+## [584]	eval-mae:0.083881	train-mae:0.045272 
+## [585]	eval-mae:0.083879	train-mae:0.045234 
+## [586]	eval-mae:0.083839	train-mae:0.045194 
+## [587]	eval-mae:0.083812	train-mae:0.045156 
+## [588]	eval-mae:0.083850	train-mae:0.045141 
+## [589]	eval-mae:0.083856	train-mae:0.045110 
+## [590]	eval-mae:0.083834	train-mae:0.045063 
+## [591]	eval-mae:0.083821	train-mae:0.045037 
+## [592]	eval-mae:0.083797	train-mae:0.044993 
+## [593]	eval-mae:0.083789	train-mae:0.044946 
+## [594]	eval-mae:0.083779	train-mae:0.044935 
+## [595]	eval-mae:0.083772	train-mae:0.044895 
+## [596]	eval-mae:0.083797	train-mae:0.044883 
+## [597]	eval-mae:0.083818	train-mae:0.044855 
+## [598]	eval-mae:0.083830	train-mae:0.044829 
+## [599]	eval-mae:0.083813	train-mae:0.044787 
+## [600]	eval-mae:0.083772	train-mae:0.044749 
+## [601]	eval-mae:0.083758	train-mae:0.044721 
+## [602]	eval-mae:0.083731	train-mae:0.044681 
+## [603]	eval-mae:0.083759	train-mae:0.044630 
+## [604]	eval-mae:0.083749	train-mae:0.044590 
+## [605]	eval-mae:0.083722	train-mae:0.044564 
+## [606]	eval-mae:0.083730	train-mae:0.044516 
+## [607]	eval-mae:0.083769	train-mae:0.044474 
+## [608]	eval-mae:0.083765	train-mae:0.044426 
+## [609]	eval-mae:0.083755	train-mae:0.044395 
+## [610]	eval-mae:0.083184	train-mae:0.044377 
+## [611]	eval-mae:0.083125	train-mae:0.044355 
+## [612]	eval-mae:0.083128	train-mae:0.044330 
+## [613]	eval-mae:0.083133	train-mae:0.044309 
+## [614]	eval-mae:0.083118	train-mae:0.044274 
+## [615]	eval-mae:0.083122	train-mae:0.044259 
+## [616]	eval-mae:0.083136	train-mae:0.044192 
+## [617]	eval-mae:0.083122	train-mae:0.044152 
+## [618]	eval-mae:0.083146	train-mae:0.044102 
+## [619]	eval-mae:0.083129	train-mae:0.044062 
+## [620]	eval-mae:0.083112	train-mae:0.044038 
+## [621]	eval-mae:0.083128	train-mae:0.043983 
+## [622]	eval-mae:0.083160	train-mae:0.043955 
+## [623]	eval-mae:0.083160	train-mae:0.043931 
+## [624]	eval-mae:0.083141	train-mae:0.043882 
+## [625]	eval-mae:0.083063	train-mae:0.043845 
+## [626]	eval-mae:0.083058	train-mae:0.043815 
+## [627]	eval-mae:0.083066	train-mae:0.043773 
+## [628]	eval-mae:0.082594	train-mae:0.043764 
+## [629]	eval-mae:0.082608	train-mae:0.043735 
+## [630]	eval-mae:0.082599	train-mae:0.043704 
+## [631]	eval-mae:0.082554	train-mae:0.043646 
+## [632]	eval-mae:0.082559	train-mae:0.043611 
+## [633]	eval-mae:0.082571	train-mae:0.043567 
+## [634]	eval-mae:0.082574	train-mae:0.043515 
+## [635]	eval-mae:0.082560	train-mae:0.043513 
+## [636]	eval-mae:0.082534	train-mae:0.043489 
+## [637]	eval-mae:0.082546	train-mae:0.043475 
+## [638]	eval-mae:0.082504	train-mae:0.043430 
+## [639]	eval-mae:0.082500	train-mae:0.043392 
+## [640]	eval-mae:0.082509	train-mae:0.043369 
+## [641]	eval-mae:0.082480	train-mae:0.043328 
+## [642]	eval-mae:0.082465	train-mae:0.043285 
+## [643]	eval-mae:0.082479	train-mae:0.043252 
+## [644]	eval-mae:0.082498	train-mae:0.043217 
+## [645]	eval-mae:0.082482	train-mae:0.043201 
+## [646]	eval-mae:0.082426	train-mae:0.043154 
+## [647]	eval-mae:0.082397	train-mae:0.043114 
+## [648]	eval-mae:0.082370	train-mae:0.043101 
+## [649]	eval-mae:0.082360	train-mae:0.043095 
+## [650]	eval-mae:0.082347	train-mae:0.043057 
+## [651]	eval-mae:0.082353	train-mae:0.043026 
+## [652]	eval-mae:0.082386	train-mae:0.042987 
+## [653]	eval-mae:0.082540	train-mae:0.042955 
+## [654]	eval-mae:0.082546	train-mae:0.042921 
+## [655]	eval-mae:0.082538	train-mae:0.042910 
+## [656]	eval-mae:0.082519	train-mae:0.042877 
+## [657]	eval-mae:0.082486	train-mae:0.042846 
+## [658]	eval-mae:0.082517	train-mae:0.042802 
+## [659]	eval-mae:0.082529	train-mae:0.042793 
+## [660]	eval-mae:0.082736	train-mae:0.042778 
+## [661]	eval-mae:0.082703	train-mae:0.042731 
+## [662]	eval-mae:0.082692	train-mae:0.042679 
+## [663]	eval-mae:0.082664	train-mae:0.042631 
+## [664]	eval-mae:0.082711	train-mae:0.042607 
+## [665]	eval-mae:0.082700	train-mae:0.042594 
+## [666]	eval-mae:0.082730	train-mae:0.042547 
+## [667]	eval-mae:0.082709	train-mae:0.042515 
+## [668]	eval-mae:0.082710	train-mae:0.042496 
+## [669]	eval-mae:0.082713	train-mae:0.042460 
+## [670]	eval-mae:0.082732	train-mae:0.042417 
+## [671]	eval-mae:0.082707	train-mae:0.042398 
+## [672]	eval-mae:0.082714	train-mae:0.042370 
+## [673]	eval-mae:0.082732	train-mae:0.042333 
+## [674]	eval-mae:0.082714	train-mae:0.042310 
+## [675]	eval-mae:0.082727	train-mae:0.042288 
+## [676]	eval-mae:0.082659	train-mae:0.042249 
+## [677]	eval-mae:0.082657	train-mae:0.042231 
+## [678]	eval-mae:0.082255	train-mae:0.042229 
+## [679]	eval-mae:0.082245	train-mae:0.042204 
+## [680]	eval-mae:0.082245	train-mae:0.042195 
+## [681]	eval-mae:0.082193	train-mae:0.042151 
+## [682]	eval-mae:0.082198	train-mae:0.042120 
+## [683]	eval-mae:0.082191	train-mae:0.042080 
+## [684]	eval-mae:0.082182	train-mae:0.042057 
+## [685]	eval-mae:0.082129	train-mae:0.042027 
+## [686]	eval-mae:0.082126	train-mae:0.042013 
+## [687]	eval-mae:0.082111	train-mae:0.041975 
+## [688]	eval-mae:0.082122	train-mae:0.041936 
+## [689]	eval-mae:0.082117	train-mae:0.041894 
+## [690]	eval-mae:0.082102	train-mae:0.041851 
+## [691]	eval-mae:0.082152	train-mae:0.041832 
+## [692]	eval-mae:0.082135	train-mae:0.041814 
+## [693]	eval-mae:0.082112	train-mae:0.041762 
+## [694]	eval-mae:0.082119	train-mae:0.041745 
+## [695]	eval-mae:0.082079	train-mae:0.041697 
+## [696]	eval-mae:0.082064	train-mae:0.041669 
+## [697]	eval-mae:0.082041	train-mae:0.041626 
+## [698]	eval-mae:0.082023	train-mae:0.041618 
+## [699]	eval-mae:0.081983	train-mae:0.041580 
+## [700]	eval-mae:0.081974	train-mae:0.041536 
+## [701]	eval-mae:0.082011	train-mae:0.041498 
+## [702]	eval-mae:0.081995	train-mae:0.041478 
+## [703]	eval-mae:0.082008	train-mae:0.041446 
+## [704]	eval-mae:0.082004	train-mae:0.041407 
+## [705]	eval-mae:0.081988	train-mae:0.041385 
+## [706]	eval-mae:0.082060	train-mae:0.041361 
+## [707]	eval-mae:0.082040	train-mae:0.041329 
+## [708]	eval-mae:0.082032	train-mae:0.041314 
+## [709]	eval-mae:0.082054	train-mae:0.041304 
+## [710]	eval-mae:0.082058	train-mae:0.041294 
+## [711]	eval-mae:0.082060	train-mae:0.041238 
+## [712]	eval-mae:0.082092	train-mae:0.041209 
+## [713]	eval-mae:0.082079	train-mae:0.041165 
+## [714]	eval-mae:0.082047	train-mae:0.041141 
+## [715]	eval-mae:0.082048	train-mae:0.041120 
+## [716]	eval-mae:0.082037	train-mae:0.041067 
+## [717]	eval-mae:0.082029	train-mae:0.041033 
+## [718]	eval-mae:0.082039	train-mae:0.041027 
+## [719]	eval-mae:0.082013	train-mae:0.040986 
+## [720]	eval-mae:0.082002	train-mae:0.040944 
+## [721]	eval-mae:0.081925	train-mae:0.040908 
+## [722]	eval-mae:0.081925	train-mae:0.040875 
+## [723]	eval-mae:0.081958	train-mae:0.040859 
+## [724]	eval-mae:0.081934	train-mae:0.040849 
+## [725]	eval-mae:0.081981	train-mae:0.040810 
+## [726]	eval-mae:0.081994	train-mae:0.040791 
+## [727]	eval-mae:0.082016	train-mae:0.040765 
+## [728]	eval-mae:0.082013	train-mae:0.040733 
+## [729]	eval-mae:0.081985	train-mae:0.040709 
+## [730]	eval-mae:0.081995	train-mae:0.040694 
+## [731]	eval-mae:0.081950	train-mae:0.040663 
+## [732]	eval-mae:0.081951	train-mae:0.040627 
+## [733]	eval-mae:0.081946	train-mae:0.040607 
+## [734]	eval-mae:0.081970	train-mae:0.040578 
+## [735]	eval-mae:0.081972	train-mae:0.040551 
+## [736]	eval-mae:0.081967	train-mae:0.040527 
+## [737]	eval-mae:0.081953	train-mae:0.040493 
+## [738]	eval-mae:0.081934	train-mae:0.040466 
+## [739]	eval-mae:0.081940	train-mae:0.040443 
+## [740]	eval-mae:0.081721	train-mae:0.040430 
+## [741]	eval-mae:0.081709	train-mae:0.040379 
+## [742]	eval-mae:0.081655	train-mae:0.040355 
+## [743]	eval-mae:0.081632	train-mae:0.040331 
+## [744]	eval-mae:0.081617	train-mae:0.040299 
+## [745]	eval-mae:0.081620	train-mae:0.040286 
+## [746]	eval-mae:0.081607	train-mae:0.040255 
+## [747]	eval-mae:0.081590	train-mae:0.040207 
+## [748]	eval-mae:0.081606	train-mae:0.040176 
+## [749]	eval-mae:0.081599	train-mae:0.040151 
+## [750]	eval-mae:0.081551	train-mae:0.040120 
+## [751]	eval-mae:0.081543	train-mae:0.040106 
+## [752]	eval-mae:0.081548	train-mae:0.040084 
+## [753]	eval-mae:0.081553	train-mae:0.040057 
+## [754]	eval-mae:0.081546	train-mae:0.040025 
+## [755]	eval-mae:0.081541	train-mae:0.040000 
+## [756]	eval-mae:0.081525	train-mae:0.039966 
+## [757]	eval-mae:0.081550	train-mae:0.039926 
+## [758]	eval-mae:0.081532	train-mae:0.039901 
+## [759]	eval-mae:0.081501	train-mae:0.039869 
+## [760]	eval-mae:0.081517	train-mae:0.039809 
+## [761]	eval-mae:0.081492	train-mae:0.039765 
+## [762]	eval-mae:0.081460	train-mae:0.039740 
+## [763]	eval-mae:0.081411	train-mae:0.039709 
+## [764]	eval-mae:0.081407	train-mae:0.039686 
+## [765]	eval-mae:0.081346	train-mae:0.039653 
+## [766]	eval-mae:0.081360	train-mae:0.039632 
+## [767]	eval-mae:0.081332	train-mae:0.039603 
+## [768]	eval-mae:0.081325	train-mae:0.039587 
+## [769]	eval-mae:0.081310	train-mae:0.039555 
+## [770]	eval-mae:0.081299	train-mae:0.039524 
+## [771]	eval-mae:0.081338	train-mae:0.039502 
+## [772]	eval-mae:0.081322	train-mae:0.039479 
+## [773]	eval-mae:0.081322	train-mae:0.039471 
+## [774]	eval-mae:0.081343	train-mae:0.039420 
+## [775]	eval-mae:0.081323	train-mae:0.039392 
+## [776]	eval-mae:0.081451	train-mae:0.039358 
+## [777]	eval-mae:0.081454	train-mae:0.039340 
+## [778]	eval-mae:0.081474	train-mae:0.039315 
+## [779]	eval-mae:0.081465	train-mae:0.039286 
+## [780]	eval-mae:0.081457	train-mae:0.039251 
+## [781]	eval-mae:0.081455	train-mae:0.039237 
+## [782]	eval-mae:0.081433	train-mae:0.039222 
+## [783]	eval-mae:0.081434	train-mae:0.039198 
+## [784]	eval-mae:0.081321	train-mae:0.039180 
+## [785]	eval-mae:0.081348	train-mae:0.039128 
+## [786]	eval-mae:0.081348	train-mae:0.039094 
+## [787]	eval-mae:0.081357	train-mae:0.039076 
+## [788]	eval-mae:0.081360	train-mae:0.039037 
+## [789]	eval-mae:0.081355	train-mae:0.039030 
+## [790]	eval-mae:0.081338	train-mae:0.038997 
+## [791]	eval-mae:0.081296	train-mae:0.038952 
+## [792]	eval-mae:0.081285	train-mae:0.038913 
+## [793]	eval-mae:0.081278	train-mae:0.038890 
+## [794]	eval-mae:0.081243	train-mae:0.038857 
+## [795]	eval-mae:0.081208	train-mae:0.038838 
+## [796]	eval-mae:0.081219	train-mae:0.038809 
+## [797]	eval-mae:0.081215	train-mae:0.038795 
+## [798]	eval-mae:0.081219	train-mae:0.038766 
+## [799]	eval-mae:0.081235	train-mae:0.038741 
+## [800]	eval-mae:0.081238	train-mae:0.038708 
+## [801]	eval-mae:0.081194	train-mae:0.038675 
+## [802]	eval-mae:0.081198	train-mae:0.038649 
+## [803]	eval-mae:0.081176	train-mae:0.038638 
+## [804]	eval-mae:0.081195	train-mae:0.038616 
+## [805]	eval-mae:0.081199	train-mae:0.038605 
+## [806]	eval-mae:0.081239	train-mae:0.038563 
+## [807]	eval-mae:0.081191	train-mae:0.038522 
+## [808]	eval-mae:0.081174	train-mae:0.038497 
+## [809]	eval-mae:0.081168	train-mae:0.038456 
+## [810]	eval-mae:0.081173	train-mae:0.038423 
+## [811]	eval-mae:0.081171	train-mae:0.038400 
+## [812]	eval-mae:0.081180	train-mae:0.038372 
+## [813]	eval-mae:0.081186	train-mae:0.038345 
+## [814]	eval-mae:0.081191	train-mae:0.038308 
+## [815]	eval-mae:0.081176	train-mae:0.038267 
+## [816]	eval-mae:0.081134	train-mae:0.038246 
+## [817]	eval-mae:0.081134	train-mae:0.038245 
+## [818]	eval-mae:0.081116	train-mae:0.038208 
+## [819]	eval-mae:0.081122	train-mae:0.038193 
+## [820]	eval-mae:0.081122	train-mae:0.038181 
+## [821]	eval-mae:0.081108	train-mae:0.038160 
+## [822]	eval-mae:0.081066	train-mae:0.038127 
+## [823]	eval-mae:0.081006	train-mae:0.038104 
+## [824]	eval-mae:0.080996	train-mae:0.038099 
+## [825]	eval-mae:0.080992	train-mae:0.038055 
+## [826]	eval-mae:0.081000	train-mae:0.038045 
+## [827]	eval-mae:0.081026	train-mae:0.038005 
+## [828]	eval-mae:0.081042	train-mae:0.037976 
+## [829]	eval-mae:0.081048	train-mae:0.037961 
+## [830]	eval-mae:0.081036	train-mae:0.037942 
+## [831]	eval-mae:0.081047	train-mae:0.037905 
+## [832]	eval-mae:0.081007	train-mae:0.037888 
+## [833]	eval-mae:0.081037	train-mae:0.037862 
+## [834]	eval-mae:0.081004	train-mae:0.037845 
+## [835]	eval-mae:0.081014	train-mae:0.037795 
+## [836]	eval-mae:0.080995	train-mae:0.037767 
+## [837]	eval-mae:0.080989	train-mae:0.037734 
+## [838]	eval-mae:0.080951	train-mae:0.037716 
+## [839]	eval-mae:0.080926	train-mae:0.037657 
+## [840]	eval-mae:0.080914	train-mae:0.037630 
+## [841]	eval-mae:0.080921	train-mae:0.037595 
+## [842]	eval-mae:0.080914	train-mae:0.037580 
+## [843]	eval-mae:0.080885	train-mae:0.037561 
+## [844]	eval-mae:0.080898	train-mae:0.037552 
+## [845]	eval-mae:0.080906	train-mae:0.037534 
+## [846]	eval-mae:0.080894	train-mae:0.037504 
+## [847]	eval-mae:0.080900	train-mae:0.037472 
+## [848]	eval-mae:0.080901	train-mae:0.037456 
+## [849]	eval-mae:0.080900	train-mae:0.037432 
+## [850]	eval-mae:0.080889	train-mae:0.037425 
+## [851]	eval-mae:0.080876	train-mae:0.037384 
+## [852]	eval-mae:0.080868	train-mae:0.037361 
+## [853]	eval-mae:0.080866	train-mae:0.037343 
+## [854]	eval-mae:0.080818	train-mae:0.037305 
+## [855]	eval-mae:0.080843	train-mae:0.037285 
+## [856]	eval-mae:0.080827	train-mae:0.037247 
+## [857]	eval-mae:0.080838	train-mae:0.037215 
+## [858]	eval-mae:0.080844	train-mae:0.037182 
+## [859]	eval-mae:0.080832	train-mae:0.037158 
+## [860]	eval-mae:0.080888	train-mae:0.037131 
+## [861]	eval-mae:0.080927	train-mae:0.037107 
+## [862]	eval-mae:0.080920	train-mae:0.037061 
+## [863]	eval-mae:0.080911	train-mae:0.037031 
+## [864]	eval-mae:0.080905	train-mae:0.036995 
+## [865]	eval-mae:0.080919	train-mae:0.036978 
+## [866]	eval-mae:0.080915	train-mae:0.036956 
+## [867]	eval-mae:0.080922	train-mae:0.036923 
+## [868]	eval-mae:0.080952	train-mae:0.036889 
+## [869]	eval-mae:0.080953	train-mae:0.036857 
+## [870]	eval-mae:0.080890	train-mae:0.036809 
+## [871]	eval-mae:0.080880	train-mae:0.036796 
+## [872]	eval-mae:0.080865	train-mae:0.036770 
+## [873]	eval-mae:0.080851	train-mae:0.036742 
+## [874]	eval-mae:0.080848	train-mae:0.036699 
+## [875]	eval-mae:0.080831	train-mae:0.036693 
+## [876]	eval-mae:0.080819	train-mae:0.036662 
+## [877]	eval-mae:0.080816	train-mae:0.036639 
+## [878]	eval-mae:0.080817	train-mae:0.036610 
+## [879]	eval-mae:0.080853	train-mae:0.036578 
+## [880]	eval-mae:0.080859	train-mae:0.036565 
+## [881]	eval-mae:0.080858	train-mae:0.036533 
+## [882]	eval-mae:0.080855	train-mae:0.036494 
+## [883]	eval-mae:0.080840	train-mae:0.036474 
+## [884]	eval-mae:0.080839	train-mae:0.036462 
+## [885]	eval-mae:0.080828	train-mae:0.036437 
+## [886]	eval-mae:0.080783	train-mae:0.036398 
+## [887]	eval-mae:0.080783	train-mae:0.036363 
+## [888]	eval-mae:0.080781	train-mae:0.036339 
+## [889]	eval-mae:0.080789	train-mae:0.036333 
+## [890]	eval-mae:0.080756	train-mae:0.036293 
+## [891]	eval-mae:0.080767	train-mae:0.036256 
+## [892]	eval-mae:0.080778	train-mae:0.036230 
+## [893]	eval-mae:0.080791	train-mae:0.036200 
+## [894]	eval-mae:0.080790	train-mae:0.036175 
+## [895]	eval-mae:0.080790	train-mae:0.036152 
+## [896]	eval-mae:0.080791	train-mae:0.036121 
+## [897]	eval-mae:0.080788	train-mae:0.036099 
+## [898]	eval-mae:0.080779	train-mae:0.036068 
+## [899]	eval-mae:0.080804	train-mae:0.036035 
+## [900]	eval-mae:0.080797	train-mae:0.036011 
+## [901]	eval-mae:0.080786	train-mae:0.035976 
+## [902]	eval-mae:0.080790	train-mae:0.035943 
+## [903]	eval-mae:0.080781	train-mae:0.035902 
+## [904]	eval-mae:0.080767	train-mae:0.035876 
+## [905]	eval-mae:0.080753	train-mae:0.035863 
+## [906]	eval-mae:0.080769	train-mae:0.035848 
+## [907]	eval-mae:0.080891	train-mae:0.035827 
+## [908]	eval-mae:0.080911	train-mae:0.035775 
+## [909]	eval-mae:0.080912	train-mae:0.035729 
+## [910]	eval-mae:0.080923	train-mae:0.035712 
+## [911]	eval-mae:0.080928	train-mae:0.035680 
+## [912]	eval-mae:0.080901	train-mae:0.035669 
+## [913]	eval-mae:0.080920	train-mae:0.035649 
+## [914]	eval-mae:0.080902	train-mae:0.035630 
+## [915]	eval-mae:0.080925	train-mae:0.035594 
+## [916]	eval-mae:0.080898	train-mae:0.035575 
+## [917]	eval-mae:0.080903	train-mae:0.035552 
+## [918]	eval-mae:0.081019	train-mae:0.035543 
+## [919]	eval-mae:0.081006	train-mae:0.035508 
+## [920]	eval-mae:0.081035	train-mae:0.035461 
+## [921]	eval-mae:0.081015	train-mae:0.035436 
+## [922]	eval-mae:0.081013	train-mae:0.035406 
+## [923]	eval-mae:0.080998	train-mae:0.035371 
+## [924]	eval-mae:0.080992	train-mae:0.035346 
+## [925]	eval-mae:0.080968	train-mae:0.035323 
+## [926]	eval-mae:0.080941	train-mae:0.035300 
+## [927]	eval-mae:0.080940	train-mae:0.035269 
+## [928]	eval-mae:0.080921	train-mae:0.035256 
+## [929]	eval-mae:0.080920	train-mae:0.035243 
+## [930]	eval-mae:0.080942	train-mae:0.035210 
+## [931]	eval-mae:0.080951	train-mae:0.035189 
+## [932]	eval-mae:0.080991	train-mae:0.035158 
+## [933]	eval-mae:0.080865	train-mae:0.035144 
+## [934]	eval-mae:0.080879	train-mae:0.035121 
+## [935]	eval-mae:0.080883	train-mae:0.035085 
+## [936]	eval-mae:0.080880	train-mae:0.035056 
+## [937]	eval-mae:0.080885	train-mae:0.035024 
+## [938]	eval-mae:0.080903	train-mae:0.034991 
+## [939]	eval-mae:0.080995	train-mae:0.034968 
+## [940]	eval-mae:0.081014	train-mae:0.034942 
+## [941]	eval-mae:0.081009	train-mae:0.034920 
+## [942]	eval-mae:0.081000	train-mae:0.034892 
+## [943]	eval-mae:0.080989	train-mae:0.034861 
+## [944]	eval-mae:0.081009	train-mae:0.034863 
+## [945]	eval-mae:0.081009	train-mae:0.034845 
+## [946]	eval-mae:0.080985	train-mae:0.034808 
+## [947]	eval-mae:0.080977	train-mae:0.034772 
+## [948]	eval-mae:0.081004	train-mae:0.034745 
+## [949]	eval-mae:0.080999	train-mae:0.034696 
+## [950]	eval-mae:0.081015	train-mae:0.034681 
+## [951]	eval-mae:0.081012	train-mae:0.034649 
+## [952]	eval-mae:0.081019	train-mae:0.034635 
+## [953]	eval-mae:0.081019	train-mae:0.034628 
+## [954]	eval-mae:0.081012	train-mae:0.034602 
+## [955]	eval-mae:0.081014	train-mae:0.034561 
+## [956]	eval-mae:0.081027	train-mae:0.034521 
+## [957]	eval-mae:0.081019	train-mae:0.034492 
+## [958]	eval-mae:0.081032	train-mae:0.034465 
+## [959]	eval-mae:0.081021	train-mae:0.034441 
+## [960]	eval-mae:0.081023	train-mae:0.034426 
+## [961]	eval-mae:0.081008	train-mae:0.034410 
+## [962]	eval-mae:0.081013	train-mae:0.034393 
+## [963]	eval-mae:0.081018	train-mae:0.034386 
+## [964]	eval-mae:0.081015	train-mae:0.034352 
+## [965]	eval-mae:0.080996	train-mae:0.034339 
+## [966]	eval-mae:0.081023	train-mae:0.034321 
+## [967]	eval-mae:0.081046	train-mae:0.034300 
+## [968]	eval-mae:0.081037	train-mae:0.034290 
+## [969]	eval-mae:0.081045	train-mae:0.034268 
+## [970]	eval-mae:0.081048	train-mae:0.034238 
+## [971]	eval-mae:0.081015	train-mae:0.034224 
+## [972]	eval-mae:0.081020	train-mae:0.034200 
+## [973]	eval-mae:0.081022	train-mae:0.034190 
+## [974]	eval-mae:0.081010	train-mae:0.034161 
+## [975]	eval-mae:0.081000	train-mae:0.034127 
+## [976]	eval-mae:0.080990	train-mae:0.034102 
+## [977]	eval-mae:0.080977	train-mae:0.034080 
+## [978]	eval-mae:0.080960	train-mae:0.034067 
+## [979]	eval-mae:0.080949	train-mae:0.034053 
+## [980]	eval-mae:0.080940	train-mae:0.034017 
+## [981]	eval-mae:0.080915	train-mae:0.033997 
+## [982]	eval-mae:0.080893	train-mae:0.033971 
+## [983]	eval-mae:0.080912	train-mae:0.033962 
+## [984]	eval-mae:0.080910	train-mae:0.033948 
+## [985]	eval-mae:0.080915	train-mae:0.033927 
+## [986]	eval-mae:0.080915	train-mae:0.033923 
+## [987]	eval-mae:0.080909	train-mae:0.033910 
+## [988]	eval-mae:0.080936	train-mae:0.033896 
+## [989]	eval-mae:0.080937	train-mae:0.033895 
+## [990]	eval-mae:0.080934	train-mae:0.033880 
+## [991]	eval-mae:0.080933	train-mae:0.033856 
+## [992]	eval-mae:0.080948	train-mae:0.033830 
+## [993]	eval-mae:0.080964	train-mae:0.033823 
+## [994]	eval-mae:0.080979	train-mae:0.033783 
+## [995]	eval-mae:0.080932	train-mae:0.033746 
+## [996]	eval-mae:0.080966	train-mae:0.033725 
+## [997]	eval-mae:0.080970	train-mae:0.033710 
+## [998]	eval-mae:0.080980	train-mae:0.033682 
+## [999]	eval-mae:0.080963	train-mae:0.033658 
+## [1000]	eval-mae:0.080967	train-mae:0.033639
 ```
 
 ```r
@@ -2089,35 +2210,6 @@ ggplot(eval, aes(x=iter, y=rmse, colour=tipo, group= tipo)) + geom_line() +
   scale_y_log10()
 ```
 
-<img src="13-arboles-2_files/figure-html/unnamed-chunk-36-1.png" width="480" />
-
-
-## Tarea {-}
-
-
-1. Revisa el script que vimos en clase de aplicación de bosques para
-predecir precios de casa (bosque-housing.Rmd). Argumenta por qué es mejor
-el segundo método para limpiar faltantes que el primero. Considera
- - Cómo respeta cada método la división entrenamiento y validación
- - El desempeño de cada método
- 
-2. Considera las importancia de variables de bosque-housing.Rmd. Muestra
-las importancias basadas en permutaciones escaladas y no escaladas. ¿Con
-qué valores en el objeto randomForest se escalan las importancias?
-
-3. Grafica importancias de Gini (MeanDecreaseGini) y de permutaciones. 
-¿Los resultados son similiares? Explica qué significa MeanDecreaseGini en el
-contexto de un problema de regresión.
-
-4. Considera nuestra primera corrida de gradient boosting
-en las notas para el ejemplo de los precios de las casas. Corre este ejemplo
-usando pérdida absoluta ($|y-f(x)|$) en lugar de pérdida cuadrática
-($(y-f(x))^2$)
-
-- Grafica las curvas de entrenamiento y validación conforme se agregan árboles
-- Explica teóricamente cuál es la diferencia del algoritmo cuando utilizas estas
-dos pérdidas.
-- Da razones por las que pérdida absoluta puede ser una mejor selección para
-algunos problemas de regresión.
+<img src="13-arboles-2_files/figure-html/unnamed-chunk-40-1.png" width="480" />
 
 

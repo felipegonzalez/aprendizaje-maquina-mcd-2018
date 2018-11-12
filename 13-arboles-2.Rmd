@@ -658,7 +658,7 @@ mod_2 <- gbm(log(vSalePrice) ~ vGrLivArea +vNeighborhood  +
                  vOverallQual + vBsmtFinSF1,  
                 data = entrena,
                 distribution = 'laplace',
-                n.trees = 100, 
+                n.trees = 500, 
                 interaction.depth = 4,
                 shrinkage = 0.1, 
                 bag.fraction = 0.5,
@@ -704,7 +704,7 @@ prom_parcial <- function(x, variable, df, mod){
   variable <- enquo(variable)
   variable_nom <- quo_name(variable)
   salida <- df %>% mutate(!!variable_nom := x) %>% 
-    mutate(pred = predict(mod, ., n.trees=100)) %>%
+    mutate(pred = predict(mod, ., n.trees = 500)) %>%
     group_by(!!variable) %>%
     summarise(f_1 = mean(pred)) 
   salida
@@ -868,7 +868,7 @@ mod_bosque %>%
 ```
 
 
-
+Puedes ver más técnicas en [Interpretable Machine Learning](https://christophm.github.io/interpretable-ml-book/), por ejemplo.
 
 ## xgboost y gbm
 

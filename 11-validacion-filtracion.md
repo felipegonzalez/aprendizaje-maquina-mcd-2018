@@ -100,7 +100,7 @@ errores
 
 ```
 ## error_valida error_prueba 
-##     1.810514     2.989814
+##     1.409657     3.814621
 ```
 
 ```r
@@ -219,7 +219,7 @@ seleccion_ajuste()
 
 ```
 ## error_valida error_prueba 
-##        0.140        0.484
+##        0.120        0.501
 ```
 
 El resultado es catastrófico otra vez:

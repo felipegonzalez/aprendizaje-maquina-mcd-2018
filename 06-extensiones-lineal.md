@@ -243,7 +243,7 @@ casas_e %>% select(Id, CentralAir, AC_present)
 ```
 ## # A tibble: 1,000 x 3
 ##       Id CentralAir AC_present
-##    <int> <chr>           <dbl>
+##    <dbl> <chr>           <dbl>
 ##  1  1070 Y                   1
 ##  2   730 Y                   1
 ##  3  1326 N                   0

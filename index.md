@@ -1,7 +1,7 @@
 --- 
 title: "Aprendizaje de máquina"
 author: "Felipe González"
-date: "2018-11-12"
+date: "2018-11-22"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 bibliography: [book.bib]

@@ -763,7 +763,7 @@ head(dat_grasa)
 ```
 ## # A tibble: 6 x 14
 ##   grasacorp  edad  peso estatura cuello pecho abdomen cadera muslo rodilla
-##       <dbl> <int> <dbl>    <dbl>  <dbl> <dbl>   <dbl>  <dbl> <dbl>   <dbl>
+##       <dbl> <dbl> <dbl>    <dbl>  <dbl> <dbl>   <dbl>  <dbl> <dbl>   <dbl>
 ## 1      12.3    23  154.     67.8   36.2  93.1    85.2   94.5  59      37.3
 ## 2       6.1    22  173.     72.2   38.5  93.6    83     98.7  58.7    37.3
 ## 3      25.3    22  154      66.2   34    95.8    87.9   99.2  59.6    38.9
@@ -1197,7 +1197,7 @@ head(dat_grasa)
 ```
 ## # A tibble: 6 x 14
 ##   grasacorp  edad  peso estatura cuello pecho abdomen cadera muslo rodilla
-##       <dbl> <int> <dbl>    <dbl>  <dbl> <dbl>   <dbl>  <dbl> <dbl>   <dbl>
+##       <dbl> <dbl> <dbl>    <dbl>  <dbl> <dbl>   <dbl>  <dbl> <dbl>   <dbl>
 ## 1      12.3    23  154.     67.8   36.2  93.1    85.2   94.5  59      37.3
 ## 2       6.1    22  173.     72.2   38.5  93.6    83     98.7  58.7    37.3
 ## 3      25.3    22  154      66.2   34    95.8    87.9   99.2  59.6    38.9

@@ -1346,8 +1346,8 @@ peliculas_nombres <- read_csv('datos/netflix/peliculas_1.csv')
 ```
 ## Parsed with column specification:
 ## cols(
-##   pelicula_id = col_integer(),
-##   year = col_integer(),
+##   pelicula_id = col_double(),
+##   year = col_double(),
 ##   name = col_character()
 ## )
 ```
@@ -1359,7 +1359,7 @@ peliculas_nombres
 ```
 ## # A tibble: 646 x 3
 ##    pelicula_id  year name                               
-##          <int> <int> <chr>                              
+##          <dbl> <dbl> <chr>                              
 ##  1           1  2003 Something's Gotta Give             
 ##  2           2  1992 Reservoir Dogs                     
 ##  3           3  2003 X2: X-Men United                   
@@ -1938,16 +1938,16 @@ head(whisky)
 ```
 ## # A tibble: 6 x 17
 ##   RowID Distillery  Body Sweetness Smoky Medicinal Tobacco Honey Spicy
-##   <chr> <chr>      <int>     <int> <int>     <int>   <int> <int> <int>
+##   <chr> <chr>      <dbl>     <dbl> <dbl>     <dbl>   <dbl> <dbl> <dbl>
 ## 1 01    Aberfeldy      2         2     2         0       0     2     1
 ## 2 02    Aberlour       3         3     1         0       0     4     3
 ## 3 03    AnCnoc         1         3     2         0       0     2     0
 ## 4 04    Ardbeg         4         1     4         4       0     0     2
 ## 5 05    Ardmore        2         2     2         0       0     1     1
 ## 6 06    ArranIsle…     2         3     1         1       0     1     1
-## # ... with 8 more variables: Winey <int>, Nutty <int>, Malty <int>,
-## #   Fruity <int>, Floral <int>, Postcode <chr>, Latitude <int>,
-## #   Longitude <int>
+## # ... with 8 more variables: Winey <dbl>, Nutty <dbl>, Malty <dbl>,
+## #   Fruity <dbl>, Floral <dbl>, Postcode <chr>, Latitude <dbl>,
+## #   Longitude <dbl>
 ```
 
 

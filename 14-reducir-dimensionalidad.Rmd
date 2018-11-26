@@ -1148,8 +1148,8 @@ $$\tilde{X}_{i,j} = X_{i,j} - \mu_j$$
   donde $\mu_j = \frac{1}{n} \sum_j X_{i,j}$.
 
 
-- La diferencia en construcción entre svd y svd con columnas centradas (componentes principales)
-es que en svd las proyecciones se hacen pasando por el origen, pero en componentes principales se hacen a partir del centroide de los datos
+- La diferencia en construcción entre Svd y Svd con columnas centradas (componentes principales)
+es que en Svd las proyecciones se hacen pasando por el origen, pero en componentes principales se hacen a partir del centroide de los datos.
 
 ### Ejemplo {-}
 

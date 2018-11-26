@@ -1223,7 +1223,7 @@ qplot(scores[,2], -comps[,2])
   
 ### Varianza en componentes principales.
   
-  Cuando centramos por columna, la svd es un tipo de análisis de la matriz
+  Cuando centramos por columna, la Svd es un tipo de análisis de la matriz
 de varianzas y covarianzas de la matriz $X$, dada por
 
 $$C = \frac{1}{n} \tilde{X}^t \tilde{X}$$
@@ -1240,9 +1240,9 @@ Pues $$\sigma_j \sum_k {u_{j,k}} = \sum_k \sum_i (\tilde{X}_{k,i})v_{j,i} =
   \sum_i v_{j,i}\sum_k (\tilde{X}_{k,i}) = 0,$$
   pues las columnas de $\tilde{X}$ tienen media cero.
 
-2- $\sigma_j^2$ es la varianza de la proyección $d_j$, pues
+2. $\sigma_j^2$ es la varianza de la proyección $d_j$, pues
 $$Var(d_j) = \sigma_j^2 \sum_k (u_{j,k} - 0)^2 = \sigma_j^2,$$
-  y el vector $u_j$ tienen norma 1.
+  y el vector $u_j$ tienen norma $1$.
 
 3. La ortogonalidad de los vectores $u_j$ se interpreta ahora en términos
 de covarianza:
@@ -1338,7 +1338,7 @@ Según vimos arriba, podemos ver que porcentaje de la varianza explica cada comp
 summary(comp_w)
 ```
 
-Y vemos que las primeras dos componentes explican casi el 50\% de la varianza. Las
+Y vemos que las primeras dos componentes explican casi el $50\%$ de la varianza. Las
 siguientes componentes aportan relativamente pooca varianza comparada con la primera
 
 Podemos graficar los whiskies en estas dos dimensiones:
@@ -1404,7 +1404,7 @@ Y los scores son:
 comp_enigh$scores[,1:2]
 ```
 
-Y la tabla de rango 1 es
+Y la tabla de rango $1$ es
 ```{r}
 tab_1 <- tcrossprod(comp_enigh$scores[,1], comp_enigh$loadings[,1])
 colnames(tab_1) <- colnames(deciles)
@@ -1454,7 +1454,7 @@ o no centrado. De otra forma, parte del análisis intenta absorber la diferencia
 unidades, lo cual generalmente no es de interés.
 
  - En componentes principales, podemos estandarizar las columnas.
- - En el análisis no centrado, podemos poner las variables en escala 0-1, por ejemplo,
+ - En el análisis no centrado, podemos poner las variables en escala $0-1$, por ejemplo,
  o dividir entre la media (si son variables positivas).
 
 ### Ejemplo {-}
@@ -1510,7 +1510,7 @@ dat_ej <- data_frame(x_1, x_2, color)
 ggplot(dat_ej, aes(x = x_1, y = x_2, colour = color)) + geom_point()
 ```
 
-Notamos que la primera dimensión de svd va en dirección del eje 1, 
+Notamos que la primera dimensión de svd va en dirección del eje $1$, 
 donde hay más dispersión en los datos alrededor del origen. 
 
 ```{r}
@@ -1556,9 +1556,9 @@ p_{j|i} = \frac{1}{P_i}\exp\left(- ||x_j - x_i ||^2 / 2\sigma_i^2 \right)
 donde $P_i$ es una constante de normalización tal que $\sum_j {p_{j|i}} = 1$.
 Por el momento pensemos que la $\sigma_i$ está fija en algún valor arbitrario.
 
-- Notamos que $p_{j|i}$ toma valores cercanos a 1 cuando 
+- Notamos que $p_{j|i}$ toma valores cercanos a $1$ cuando 
 $x_i$ y $x_j$ están cercanos (su distancia es chica), y rápidamente
-decae a 0 cuando $x_i$ y $x_j$ se empiezan a alejar.
+decae a $0$ cuando $x_i$ y $x_j$ se empiezan a alejar.
 - Cuando la $\sigma$ es chica, si $x_i$ y $x_j$ están aunque sea un poco
 separados, $p_{j|i}\approx 0$. Si $\sigma$ es grande, entonces esta
 cantidad decae más lentamente cuando los puntos se alejan
@@ -1582,7 +1582,7 @@ para cada caso $i$ en los datos.
  Nótese que estas similitudes son sensibles cuando los
 puntos están relativamente cerca, pero se hacen rápidamente cero cuando
 las distancias son más grandes. Esto permite que al intentar hacer la 
-aproximación realmente nos concentremos en la estructura local alrededor de cada punto $x^{(i)}$
+aproximación realmente nos concentremos en la estructura local alrededor de cada punto $x^{(i)}.$
 
 - Nótese que usamos $\sigma=1$ en la definición de las $q_{j|i}$, pues esto depende de la escala de la nueva representación (que vamos a encontrar).
 - Dependiendo de la $\sigma_i$, podemos afinar el método para definir qué
@@ -1601,8 +1601,8 @@ $$\min_{y^{1}, y^{2}, \ldots, y^{(n)}} \sum_{i,j} p_{j|i} \log \frac{p_{j|i}}{q_
 Existen muchas maneras de entender esta cantidad. Por lo pronto,
 notemos que 
 
-- Si $p_{j|i} = q_{1|j}$, entonces esta cantidad es 0 
-(pues el logaritmo de 1 es cero). 
+- Si $p_{j|i} = q_{1|j}$, entonces esta cantidad es $0$
+(pues el logaritmo de $1$ es cero). 
 - Para cada $i$,  $\sum_{j} p_{j|i} \log \frac{p_{j|i}}{q_{j|i}}\geq 0$. Demuestra usando cálculo.
 - Y **más importante**:  $p_{j|i} \log \frac{p_{j|i}}{q_{j|i}}$ es muy grande
 cuando obtenemos una $q_{j|i}$ chica para una $p_{j|i}$ grande (representar lejos puntos cercanos), pero no aumenta

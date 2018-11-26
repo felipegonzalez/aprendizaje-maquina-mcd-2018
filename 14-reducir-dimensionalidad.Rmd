@@ -944,7 +944,7 @@ peliculas_nombres
 ```
 
 Hay muchas peliculas que no son evaluadas por ningún usuario. Aquí tenemos que decidir
-cómo tratar estos datos: si los rellenamos con 0, la implicación es que un usuario
+cómo tratar estos datos: si los rellenamos con $0$, la implicación es que un usuario
 tiene bajo interés en una película que no ha visto. Hay otras opciones (y quizá un
 método que trate apropiadamente los datos faltantes es mejor).
 
@@ -987,7 +987,7 @@ V_peliculas <- readRDS('cache_obj/v_peliculas.rds')
 U_usuarios <- readRDS('cache_obj/u_usuarios.rds')
 ```
 
-Veamos primero las componentes 2, 3 y 4. 
+Veamos primero las componentes $2$, $3$ y $4$. 
 
 
 ```{r}
@@ -1049,7 +1049,7 @@ evals_num_p <- readRDS('cache_obj/evals_num_p.rds')
 qplot(evals_num_p$num_evals, svd_parcial$v[,1])
 ```
 
-Esta dimensión aparece pues la primera aproximación de rango 1 intenta replicar
+Esta dimensión aparece pues la primera aproximación de rango $1$ intenta replicar
 los valores "bajos" de pocas evaluaciones tanto en usuarios como en películas.
 En realidad es una distorsión producida por cómo hemos tratado los datos ("imputando"
 cero cuando no existe una evaluación).
@@ -1074,20 +1074,20 @@ Que podríamos resumir, por ejemplo, con la media de errores absolutos:
 mean(abs(as.numeric(X_arr-X_arr_2)))
 ```
 
-Otra opción es usar la norma Frobenius, calculando para la apoximación de rango 1
+Otra opción es usar la norma Frobenius, calculando para la apoximación de rango $1$
 
 
 ```{r}
 1 - (sum(X_arr^2) - sum(svd_gasto$d[1]^2))/sum(X_arr^2)
 ```
 
-Lo que indica que capturamos 99.8\% de la información, y para la de rango 2:
-d
+Lo que indica que capturamos $99.8\%$ de la información, y para la de rango $2$:
+
 ```{r}
 1-(sum(X_arr^2) - sum(svd_gasto$d[1:2]^2))/sum(X_arr^2)
 ```
 
-Lo que indica que estos datos (en 3 variables), podemos entenderlos mediante
+Lo que indica que estos datos (en $3$ variables), podemos entenderlos mediante
 un análisis de dos dimensiones
 
 ---
@@ -1096,7 +1096,7 @@ un análisis de dos dimensiones
 Podemos medir la calidad de la representación de $X$ ($n\times p$ con $p < n$) 
 de una aproximación $X_k$ de SVD mediante
 $$1-\frac{||X-X_k||_F^2}{||X||_F^2}  = \frac{\sigma_1^2 + \sigma_2^2 + \cdots \sigma_k^2}{\sigma_1^2 + \sigma_2^2 + \cdots \sigma_p^2},$$
-que es un valor entre 0 y 1. Cuanto más cercana a 1 está, mejor es la representación.
+que es un valor entre $0$ y $1$. Cuanto más cercana a $1$ está, mejor es la representación.
 ```
 
 **Observaciones**: Dependiendo de nuestro objetivo, nos interesa alcanzar distintos
@@ -1112,7 +1112,7 @@ por nuestra aproximación.
 
 #### Ejemplo {-}
 Para el problema de Netflix podemos calcular la calidad de representación dada por
-las primeras 4 dimensiones
+las primeras $4$ dimensiones
 
 ```{r}
 #norma_X  <- sum(evals$calif^2)

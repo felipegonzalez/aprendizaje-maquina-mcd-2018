@@ -1301,24 +1301,24 @@ en tensorflow:</p>
 <pre class="sourceCode r"><code class="sourceCode r">score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_valid_s, y_valid)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.4766701
+## [1] 0.4774766
 ## 
 ## $acc
-## [1] 0.7831325
+## [1] 0.7861446
 ## 
 ## $binary_crossentropy
-## [1] 0.4373235</code></pre>
+## [1] 0.4365275</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">predict_classes</span>(x_valid_s),y_valid) 
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 193  42
-##   1  30  67</code></pre>
+##   0 194  42
+##   1  29  67</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##             0         1
-##   0 0.8654709 0.3853211
-##   1 0.1345291 0.6146789</code></pre>
+##   0 0.8699552 0.3853211
+##   1 0.1300448 0.6146789</code></pre>
 <p>Es importante monitorear las curvas de aprendizaje (entrenamiento y
 validación) para diagnosticar mejoras:</p>
 <pre class="sourceCode r"><code class="sourceCode r">df_iteraciones &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(iteraciones)

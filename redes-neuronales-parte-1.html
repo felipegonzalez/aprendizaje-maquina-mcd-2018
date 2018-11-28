@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-11-22">
+<meta name="date" content="2018-11-28">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1301,13 +1301,13 @@ en tensorflow:</p>
 <pre class="sourceCode r"><code class="sourceCode r">score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_valid_s, y_valid)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.4742123
+## [1] 0.4770703
 ## 
 ## $acc
 ## [1] 0.7861446
 ## 
 ## $binary_crossentropy
-## [1] 0.4356997</code></pre>
+## [1] 0.4386062</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">predict_classes</span>(x_valid_s),y_valid) 
 tab_confusion</code></pre>
 <pre><code>##    y_valid

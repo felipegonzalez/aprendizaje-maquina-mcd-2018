@@ -777,7 +777,7 @@ $$X=U\Sigma V^t,$$
 Los valores singulares de $\Sigma$ estan ordenados en orden decreciente.
     
 - Las columnas de U y V son vectores ortogonales unitarios. La i-ésima columna
-$u_i$ de $V$ y la í-esima columna $v_i$ de $V$ son pares de vectores propios $(u_i, v_i)$ izquierdo y derecho de $X$  con valor singular $\sigma_i = \Sigma_{i,i}$
+$u_i$ de $V$ y la i-ésima columna $v_i$ de $V$ son pares de vectores propios $(u_i, v_i)$ izquierdo y derecho de $X$  con valor singular $\sigma_i = \Sigma_{i,i}$
 
 ```
 

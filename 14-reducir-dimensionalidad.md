@@ -1119,8 +1119,7 @@ v_2^t \\
 \vdots \\
 v_k^t
 \end{array}
-\right)
-$$
+\right)$$
 
 o más simplemente, como
 
@@ -1380,18 +1379,19 @@ método que trate apropiadamente los datos faltantes es mejor).
 
 
 ```r
-#no correr en notas
+# no correr en notas
 library(Matrix)
 library(methods)
 library(irlba)
 if(FALSE){
   evals <- evals %>% group_by(usuario_id) %>% mutate(calif_centrada = calif - mean(calif))
-  #Usamos matriz rala - de otra manera la matriz es demasiado grande
+  #Usamos matriz rala, de otra manera la matriz es demasiado grande
   evals_mat <- sparseMatrix(i = evals$usuario_id, j=evals$pelicula_id, x = evals$calif)
   svd_parcial <- irlba(evals_mat, 4)
   saveRDS(svd_parcial, file ='cache_obj/svd_netflix.rds')
 }
 ```
+
 
 
 ```r
@@ -1425,6 +1425,7 @@ V_peliculas <- readRDS('cache_obj/v_peliculas.rds')
 U_usuarios <- readRDS('cache_obj/u_usuarios.rds')
 ```
 
+
 Veamos primero las componentes 2, 3 y 4. 
 
 
@@ -1440,7 +1441,7 @@ qplot(svd_parcial$u[,2])
 <img src="14-reducir-dimensionalidad_files/figure-html/unnamed-chunk-58-1.png" width="672" />
 
 ```r
-qplot(svd_parcial$v[,2])#
+qplot(svd_parcial$v[,2])
 ```
 
 ```
@@ -2026,6 +2027,8 @@ ggplot(scores_w, aes(x=Comp.1, y= -Comp.2, label=Distillery)) +
 ```
 
 <img src="14-reducir-dimensionalidad_files/figure-html/unnamed-chunk-88-1.png" width="672" />
+
+
 
 
 ¿Que pasa si usamos svd sin centrar? Vemos que la primera componente simplemente

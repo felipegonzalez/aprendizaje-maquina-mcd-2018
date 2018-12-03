@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-11-28">
+<meta name="date" content="2018-12-03">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -403,6 +403,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="14.9.3" data-path="reduccion-de-dimensionalidad.html"><a href="reduccion-de-dimensionalidad.html#perplexity"><i class="fa fa-check"></i><b>14.9.3</b> Perplexity</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="15" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html"><i class="fa fa-check"></i><b>15</b> Análisis de conglomerados (clustering)</a><ul>
+<li class="chapter" data-level="15.1" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#introduccion-1"><i class="fa fa-check"></i><b>15.1</b> Introducción</a><ul>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#ejemplo-64"><i class="fa fa-check"></i>Ejemplo</a></li>
+</ul></li>
+<li class="chapter" data-level="15.2" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#enfoques-combinatorio-y-basado-en-modelos."><i class="fa fa-check"></i><b>15.2</b> Enfoques: combinatorio y basado en modelos.</a></li>
+<li class="chapter" data-level="15.3" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#k-medias"><i class="fa fa-check"></i><b>15.3</b> K-medias</a><ul>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#algoritmo-de-k-medias"><i class="fa fa-check"></i>Algoritmo de k-medias</a></li>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#ejemplo-65"><i class="fa fa-check"></i>Ejemplo</a></li>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#ejercicio-8"><i class="fa fa-check"></i>Ejercicio</a></li>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#usando-la-funcion-k-means"><i class="fa fa-check"></i>Usando la funcion k-means</a></li>
+</ul></li>
+<li class="chapter" data-level="15.4" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#seleccion-de-numero-de-clusters."><i class="fa fa-check"></i><b>15.4</b> Selección de número de clusters.</a><ul>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#variacion-dentro-de-clusters-para-distintas-soluciones"><i class="fa fa-check"></i>Variación dentro de clusters para distintas soluciones</a></li>
+<li class="chapter" data-level="15.4.1" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#criterios-especificos"><i class="fa fa-check"></i><b>15.4.1</b> Criterios específicos</a></li>
+</ul></li>
+<li class="chapter" data-level="15.5" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#dificultades-en-segmentacionclustering."><i class="fa fa-check"></i><b>15.5</b> Dificultades en segmentación/clustering.</a><ul>
+<li class="chapter" data-level="15.5.1" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#estructuras-no-compactas"><i class="fa fa-check"></i><b>15.5.1</b> Estructuras no compactas</a></li>
+<li class="chapter" data-level="15.5.2" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#existencia-o-no-de-grupos-naturales"><i class="fa fa-check"></i><b>15.5.2</b> Existencia o no de grupos “naturales”</a></li>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#grupos-en-dimension-alta"><i class="fa fa-check"></i>Grupos en dimensión alta</a></li>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#dificultades-en-la-seleccion-de-metrica"><i class="fa fa-check"></i>Dificultades en la selección de métrica</a></li>
+</ul></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Publicado con bookdown</a></li>
 
@@ -503,7 +525,7 @@ ajustar_evaluar &lt;-<span class="st"> </span><span class="cf">function</span>(d
 <pre class="sourceCode r"><code class="sourceCode r">errores &lt;-<span class="st"> </span><span class="kw">simular_datos</span>(<span class="dv">500</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">separar</span>(<span class="dt">prop=</span> <span class="kw">c</span>(<span class="fl">0.4</span>,<span class="fl">0.4</span>,<span class="fl">0.2</span>)) <span class="op">%&gt;%</span><span class="st"> </span>ajustar_evaluar
 errores</code></pre>
 <pre><code>## error_valida error_prueba 
-##     1.538048     3.344871</code></pre>
+##     2.246100     3.192456</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">reps_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">map</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">50</span>, simular_datos, <span class="dt">n =</span> <span class="dv">500</span>) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">        </span><span class="kw">map</span>(separar, <span class="dt">prop=</span> <span class="kw">c</span>(<span class="fl">0.6</span>,<span class="fl">0.2</span>,<span class="fl">0.2</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">        </span><span class="kw">map</span>(ajustar_evaluar) <span class="op">%&gt;%</span>
@@ -589,7 +611,7 @@ varias veces para confirmar más sólidamente la idea</p>
 }
 <span class="kw">seleccion_ajuste</span>()</code></pre>
 <pre><code>## error_valida error_prueba 
-##         0.08         0.52</code></pre>
+##        0.140        0.476</code></pre>
 <p>El resultado es catastrófico otra vez:</p>
 <pre class="sourceCode r"><code class="sourceCode r">errores_selec &lt;-<span class="st"> </span><span class="kw">map</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">30</span>, seleccion_ajuste) <span class="op">%&gt;%</span><span class="st"> </span>transpose <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">map</span>(unlist) <span class="op">%&gt;%</span><span class="st"> </span>as.data.frame
 <span class="kw">ggplot</span>(errores_selec, <span class="kw">aes</span>(<span class="dt">x=</span>error_prueba, <span class="dt">y=</span>error_valida)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_abline</span>(<span class="dt">colour=</span><span class="st">&#39;red&#39;</span>) <span class="op">+</span>

@@ -25,7 +25,7 @@
 <meta name="author" content="Felipe González">
 
 
-<meta name="date" content="2018-11-28">
+<meta name="date" content="2018-12-03">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -401,6 +401,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="14.9.2" data-path="reduccion-de-dimensionalidad.html"><a href="reduccion-de-dimensionalidad.html#minimizacion-para-sne"><i class="fa fa-check"></i><b>14.9.2</b> Minimización para SNE</a></li>
 <li class="chapter" data-level="" data-path="reduccion-de-dimensionalidad.html"><a href="reduccion-de-dimensionalidad.html#ejemplo-63"><i class="fa fa-check"></i>Ejemplo</a></li>
 <li class="chapter" data-level="14.9.3" data-path="reduccion-de-dimensionalidad.html"><a href="reduccion-de-dimensionalidad.html#perplexity"><i class="fa fa-check"></i><b>14.9.3</b> Perplexity</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html"><i class="fa fa-check"></i><b>15</b> Análisis de conglomerados (clustering)</a><ul>
+<li class="chapter" data-level="15.1" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#introduccion-1"><i class="fa fa-check"></i><b>15.1</b> Introducción</a><ul>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#ejemplo-64"><i class="fa fa-check"></i>Ejemplo</a></li>
+</ul></li>
+<li class="chapter" data-level="15.2" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#enfoques-combinatorio-y-basado-en-modelos."><i class="fa fa-check"></i><b>15.2</b> Enfoques: combinatorio y basado en modelos.</a></li>
+<li class="chapter" data-level="15.3" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#k-medias"><i class="fa fa-check"></i><b>15.3</b> K-medias</a><ul>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#algoritmo-de-k-medias"><i class="fa fa-check"></i>Algoritmo de k-medias</a></li>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#ejemplo-65"><i class="fa fa-check"></i>Ejemplo</a></li>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#ejercicio-8"><i class="fa fa-check"></i>Ejercicio</a></li>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#usando-la-funcion-k-means"><i class="fa fa-check"></i>Usando la funcion k-means</a></li>
+</ul></li>
+<li class="chapter" data-level="15.4" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#seleccion-de-numero-de-clusters."><i class="fa fa-check"></i><b>15.4</b> Selección de número de clusters.</a><ul>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#variacion-dentro-de-clusters-para-distintas-soluciones"><i class="fa fa-check"></i>Variación dentro de clusters para distintas soluciones</a></li>
+<li class="chapter" data-level="15.4.1" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#criterios-especificos"><i class="fa fa-check"></i><b>15.4.1</b> Criterios específicos</a></li>
+</ul></li>
+<li class="chapter" data-level="15.5" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#dificultades-en-segmentacionclustering."><i class="fa fa-check"></i><b>15.5</b> Dificultades en segmentación/clustering.</a><ul>
+<li class="chapter" data-level="15.5.1" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#estructuras-no-compactas"><i class="fa fa-check"></i><b>15.5.1</b> Estructuras no compactas</a></li>
+<li class="chapter" data-level="15.5.2" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#existencia-o-no-de-grupos-naturales"><i class="fa fa-check"></i><b>15.5.2</b> Existencia o no de grupos “naturales”</a></li>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#grupos-en-dimension-alta"><i class="fa fa-check"></i>Grupos en dimensión alta</a></li>
+<li class="chapter" data-level="" data-path="analisis-de-conglomerados-clustering.html"><a href="analisis-de-conglomerados-clustering.html#dificultades-en-la-seleccion-de-metrica"><i class="fa fa-check"></i>Dificultades en la selección de métrica</a></li>
 </ul></li>
 </ul></li>
 <li class="divider"></li>
@@ -878,12 +900,12 @@ history &lt;-<span class="st"> </span>modelo <span class="op">%&gt;%</span><span
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_weights</span>(modelo)</code></pre>
 <pre><code>## [[1]]
 ##            [,1]
-## [1,] -0.6017681
-## [2,]  0.2080806
-## [3,]  0.2646974
+## [1,] -0.7136114
+## [2,]  0.2062445
+## [3,]  0.4179292
 ## 
 ## [[2]]
-## [1] 1.654061</code></pre>
+## [1] 1.700001</code></pre>
 <p>Y verificamos que concuerda con la salida de <em>glm</em>:</p>
 <pre class="sourceCode r"><code class="sourceCode r">mod_logistico &lt;-<span class="st"> </span><span class="kw">glm</span>(g <span class="op">~</span><span class="st"> </span>x_<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>x_<span class="dv">2</span><span class="op">+</span><span class="st"> </span>x_<span class="dv">3</span>, <span class="dt">data =</span> dat_ent, <span class="dt">family =</span> <span class="st">&#39;binomial&#39;</span>) 
 <span class="kw">coef</span>(mod_logistico)</code></pre>
@@ -955,13 +977,13 @@ history &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><s
 score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.2878349
+## [1] 0.2911305
 ## 
 ## $acc
-## [1] 0.9312407
+## [1] 0.9307424
 ## 
 ## $categorical_crossentropy
-## [1] 0.2867882</code></pre>
+## [1] 0.2900829</code></pre>
 <p>Podemos también intentar con el ejemplo de spam:</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
 <span class="kw">library</span>(tidyr)
@@ -997,13 +1019,13 @@ tab_confusion &lt;-<span class="st"> </span><span class="kw">table</span>(modelo
 tab_confusion</code></pre>
 <pre><code>##    y_valid
 ##       0   1
-##   0 900  66
-##   1  27 541</code></pre>
+##   0 895  55
+##   1  32 552</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(tab_confusion, <span class="dv">2</span>)</code></pre>
 <pre><code>##    y_valid
 ##              0          1
-##   0 0.97087379 0.10873147
-##   1 0.02912621 0.89126853</code></pre>
+##   0 0.96548004 0.09060956
+##   1 0.03451996 0.90939044</code></pre>
 </div>
 </div>
 <div id="activaciones-relu" class="section level2">
@@ -1062,13 +1084,13 @@ history &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><s
 score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)
 score</code></pre>
 <pre><code>## $loss
-## [1] 0.2865627
+## [1] 0.2956193
 ## 
 ## $acc
-## [1] 0.9427005
+## [1] 0.9392128
 ## 
 ## $categorical_crossentropy
-## [1] 0.2103544</code></pre>
+## [1] 0.2147467</code></pre>
 </div>
 </div>
 <div id="dropout-para-regularizacion" class="section level2">
@@ -1193,43 +1215,43 @@ el capa oculta:</p>
 <p><img src="08-redes-neuronales-2_files/figure-html/unnamed-chunk-46-1.png" width="480" /></p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">get_weights</span>(modelo_dropout)[[<span class="dv">3</span>]]</code></pre>
 <pre><code>##             [,1]
-##  [1,] -0.8063675
-##  [2,]  0.6471486
-##  [3,] -0.9866974
-##  [4,] -0.6317982
-##  [5,]  0.6336465
-##  [6,]  0.7069929
-##  [7,]  0.6697894
-##  [8,]  0.5440920
-##  [9,] -1.3371924
-## [10,] -1.0613713
-## [11,]  0.8092274
-## [12,] -0.6410899
-## [13,] -0.7681679
-## [14,]  0.9762233
-## [15,] -0.8704098
-## [16,]  0.9106598
-## [17,] -0.8372843
-## [18,]  0.8004932
-## [19,]  0.7881852
-## [20,] -0.8084586
-## [21,] -0.9380109
-## [22,] -1.4317229
-## [23,] -1.0528682
-## [24,] -0.7120984
-## [25,]  0.5290234
-## [26,] -1.2440741
-## [27,] -0.9218262
-## [28,] -0.7240317
-## [29,]  0.6846300
-## [30,]  0.3919170</code></pre>
+##  [1,]  0.4933418
+##  [2,] -1.5190125
+##  [3,] -0.6721783
+##  [4,] -0.1436823
+##  [5,] -0.8014820
+##  [6,] -0.9409379
+##  [7,] -0.6534868
+##  [8,] -0.7721050
+##  [9,] -0.8477745
+## [10,]  0.8147314
+## [11,]  0.8673671
+## [12,] -0.9728577
+## [13,] -0.7067203
+## [14,] -0.8269666
+## [15,] -0.9412379
+## [16,]  0.7967373
+## [17,]  0.6111231
+## [18,]  0.5349171
+## [19,] -0.7499578
+## [20,] -1.4170254
+## [21,] -0.7632285
+## [22,] -0.7109954
+## [23,]  0.4692259
+## [24,] -0.8548641
+## [25,] -1.4235404
+## [26,]  0.8776902
+## [27,] -0.8175490
+## [28,]  0.5550131
+## [29,] -1.3588960
+## [30,]  0.5064754</code></pre>
 <p>¿Cuáles de estas unidades tienen peso positivo y negativo en la capa final?</p>
 <pre class="sourceCode r"><code class="sourceCode r">pesos_capa_f &lt;-<span class="st"> </span><span class="kw">get_weights</span>(modelo_dropout)[[<span class="dv">3</span>]]
 <span class="kw">graf_pesos</span>(pesos[, pesos_capa_f <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
-<pre><code>## Warning: Removed 17 rows containing missing values (geom_tile).</code></pre>
+<pre><code>## Warning: Removed 20 rows containing missing values (geom_tile).</code></pre>
 <p><img src="08-redes-neuronales-2_files/figure-html/unnamed-chunk-47-1.png" width="480" /></p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graf_pesos</span>(pesos[, pesos_capa_f <span class="op">&lt;</span><span class="st"> </span><span class="dv">-0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
-<pre><code>## Warning: Removed 13 rows containing missing values (geom_tile).</code></pre>
+<pre><code>## Warning: Removed 10 rows containing missing values (geom_tile).</code></pre>
 <p><img src="08-redes-neuronales-2_files/figure-html/unnamed-chunk-47-2.png" width="480" /></p>
 <p>Veamos cómo se activan distintas unidades con diferentes entradas:</p>
 <pre class="sourceCode r"><code class="sourceCode r">indices &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">28</span>, <span class="dv">3</span>, <span class="dv">29</span>, <span class="dv">16</span>)
@@ -1240,37 +1262,37 @@ entrena_<span class="dv">3</span><span class="op">$</span>digito[indices]</code>
 dense_output &lt;-<span class="st"> </span><span class="kw">predict</span>(dense_layer, x_train_<span class="dv">3</span>[indices, , <span class="dt">drop=</span><span class="ot">FALSE</span>])
 dense_t &lt;-<span class="st"> </span><span class="kw">t</span>(dense_output)
 dense_t</code></pre>
-<pre><code>##            [,1]     [,2]      [,3]       [,4]     [,5]
-##  [1,] 0.0000000 0.000000 0.3955274 0.09459674 0.000000
-##  [2,] 0.0000000 0.000000 0.0000000 0.00000000 0.000000
-##  [3,] 0.0000000 2.518101 0.0000000 2.62992072 2.956688
-##  [4,] 0.0000000 0.000000 3.1450527 0.00000000 4.849462
-##  [5,] 0.8250421 0.000000 0.0000000 0.00000000 0.000000
-##  [6,] 1.1910992 0.000000 0.0000000 0.00000000 0.000000
-##  [7,] 0.0000000 0.000000 0.0000000 0.00000000 0.000000
-##  [8,] 4.3005452 0.000000 0.0000000 0.00000000 0.000000
-##  [9,] 0.0000000 0.000000 4.0688410 1.84244537 0.000000
-## [10,] 0.0000000 0.000000 0.0000000 2.68983293 0.000000
-## [11,] 0.0000000 0.000000 0.0000000 0.00000000 0.000000
-## [12,] 0.0000000 5.026496 0.0000000 0.00000000 6.418740
-## [13,] 0.0000000 0.000000 0.0000000 0.00000000 4.601549
-## [14,] 0.0000000 0.000000 0.0000000 0.00000000 0.000000
-## [15,] 0.0000000 0.000000 3.6028173 0.00000000 1.509519
-## [16,] 2.8562508 0.000000 0.0000000 0.00000000 0.000000
-## [17,] 0.0000000 5.044278 0.0000000 2.27078772 3.958999
-## [18,] 0.0000000 0.000000 0.0000000 0.00000000 0.000000
-## [19,] 0.0000000 0.000000 0.0000000 0.00000000 0.000000
-## [20,] 0.0000000 0.000000 0.0000000 0.00000000 4.204389
-## [21,] 0.0000000 4.667317 0.0000000 3.25500894 2.156383
-## [22,] 0.0000000 0.000000 3.6227140 2.11348367 0.000000
-## [23,] 0.0000000 0.000000 3.3632421 1.78435135 0.000000
-## [24,] 0.0000000 0.000000 0.0000000 0.00000000 4.076000
-## [25,] 0.9021806 0.000000 0.0000000 0.00000000 0.000000
-## [26,] 0.0000000 0.000000 4.4864879 0.00000000 0.000000
-## [27,] 0.0000000 0.000000 5.4809356 0.00000000 0.000000
-## [28,] 0.0000000 1.466995 0.0000000 2.97335100 6.309838
-## [29,] 0.0000000 0.000000 0.0000000 0.00000000 0.000000
-## [30,] 3.3296509 0.000000 0.0000000 0.00000000 0.000000</code></pre>
+<pre><code>##            [,1]      [,2]      [,3]     [,4]       [,5]
+##  [1,] 0.8583851 0.0000000 0.0000000 0.000000 0.00000000
+##  [2,] 0.0000000 0.0000000 3.9322865 1.914090 0.00000000
+##  [3,] 0.0000000 3.6627576 0.0000000 2.554982 6.13112116
+##  [4,] 0.0000000 0.0000000 0.0000000 0.000000 0.00000000
+##  [5,] 0.0000000 0.0000000 4.4276423 2.208213 0.00000000
+##  [6,] 0.0000000 0.0000000 0.0000000 2.271751 0.02533412
+##  [7,] 0.0000000 0.8815532 0.0000000 0.000000 6.90627337
+##  [8,] 0.0000000 0.0000000 0.0000000 0.000000 4.46495342
+##  [9,] 0.0000000 0.0000000 0.0000000 0.000000 5.45109892
+## [10,] 0.0000000 0.0000000 0.0000000 0.000000 0.00000000
+## [11,] 0.0000000 0.0000000 0.0000000 0.000000 0.00000000
+## [12,] 0.0000000 3.9176350 0.0000000 2.921348 3.92297864
+## [13,] 0.0000000 0.0000000 3.5913792 0.000000 0.00000000
+## [14,] 0.0000000 0.0000000 3.3009856 0.000000 3.39014173
+## [15,] 0.0000000 0.0000000 0.8177639 0.000000 0.00000000
+## [16,] 2.0986826 0.0000000 0.0000000 0.000000 0.00000000
+## [17,] 0.0000000 0.0000000 0.0000000 0.000000 0.00000000
+## [18,] 2.7859616 0.0000000 0.0000000 0.000000 0.00000000
+## [19,] 0.0000000 0.9347153 3.3336515 0.000000 0.21250674
+## [20,] 0.0000000 0.0000000 5.7562337 3.121527 0.00000000
+## [21,] 0.0000000 4.1856236 0.0000000 3.264224 2.44380116
+## [22,] 0.0000000 4.2991719 0.0000000 2.804502 0.00000000
+## [23,] 3.7843108 0.0000000 0.0000000 0.000000 0.00000000
+## [24,] 0.0000000 0.0000000 0.2142251 0.000000 5.25089741
+## [25,] 0.0000000 0.0000000 4.3676434 0.000000 0.00000000
+## [26,] 0.0000000 0.0000000 0.2047818 0.000000 0.00000000
+## [27,] 0.0000000 2.9936934 0.0000000 0.000000 4.86281061
+## [28,] 0.8430292 0.0000000 0.0000000 0.000000 0.00000000
+## [29,] 0.0000000 0.0000000 4.3602815 1.982881 0.00000000
+## [30,] 2.4099879 0.0000000 0.0000000 0.000000 0.00000000</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graf_pesos</span>(pesos[, dense_t[ ,<span class="dv">1</span>] <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
 <p><img src="08-redes-neuronales-2_files/figure-html/unnamed-chunk-49-1.png" width="480" /></p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">graf_pesos</span>(pesos[, dense_t[ ,<span class="dv">2</span>] <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>], <span class="dt">mostrar_facets =</span> <span class="ot">TRUE</span>)</code></pre>
@@ -1330,13 +1352,13 @@ history &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><s
 score &lt;-<span class="st"> </span>modelo_tc <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)
 score</code></pre>
 <pre><code>## $loss
-## [1] 14.5204
+## [1] 0.2259569
 ## 
 ## $acc
-## [1] 0.09965122
+## [1] 0.9491779
 ## 
 ## $categorical_crossentropy
-## [1] 14.51191</code></pre>
+## [1] 0.2218938</code></pre>
 </div>
 </div>
 <div id="ajuste-de-hiperparametros" class="section level2">

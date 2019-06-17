@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/felipegonzalez/aprendizaje-maquina-mcd.svg?branch=master)](https://travis-ci.org/felipegonzalez/aprendizaje-maquina-mcd)
 # aprendizaje-maquina-mcd
 
 

@@ -44,7 +44,7 @@ o la distancia euclideana para las variables estandarizadas.
 ### Ejemplo {-}
 
 Consideramos las ocurrencias de temblores cerca de Fiji 
-(The data set give the locations of 1000 seismic events of MB > 4.0. The events occurred in a cube near Fiji since 1964.)
+(The data set give the locations of $1000$ seismic events of MB $>$ $4.0$. The events occurred in a cube near Fiji since $1964$.)
 
 ```{r, fig.width=4.5, fig.asp=0.7}
 quakes_1 <- quakes[, c('lat','long')]
@@ -94,7 +94,7 @@ de datos muy chico.
 a este problema de minimización.
 
 
-## K-medias
+## $K$-medias
 
 
 Este es posiblemente el algoritmo (o familia de algoritmos)
@@ -172,7 +172,7 @@ encontrar centroide, etc.
 
 Esto sugiere el siguiente algoritmo:
 
-### Algoritmo de k-medias {-}
+### Algoritmo de $k$-medias {-}
 
 ```{block2, type='comentario'}
 **K-means**
@@ -303,7 +303,7 @@ los grupos que obtuvimos? ¿Qué defectos potenciales le ves a este agrupamiento
 
 ### Usando la funcion k-means {-}
 
-La función $k-means$ de R automáticamente produce varias corridas con
+La función $k$-means de R automáticamente produce varias corridas con
 distintos inicios aleatorios y selecciona la que produzca el mínimo 
 más bajo.
 
@@ -365,11 +365,11 @@ ggplot(datos_codo, aes(x = no_clusters, y = tot_within)) +
 Agregar un cluster adicional hace más complejo nuestro resumen, así
 que incrementamos el número de clusters sólo cuando tenemos una mejora
 considerable en la solución. En este caso particular, un buen lugar para
-cortar es el codo (en 3 clusters), pues añadir un cluster más no mejora
+cortar es el codo (en $3$ clusters), pues añadir un cluster más no mejora
 la solución considerablemente.
 
 A veces el punto de corte no es tan claro, aunque vemos que en nuestro
-ejemplo de terremotos la estructura más clara es la de 2 grupos:
+ejemplo de terremotos la estructura más clara es la de $2$ grupos:
 
 ```{r}
 set.seed(2800)
@@ -406,7 +406,7 @@ Más frecuentemente, la selección de número de grupos se hace tomando en
 cuenta el uso posterior que se va a hacer de los clusters. Por ejemplo:
 
 - En segmentación de clientes/usuarios, casi siempre queremos un grupo
-no muy grande de grupos (2-10, máximo decenas), pues puede ser difícil diseñar productos o estrategias particulares si tenemos muchos segmentos. Lo mismo sucede en 
+no muy grande de grupos ($2-10$, máximo decenas), pues puede ser difícil diseñar productos o estrategias particulares si tenemos muchos segmentos. Lo mismo sucede en 
 aplicaciones científicas, por ejemplo clasificar objetos como
 estrellas, galaxias, etc.
 
@@ -414,7 +414,7 @@ estrellas, galaxias, etc.
 ejemplo, para agrupar objetos (noticias, tweets, por ejemplo) en clusters
 muy compactos (de alta similitud), y así detectar duplicados o relaciones
 entre fuentes de noticias, usuarios de twitter, etc. Hay más opciones además
-de algoritmos clásicos como k-means para este tipo de problemas
+de algoritmos clásicos como $k$-means para este tipo de problemas
 
 La estrategia típica es entonces producir varias agrupaciones, y compararlas
 según sus virtudes para uso posterior.
@@ -424,25 +424,25 @@ según sus virtudes para uso posterior.
 Consideremos segmentar personas según sus actitudes hacia las responsabilidades
 que tiene o no el gobierno en cuanto al bienestar de las personas. 
 
-European Social Survey (ESS) data from the 2008 (fourth) round in the United Kingdom. The data are from a questionnaire on "what the responsibilities of governments should or should not be". 
+European Social Survey (ESS) data from the $2008$ (fourth) round in the United Kingdom. The data are from a questionnaire on "what the responsibilities of governments should or should not be". 
 gvjbevn
-Job for everyone, governments' responsibility (0-10).
+Job for everyone, governments' responsibility ($0-10$).
 gvhlthc
-Health care for the sick, governments' responsibility (0-10).
+Health care for the sick, governments' responsibility ($0-10$).
 gvslvol
-Standard of living for the old, governments' responsibility (0-10).
+Standard of living for the old, governments' responsibility ($0-10$).
 gvslvue
-Standard of living for the unemployed, governments' responsibility (0-10).
+Standard of living for the unemployed, governments' responsibility ($0-10$).
 gvcldcr
-Child care services for working parents, governments' responsibility (0-10).
+Child care services for working parents, governments' responsibility ($0-10$).
 gvpdlwk
-Paid leave from work to care for sick family, governments' responsibility (0-10).
+Paid leave from work to care for sick family, governments' responsibility ($0-10$).
 sbprvpv
-Social benefits/services prevent widespread poverty (1-5).
+Social benefits/services prevent widespread poverty ($1-5$).
 sbeqsoc
-Social benefits/services lead to a more equal society (1-5).
+Social benefits/services lead to a more equal society ($1-5$).
 sbcwkfm
-Social benefits/services make it easier to combine work and family (1-5).
+Social benefits/services make it easier to combine work and family ($1-5$).
 
 ```{r}
 load('datos/ess4_gb.Rdata')
@@ -453,9 +453,9 @@ nombre = c('trabajo_a_todos','cuidados_salud_enfermos','garantizar_nivel_mayores
 head(dat)
 ```
 
-En este caso particular tenemos unas variables que están en escala 1-5 y otras 1-10. Esta variabilidad
+En este caso particular tenemos unas variables que están en escala $1-5$ y otras $1-10$. Esta variabilidad
 distinta sólo es escala de las respuestas, así que normalizamos dividiendo cada pregunta por
-su máximo (dividir entre 10 las preguntas en escala de 1 a 10 y entre 5 las de 1 a 5.
+su máximo (dividir entre $10$ las preguntas en escala de $1$ a $10$ y entre $5$ las de $1$ a $5$.
  Podríamos también estandarizar):
 
 
@@ -533,7 +533,7 @@ sol_cl <- ajustes_k[[5]]
 table(sol_cl$cluster)
 ```
 
-Todos los grupos tienen tamaño razonable. No queremos tener grupos muy chicos, **pues entonces es difícil caracterizarlos o entenderlos**: si hay 15 personas en un grupo, cualquier resumen de este grupo estaría sujeto a variación muestral alta.
+Todos los grupos tienen tamaño razonable. No queremos tener grupos muy chicos, **pues entonces es difícil caracterizarlos o entenderlos**: si hay $15$ personas en un grupo, cualquier resumen de este grupo estaría sujeto a variación muestral alta.
 
 Consideramos las variables originales:
 
@@ -584,7 +584,7 @@ en el análisis de este tipo de datos.
 
 - La dificultad grande en el análisis de este tipo de datos es la heterogeneidad
 en el uso de la escala. Esto quiere decir que no todas las personas usan
-escalas 1-10 (o 1-5, o 1-100, o Totalmente de acuerdo-Totalmente en desacuerdo)
+escalas $1-10$ (o $1-5$, o $1-100$, o Totalmente de acuerdo-Totalmente en desacuerdo)
 de la misma manera. Hay algunos que usan todo el rango de la escala, otros que se
 concentran en la mitad, etc. y muchas veces eso no tienen que ver sólo con el verdadero
 nivel de acuerdo o desacuerdo de la persona, sino también con cómo usa el lenguaje
@@ -605,7 +605,7 @@ Vamos a empezar apuntando dificultades que se comunmente se encuentran:
 - La estructura de grupos naturales que buscamos no es necesariamente de 
 clusters compactos.
 - No existen grupos naturales
-- En dimensiones altas (digamos > 30) muchas veces todos los puntos
+- En dimensiones altas (digamos $>$ $30$) muchas veces todos los puntos
 están a distancias similares entre ellos, especialmente cuando hay variables 
 que aportan la separación entre grupos.
 - Dificultades en la selección de medida de distancia (o disimilitud).
@@ -614,12 +614,12 @@ que aportan la separación entre grupos.
 
 ### Estructuras no compactas
 
-En algunos casos se dice que k-medias no tiene supuestos, otros dicen que tienen supuestos
+En algunos casos se dice que $k$-medias no tiene supuestos, otros dicen que tienen supuestos
 de clusters esféricos, etc.
 
- k-medias es un algoritmo, no es un modelo. Así que en realidad no tiene supuestos en el sentido típico. 
+ $k$-medias es un algoritmo, no es un modelo. Así que en realidad no tiene supuestos en el sentido típico. 
 **Lo importante es entender la cantidad que estamos minimizando**. Si lo que realmente queremos
-hacer es minimizar esta cantidad, entonces k-medias nos devuelve una solución razonable.
+hacer es minimizar esta cantidad, entonces $k$-medias nos devuelve una solución razonable.
 
 Pero hay veces que no queremos minimizar esta cantidad. Un ejemplo clásico es el siguiente
 
@@ -632,13 +632,13 @@ df$grupo <- kmeans(df, centers=2, nstart=20)$cluster
 ggplot(df, aes(x=x, y=y, colour=factor(grupo))) + geom_point()
 ```
 
-¿Por qué falla k-medias? Porque la estructura de grupos que estábamos buscando
+¿Por qué falla $k$-medias? Porque la estructura de grupos que estábamos buscando
 **no** es una donde los clusters están definidos por distancia baja a su centro.
 Aquí realmente queremos otra cosa más complicada, como clusters definidos por
 cantidades invariantes (en este caso, distancia al origen)
 
 Sin embargo, si lo que nos interesa es distancia baja a un centroide, entonces
-está solución es razonable para k=2
+está solución es razonable para $k=2$
 
 
 ```{r, fig.width=4.5, fig.asp=0.7}
@@ -677,7 +677,7 @@ df$grupo <- kmeans(df, centers=5, nstart=20)$cluster
 ggplot(df, aes(x=x, y=y, colour=factor(grupo))) + geom_point()
 ```
 
-Nótese que k-means logró encontrar una buena solución, y esta solución puede
+Nótese que $k$-means logró encontrar una buena solución, y esta solución puede
 ser muy útil para nuestros fines (agrupa puntos "similares"). Sin embargo, en esta situación debemos reconocer que los tamaños, las posiciones,
 y el número de grupos es fundamentalmente arbitrario, y una "buena" solución depende de 
 nuestros fines.
@@ -740,7 +740,7 @@ ocurre en la segmentación por actitudes/ideología: no hay "buenos" y "malos" o
 ### Grupos en dimensión alta {-}
 
 
-En dimensión más alta (50 variables, 10 casos) observamos cosas como la siguiente:
+En dimensión más alta ($50$ variables, $10$ casos) observamos cosas como la siguiente:
 ```{r}
 set.seed(1266)
 mat_1 <- rbind(matrix(rnorm(10*50), ncol=50))

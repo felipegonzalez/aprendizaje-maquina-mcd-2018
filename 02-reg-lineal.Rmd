@@ -402,7 +402,7 @@ y  si $j=1,2,\ldots, p$ entonces
 
 $$\frac{\partial f_\beta(x^{(i)})}{\partial \beta_j} = x_j^{(i)}$$
 
-Entonces, si ponemos $  u^{(i)}=\frac{1}{2}(y^{(i)} - f_\beta(x^{(i)}))^2 $:
+Entonces, si ponemos $u^{(i)}=\frac{1}{2}(y^{(i)} - f_\beta(x^{(i)}))^2$:
 
 
 $$\frac{\partial u^{(i)}}{\partial \beta_0} = -(y^{(i)} - f_\beta(x^{(i)}))$$

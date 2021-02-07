@@ -94,9 +94,9 @@ Y consideramos las diferencias de los ajustados con los valores observados:
 
 $$e^{(i)} = y^{(i)} - f_\beta (x^{(i)})$$
 
-La idea entonces es minimizar la suma de los residuales al cuadrado, para
+La idea entonces es minimizar la suma de los residuales al cuadrado (RSS, residual sum of squares), para
 intentar que la función ajustada pase lo más cercana a los puntos de entrenamiento 
-que sea posible. Si
+que sea posible. Si 
 
 $$RSS(\beta) = \sum_{i=1}^N (y^{(i)} - f_\beta(x^{(i)}))^2$$
 Queremos resolver

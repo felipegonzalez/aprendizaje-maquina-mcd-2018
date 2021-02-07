@@ -147,7 +147,7 @@ $G(70\%) = 1$ (impago), pues $p_1(70\%) = 0.57$ y $p_2(70\%) = 0.43$.
 
 ¿Cómo estimamos ahora las probabilidades de clase a partir de una
 muestra de entrenamiento? Veremos por ahora
-dos métodos: k-vecinos más cercanos y regresión logística. 
+dos métodos: $k$-vecinos más cercanos y regresión logística. 
 
 
 
@@ -198,7 +198,7 @@ graf_1
 
 ### k-vecinos más cercanos 
 
-Podemos extender fácilmente k vecinos más cercanos para ver un ejemplo de cómo
+Podemos extender fácilmente $k$ vecinos más cercanos para ver un ejemplo de cómo
 estimar
 las probabilidades de clase $p_g(x)$. La idea general es igual que en regresión,
 y es simple: nos fijamos en las tasas locales de impago alrededor de la $x$ para

@@ -13,7 +13,7 @@ descomposición aditiva en matrices de rango uno, así que comenzaremos
 explicando estos conceptos.
 
 
-## Descomposición aditiva en matrices de rango 1
+## Descomposición aditiva en matrices de rango $1$
 
 
 Supongamos que tenemos una matriz de datos $X$ de tamaño $n\times p$ (todas
@@ -24,10 +24,10 @@ todas definidas en una misma escala:
 por ejemplo, cantidades de dinero, poblaciones, número de eventos, etc. Cuando no
 es así, entonces normalizamos las variables de alguna forma para no tener unidades.
 
-### Matrices de rango 1
+### Matrices de rango $1$
 
 Una de las estructuras de datos más simples que podemos imaginar (que sea interesante)
-para un tabla de este tipo es que se trata de una matriz de datos de rango 1.
+para un tabla de este tipo es que se trata de una matriz de datos de rango $1$.
 Es  generada por un *score* de individuos que determina mediante un *peso* el valor
 de una variable. Es decir, el individuo $i$ en la variable $j$ es
 
@@ -47,7 +47,7 @@ donde consideramos a $u$ y $v$ como matrices columna.
 ```{block2, type='comentario'}
 
 - Una matriz de rango uno (o en general de rango bajo) es más simple de analizar.
-En rango 1, tenemos que entender la variación de $n+p$ datos (componentes de $u$ y $v$),
+En rango $1$, tenemos que entender la variación de $n+p$ datos (componentes de $u$ y $v$),
 mientras que en una matriz general tenemos que entender $n\times p$ datos.
 
 - Cada variable $j$ de las observaciones es un reescalamiento del índice o score $u$
@@ -59,11 +59,11 @@ $v$ de las variables por el factor $\sigma u_i$.
 ```
 
 
-### Ejemplo: una matriz de rango 1 de preferencias {-}
+### Ejemplo: una matriz de rango $1$ de preferencias {-}
 
 Supongamos que las columnas de $X$ son películas ($p$), los renglones ($n$)
 personas, y la entrada $X_{ij}$ es la afinidad de la persona $i$ por la película $j$.
-Vamos a suponer que estos datos tienen una estructura ficticia de rango 1, basada
+Vamos a suponer que estos datos tienen una estructura ficticia de rango $1$, basada
 en las preferencias de las personas por películas de ciencia ficción.
 
 Construimos los pesos de las películas que refleja qué tanto son de 
@@ -166,10 +166,10 @@ la tabla completa, podemos simplemente considerar los dos vectores de índices (
 
 ---
 
-## Aproximación con matrices de rango 1.
+## Aproximación con matrices de rango $1$.
 
-En general, las matrices de datos reales no son de rango 1. Más bien nos interesa
-saber si se puede hacer una buena aproximación de rango 1.
+En general, las matrices de datos reales no son de rango $1$. Más bien nos interesa
+saber si se puede hacer una buena aproximación de rango $1$.
 
 
 ```{block2, type='comentario'}
@@ -182,7 +182,7 @@ obtendríamos información valiosa.
 
 
 Medimos la diferencia entre una matriz de datos general $X$ y una matriz
-de rango 1 $\sigma uv^t$ mediante la norma Frobenius:
+de rango $1$ $\sigma uv^t$ mediante la norma Frobenius:
 
 $$ ||X-\sigma uv^t||^2_F = \sum_{i,j} (X_{i,j} - \sigma u_iv_j)^2$$
 
@@ -215,7 +215,7 @@ estrategia general.
 
 Digamos que el vector $u$ denota los niveles generales de cada rubro (es un vector
 de longitud 5), y el vector $v$ denota los niveles generales de cada año
-(un vector de longitud 3). Queremos ver si es razonable aproximar
+(un vector de longitud $3$). Queremos ver si es razonable aproximar
 $$X\approx uv^t$$
 
 **Observación**: En este caso, la ecuación de arriba $X_{i,j} = u_iv_j$  expresa
@@ -279,8 +279,8 @@ data_frame(rubro = rownames(X_arr), nivel = u_rubros) %>% arrange(desc(nivel))
 data_frame(año = colnames(X_arr), nivel = v_años)
 ```
 
-- Pudimos explicar estos datos usando esos dos índices (5+3=7 números) en lugar
-de toda la tabla(5(3)=15 números).
+- Pudimos explicar estos datos usando esos dos índices ($5+3=7$ números) en lugar
+de toda la tabla($5\cdot 3$=15 números).
 
 - Una vez explicado esto, podemos concentrarnos en los patrones que hemos aislado
 en la matriz $R$. Podríamos repetir buscando una aproximación igual a la que acabomos 
@@ -289,10 +289,10 @@ de hacer para la matriz $X$, o podríamos hacer distintos tipos de análisis.
 ---
 
 
-### Suma de matrices de rango 1.
+### Suma de matrices de rango $1$.
 
 La matriz de datos $X$ muchas veces no puede aproximarse bien con una sola matriz
-de rango 1. Podríamos entonces buscar descomponer los datos en más de una dimensión
+de rango $1$. Podríamos entonces buscar descomponer los datos en más de una dimensión
 latente:
 
 $$X = \sigma_1 u_1v_1^t + \sigma_2 u_2v_2^t+\ldots+ \sigma_k u_kv_k^t$$
@@ -379,11 +379,11 @@ df_agg %>% spread(pelicula, afinidad)
 
 
 **Observación**: Piensa qué harías si vieras esta tabla directamente, e imagina
-cómo simplificaría la comprensión y análisis si conocieras las matrices de rango 1
+cómo simplificaría la comprensión y análisis si conocieras las matrices de rango $1$
 con las que se construyó este ejemplo.
 
 
-Consideremos la persona 2:
+Consideremos la persona $2$:
 
 ```{r}
 filter(personas, persona==2)
@@ -424,7 +424,7 @@ a los datos.
 ```{block2, type='comentario'}
 Nuestro problema generalmente es el inverso: si tenemos la matriz de datos $X$,
 ¿podemos encontrar un número bajo $k$ de dimensiones de forma que $X$ se escribe (o aproxima) como suma de
-matrices de $k$ matrices rango 1? Lograr esto sería muy bueno, pues otra vez
+matrices de $k$ matrices rango $1$? Lograr esto sería muy bueno, pues otra vez
 simplificamos el análisis a solo un número de dimensiones $k$ (muy) menor a $p$,
 el número de variables, sin perder mucha información (con buen grado de aproximación).
 
@@ -434,7 +434,7 @@ esqpecialmente en términos de aquellas dimensiones que aportan mucho a la aprox
 
 
 En general, buscamos encontrar una aproximación de la matriz $X$ mediante una
-suma de matrices de rango 1
+suma de matrices de rango $1$
 
 $$X \approx \sigma_1 u_1v_1^t + \sigma_2 v_2v_2^t+\ldots+ \sigma_k u_kv_k^t.$$
 
@@ -451,7 +451,7 @@ y es una medida de qué tan cerca están las dos matrices $A$ y $B$, componente
 a componente. 
 
 
-### Discusión: aproximación de rango 1.
+### Discusión: aproximación de rango $1$.
 
 Empecemos resolviendo el problema más simple, que es
 
@@ -560,7 +560,7 @@ Podemos evaluar la calidad de la aproximación usando
 la igualdad
 $$\||A||_F^2 = traza (AA^t)$$
 que es fácil de demostrar, pues la componente $(i,i)$ de $AA^t$  está dada por
-el producto punto del renglon $i$ de A por el renglón $i$ de $A$, que es $\sum_{i,j}a_{i,j}^2.$
+el producto punto del renglon $i$ de $A$ por el renglón $i$ de $A$, que es $\sum_{i,j}a_{i,j}^2.$
 
 Entonces tenemos que
 
@@ -570,7 +570,7 @@ que es igual a
 
 $$ \mathrm{Tr} (XX^t) - 2\sigma \mathrm{Tr} ( X(vu^t)) + \sigma^2\mathrm{Tr}(uv^tvu^t)$$ 
 
-Como $u$ y $v$ tienen norma 1, tenemos que $v^tv=1$, y 
+Como $u$ y $v$ tienen norma $1$, tenemos que $v^tv=1$, y 
 $\textrm{Tr(uu^t)} = \sum_i u_i^2 = 1$.
 Adicionalmente, usando el hecho de que $Xv=\sigma u$ obtenemos
 
@@ -586,7 +586,7 @@ que es una medida del "tamaño" de la matriz $X$.
 
 ### Discusión: aproximaciones de rango más alto
 
-Vamos a repetir el análisis para dimensión 2, repitiendo el proceso que hicimos arriba.
+Vamos a repetir el análisis para dimensión $2$, repitiendo el proceso que hicimos arriba.
 Denotamos como $u_1$ y $v_1$ los vectores $u$ y $v$ que encontramos en el paso anterior.
 Ahora buscamos minimizar
 
@@ -610,11 +610,11 @@ más grandes para los que hay solución de \@ref(eq:valor-propio-derecho) y \@re
 **Observaciones**:
 
 - Aunque aquí usamos un argumento incremental o *greedy* 
-(comenzando con la mejor aproximación de rango 1),
-es posible demostrar que la mejor aproximación de rango 2 se puede construir de este modo. Ver
+(comenzando con la mejor aproximación de rango $1$),
+es posible demostrar que la mejor aproximación de rango $2$ se puede construir de este modo. Ver
 por ejemplo [estas notas](https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf).
-- En el caso de dimensión 2, vemos que **la solución es incremental**: $\sigma_1, u_1, v_1$ son los
-mismos que para la solución de dimensión 1. En dimensión 2, tenemos que buscar el siguiente
+- En el caso de dimensión $2$, vemos que **la solución es incremental**: $\sigma_1, u_1, v_1$ son los
+mismos que para la solución de dimensión $1$. En dimensión $2$, tenemos que buscar el siguiente
 valor singular más grande después de $\sigma_1$, de forma que tenemos $\sigma_1^2 \geq \sigma_2^2$.
 La solución entonces es agregar $\sigma_2 u_2 v_2^t$, donde $(u_2,v_2)$ es el par de vectores
 propios izquierdo y derecho.
@@ -626,7 +626,7 @@ Ahora podemos enunciar nuestro teorema:
   
 Sea $X$ una matriz $n\times p$, y supongamos que $p\leq n$. Entonces, para cada $k \leq p$, 
   la mejor aproximación de rango $k$ a la  matriz $X$ se puede escribir como
-una suma $X_k$ de $k$ matrices de rango 1:
+una suma $X_k$ de $k$ matrices de rango $1$:
 $$X_k =  \sigma_1 u_1v_1^t + \sigma_2 u_2v_2^t + \ldots \sigma_k u_kv_k^t,$$
 donde 
 
@@ -636,8 +636,8 @@ $$||X-X_k||^2_F = ||X||^2_F -
 es sucesivamente mejor.
 - $\sigma_1^2 \geq \sigma_2^2 \geq \cdots  \geq \sigma_k^2\geq 0$
 - Los vectores $(u_i,v_i)$ son un par de vectores propios izquierdo y derechos para $X$ con valor singular $\sigma_i$.
-- $v_1,\ldots, v_k$ son vectores ortogonales de norma 1
-- $u_1,\ldots, u_k$ son vectores ortogonales de norma 1
+- $v_1,\ldots, v_k$ son vectores ortogonales de norma $1$
+- $u_1,\ldots, u_k$ son vectores ortogonales de norma $1$
 
 ```
 
@@ -647,7 +647,7 @@ es sucesivamente mejor.
 para encontrar las aproximación de rango bajo,
 sino que se usan algoritmos para encontrar vectores propios de $X^tX$ (que son las $v$'s),
 o más generalmente algoritmos basados en álgebra lineal 
-que intentan encontrar directamente los pares de vectores (u_i, v_i), y otros algoritmos
+que intentan encontrar directamente los pares de vectores $(u_i, v_i)$, y otros algoritmos
 numéricos (por ejemplo, basados en iteraciones).
 
 
@@ -691,16 +691,16 @@ u
 
 Podemos considerar ahora la segunda dimensión que encontramos. 
 
-- En los scores: $u_2$ tiene valores altos en el rubro 3 (salud), y valores negativos en rubro 1. Es un patrón
-de gasto más alto en todo menos en comida (que es el rubro 1), especialmente en salud.
+- En los scores: $u_2$ tiene valores altos en el rubro $3$ (salud), y valores negativos en rubro $1$. Es un patrón
+de gasto más alto en todo menos en comida (que es el rubro $1$), especialmente en salud.
 
-- Ahora vemos $v_2$:  tiene un valor alto en el año 60 (3a entrada), y valores más negativos para
-los dos primeros años (40 y 50)
+- Ahora vemos $v_2$:  tiene un valor alto en el año $60$ (3a entrada), y valores más negativos para
+los dos primeros años ($40$ y $50$)
 
-- Así que decimos que en los 60, el ingreso se desplazó hacia salud (y otros rubros en general),
+- Así que decimos que en los $60$, el ingreso se desplazó hacia salud (y otros rubros en general),
 reduciéndose el de comida.
 
- Si multiplicamos podemos ver la contribución de esta matriz de rango 1 (en billones (US) de dólares):
+ Si multiplicamos podemos ver la contribución de esta matriz de rango $1$ (en billones (US) de dólares):
 ```{r}
 d <- svd_gasto$d
 (d[2]*tcrossprod(svd_gasto$u[,2], svd_gasto$v[,2])) %>% round(1)
@@ -709,7 +709,7 @@ d <- svd_gasto$d
 Este es un efecto relativamente chico (comparado con el patrón estable de la primera
 dimensión), pero ilumina todavía un aspecto adicional de esta tabla.
 
-La norma de la diferencia entre la matriz $X$ y la aproximación de rango 2 podemos calcularla
+La norma de la diferencia entre la matriz $X$ y la aproximación de rango $2$ podemos calcularla
 de dos maneras:
 
 ```{r}

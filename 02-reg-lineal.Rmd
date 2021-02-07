@@ -682,12 +682,12 @@ round(summary(pr_modelo$lpsa), 2)
 
 Ahora podemos interpretar el predictor:
 
-- Cuando las variables lcavol y age están en sus media, la predicción de lpsa
-  es 2.5
-- Si lcavol sube 1 desviación estándar por encima de la media, el predictor de lpsa
-sube alrededor de 0.9 unidades (de un rango de alrededor de 6 unidades)
-- Si age sube 1 desviación estándar por encima de su media, el predictor de lpsa
-sube 0.02, lo cual es un movimiento muy chico considerando la variación de lpsa.
+- Cuando las variables $lcavol$ y $age$ están en sus media, la predicción de $lpsa$
+  es $2.5$
+- Si $lcavol$ sube $1$ desviación estándar por encima de la media, el predictor de $lpsa$
+sube alrededor de $0.9$ unidades (de un rango de alrededor de $6$ unidades)
+- Si age sube $1$ desviación estándar por encima de su media, el predictor de $lpsa$
+sube $0.02$, lo cual es un movimiento muy chico considerando la variación de $lpsa$.
 
 
 
@@ -703,7 +703,7 @@ cuidados se estudian en un curso de regresión desde el punto de vista
 estadístico, por ejemplo:
 
 - La interpretación coeficiente a coeficiente no toma en cuenta la estructura
-de asociación de las $x's$. Rara vez *cambios marginales* en una variable 
+de asociación de las $x$'s. Rara vez *cambios marginales* en una variable 
 de entrada ocurren
 de manera independiente de las otras variables de entrada.
 
@@ -711,8 +711,8 @@ de manera independiente de las otras variables de entrada.
 de los coeficientes para poder concluir acerca de su relación con el fenómeno 
 (tratable desde punto de vista estadístico, pero hay que checar supuestos). 
 Quizá el error de estimación del
-coeficiente de lcavol es 2 veces su magnitud - difícilmente podemos concluir 
-algo acerca la relación de lcavol.
+coeficiente de $lcavol$ es $2$ veces su magnitud - difícilmente podemos concluir 
+algo acerca la relación de $lcavol$.
 
 - Efectos no lineales: si la estructura del problema es altamente no lineal,
 los coeficientes de un modelo lineal no tienen una interpretación clara en relación 

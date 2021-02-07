@@ -898,11 +898,11 @@ el error de predicción. Como ejercicio, compara los modelos con
 $k = 2, 25, 200$ utilizando una muestra de prueba. ¿Cuál se desempeña mejor? 
 Da las razones de el mejor o peor desempeño: recuerda que el desempeño en predicción puede sufrir porque la función estimada no es suficiente flexible para capturar patrones importantes, pero también porque parte del ruido se incorpora en la predicción.
 
-Por los ejemplos anteriores, vemos que k-vecinos más cercanos puede considerarse como un aproximador universal, que puede adaptarse a cualquier patrón importante que haya en los datos. Entonces, ¿cuál es la razón de utilizar otros métodos como regresión? ¿Por qué el desempeño de regresión sería superior?
+Por los ejemplos anteriores, vemos que $k$-vecinos más cercanos puede considerarse como un aproximador universal, que puede adaptarse a cualquier patrón importante que haya en los datos. Entonces, ¿cuál es la razón de utilizar otros métodos como regresión? ¿Por qué el desempeño de regresión sería superior?
 
 
 #### La maldición de la dimensionalidad {-}
-El método de k-vecinos más cercanos funciona mejor cuando hay muchas $x$ cercanas a $x0$, de forma que el promedio sea estable (muchas $x$), y extrapolemos poco ($x$ cercanas).
+El método de $k$-vecinos más cercanos funciona mejor cuando hay muchas $x$ cercanas a $x0$, de forma que el promedio sea estable (muchas $x$), y extrapolemos poco ($x$ cercanas).
 Cuando $k$ es muy chica, nuestras estimaciones son ruidosas, y cuando $k$ es grande y los vecinos están lejos, entonces estamos sesgando la estimación local con datos lejanos a nuestra región de interés.
 
 El problema es que en dimensión alta, casi cualquier conjunto de
@@ -914,7 +914,7 @@ entrenamiento (independientemente del tamaño) sufre fuertemente por uno o ambas
  Consideremos que la salida Y es determinística $Y = e^{-8\sum_{j=1}^p x_j^2}$.
 Vamos a usar 1-vecino más cercano para hacer predicciones, c
 on una muestra de entrenamiento de 1000 casos.
-Generamos $x^{i}‘s uniformes en $[ 1,1]$, para $p = 2$, y calculamos la respuesta 
+Generamos $x^{i}$‘s uniformes en $[ 1,1]$, para $p = 2$, y calculamos la respuesta 
 $Y$ para cada caso:
 
 ```{r}

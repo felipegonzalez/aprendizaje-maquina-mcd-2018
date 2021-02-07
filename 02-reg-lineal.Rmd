@@ -207,7 +207,7 @@ Supongamos que una función $h(x)$ es convexa y tiene un mínimo. La idea
 de descenso en gradiente es comenzar con un candidato inicial $z_0$ y calcular
 la derivada en $z^{(0)}$. Si $h(z^{(0)})>0$, la función es creciente en $z^{(0)}$ y nos
 movemos ligeramente 
-a la izquierda para obtener un nuevo candidato $z^{(1)}$. si $h(z^{(0)})<0$, la
+a la izquierda para obtener un nuevo candidato $z^{(1)}$. Si $h(z^{(0)})<0$, la
 función es decreciente en $z^{(0)}$ y nos
 movemos ligeramente a la derecha  para obtener un nuevo candidato $z^{(1)}$. Iteramos este
 proceso hasta que la derivada es cercana a cero (estamos cerca del óptimo).

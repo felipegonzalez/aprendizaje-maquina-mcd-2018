@@ -109,7 +109,7 @@ $$\min_{\beta} RSS(\beta) = \min_{\beta}\sum_{i=1}^N (y^{(i)} - f_\beta(x^{(i)})
 
 **Observación**:
 Como discutimos al final de las sección anterior, minimizar directamente el error
- de entrenamiento para encontrar los coeficientes puede resultar en en un modelo
+ de entrenamiento para encontrar los coeficientes puede resultar en un modelo
  sobreajustado/con varianza alta/ruidoso. En la sección anterior discutimos
  tres grandes estrategias para mitigar este problema (restringir la familia
  de funciones, penalizar la función objetivo, perturbar la muestra de entrenamiento).

@@ -629,7 +629,7 @@ con los coeficientes del modelo no normalizado.
 Supongamos que el modelo en las variables originales  es
 $${f}_\beta (X) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p,$$
 Consideramos el modelo con variables estandarizadas
-$${g}_\beta (X) = \beta_0^s + \beta_1^s Z_1 + \beta_2^s Z_2 + \cdots + \beta_p^s Z_p,$$
+$${g}_\beta (Z) = \beta_0^s + \beta_1^s Z_1 + \beta_2^s Z_2 + \cdots + \beta_p^s Z_p,$$
 
 Sustituyendo $Z_j = (X_j - \mu_j)/s_j,$ 
 

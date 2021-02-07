@@ -961,7 +961,7 @@ para obtener resultados no tan malos (pruébalo).
 ¿Qué es lo que está pasando? La razón es que en dimensiones altas, 
 los puntos de la muestra de entrenamiento están muy lejos 
 unos de otros, y están cerca de la frontera, 
-incluso para tamaños de muestra relativamente grandes como n = 1000.
+incluso para tamaños de muestra relativamente grandes como $n = 1000$.
 Cuando la dimensión crece, la situación empeora exponencialmente.
 
 ```{block, type = 'comentario'}

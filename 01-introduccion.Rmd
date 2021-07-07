@@ -212,7 +212,6 @@ datos_muestra %>% select(name, peso_kg, rendimiento_kpl)
 Y podríamos comenzar graficando rendimiento contra
 peso. Cada
 punto representa un coche distinto. En esta
-gráfica vemos que los valores de rendimiento varían según según
 peso de una manera sistemática: cuanto más grande es el peso,
 más bajo es el rendimiento:
 

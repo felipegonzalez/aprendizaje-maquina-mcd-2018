@@ -391,7 +391,7 @@ tenemos, y qué tan buenas pueden ser nuestras predicciones.
 
 ## Predicciones
 
-La idea es entonces producir una estimación de f que nos permita hacer predicciones.
+La idea es entonces producir una estimación de $f$ que nos permita hacer predicciones.
 
 Si denotamos por $\hat{f}$ a una estimación de $f$ construida a partir de los datos,
 podemos hacer predicciones aplicando $\hat{f}$ a valores de $X$.

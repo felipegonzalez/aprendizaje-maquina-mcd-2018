@@ -734,14 +734,14 @@ en los datos), estos dos errores típicamente divergen.
 Ahora mostramos otro aspecto característico del aprendizaje supervisado. En primer
 lugar, el método general más usual para encontrar $\hat{f}$ es hacer lo siguiente:
 
-- Consideramos una familia de funciones $h$ candidatas para aproximar $f$
+- Consideramos una familia de funciones $h$ candidatas para aproximar $f$.
 - Calculamos el error de entrenamiento de cada posible $h$, y encontramos
 la $h$ que minimiza el error de entrenamiento (la que más se ajusta a los datos
 de entrenamiento). Tomamos $\hat{f} = h$.
 $$\hat{f} = \min_h \frac{1}{N}\sum_{i=1}^N (y^{(i)} - h(x^{(i)}))^2.$$
 - Evaluar el error de predicción del modelo que seleccionamos (queremos que sea bajo):
 
-$$\hat{Err} =   \frac{1}{m}\sum_{j=1}^m (y_0^{(j)} - \hat{f}(x_0^{(j)}))^2$$
+$$\hat{Err} =   \frac{1}{m}\sum_{j=1}^m (y_0^{(j)} - \hat{f}(x_0^{(j)}))^2.$$
 
 De modo que el proceso es un problema de minimización. Lo que hace
 interesante nuestro caso es que realmente **no queremos minimizar el error de entrenamiento**. Queremos **minimizar el error de prueba**. O sea que minimizamos una cantidad

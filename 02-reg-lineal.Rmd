@@ -17,8 +17,8 @@ $$f_\beta (X) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_p X_p,$$
 Nuestro trabajo será entonces, dada una muestra de entrenamiento ${\mathcal L}$,
 encontrar valores apropiados de las $\beta$'s, para construir un predictor:
 
-$$\hat{f}(X) = \hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2 \cdots + \hat{\beta} X_p$$
-y usaremos esta función $\hat{f}$ para hacer predicciones $\hat{Y} =\hat{f}(X)$.
+$$\hat{f}_\beta(X) = \hat{\beta}_0 + \hat{\beta}_1 X_1 + \hat{\beta}_2 X_2 \cdots + \hat{\beta} X_p$$
+y usaremos esta función $\hat{f}_\beta$ para hacer predicciones $\hat{Y} =\hat{f}_\beta(X)$.
 
 
 
